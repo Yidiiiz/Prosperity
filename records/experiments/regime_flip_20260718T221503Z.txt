@@ -1,0 +1,34 @@
+record: experiments/regime_flip_20260718T221503Z.txt
+utc: 2026-07-18T22:15:03+00:00
+git: a4d1dd1
+rng_seed: [42, 7, 2026]
+config: {"seeds": [42, 7, 2026], "trend_ticks": 3000, "mr_ticks": 5000}
+========================================================================
+
+--- results -----------------------------------------------------
+regime flip: 3000t trend_up -> 5000t mean_revert, seeds [42, 7, 2026]
+
+seed 42  [PASS]
+  after trend  (pop  40):  mom   72%  mr   12%  sit  15%
+  after m-rev  (pop  58):  mom    5%  mr   95%  sit   0%
+  mean_revert share shift +82 pts  (want >= +20: ok)
+  system wealth +32.7%  (want > 0: ok)
+  treasury      +21.6% vs initial  (want > 0: ok)
+
+seed 7  [PASS]
+  after trend  (pop  91):  mom  100%  mr    0%  sit   0%
+  after m-rev  (pop  83):  mom    6%  mr   94%  sit   0%
+  mean_revert share shift +94 pts  (want >= +20: ok)
+  system wealth +52.3%  (want > 0: ok)
+  treasury      +37.4% vs initial  (want > 0: ok)
+
+seed 2026  [PASS]
+  after trend  (pop  48):  mom   98%  mr    2%  sit   0%
+  after m-rev  (pop  96):  mom    3%  mr   97%  sit   0%
+  mean_revert share shift +95 pts  (want >= +20: ok)
+  system wealth +43.7%  (want > 0: ok)
+  treasury      +28.3% vs initial  (want > 0: ok)
+
+FLAGSHIP PASS
+
+=== RESULT: PASS

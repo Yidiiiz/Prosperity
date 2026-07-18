@@ -1,0 +1,96 @@
+record: tests/pytest_20260718T225030Z.txt
+utc: 2026-07-18T22:50:30+00:00
+git: 84ad4c5-dirty
+rng_seed: n/a
+config: n/a
+========================================================================
+============================= test session starts =============================
+platform win32 -- Python 3.14.3, pytest-9.1.1, pluggy-1.6.0 -- C:\Python314\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\yzhao\Documents\GitHub\Prosperity
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.14.1
+collecting ... collected 77 items
+
+tests/test_config.py::test_default_config_is_valid PASSED                [  1%]
+tests/test_config.py::test_missing_key_rejected PASSED                   [  2%]
+tests/test_config.py::test_float_cents_rejected PASSED                   [  3%]
+tests/test_config.py::test_death_floor_must_be_below_seed PASSED         [  5%]
+tests/test_config.py::test_reserve_floor_at_least_death_floor PASSED     [  6%]
+tests/test_config.py::test_lot_granularity_constraint PASSED             [  7%]
+tests/test_config.py::test_stagnation_must_exceed_max_lookback PASSED    [  9%]
+tests/test_config.py::test_rent_bps_capped PASSED                        [ 10%]
+tests/test_config.py::test_treasury_must_fund_gen0 PASSED                [ 11%]
+tests/test_config.py::test_repay_multiple_hard_cliff PASSED              [ 12%]
+tests/test_config.py::test_repay_multiple_above_validated_needs_flag PASSED [ 14%]
+tests/test_config.py::test_unknown_regime_kind_rejected PASSED           [ 15%]
+tests/test_conservation.py::test_conservation_over_2000_tick_run PASSED  [ 16%]
+tests/test_conservation.py::test_property_1000_random_valid_operations PASSED [ 18%]
+tests/test_determinism.py::test_identical_config_and_seed_identical_ledger PASSED [ 19%]
+tests/test_determinism.py::test_different_seed_different_ledger PASSED   [ 20%]
+tests/test_determinism.py::test_resume_matches_uninterrupted_run PASSED  [ 22%]
+tests/test_determinism.py::test_petri_deterministic_given_seed PASSED    [ 23%]
+tests/test_determinism.py::test_petri_price_floor PASSED                 [ 24%]
+tests/test_determinism.py::test_petri_regime_boundaries_and_looping PASSED [ 25%]
+tests/test_evolution.py::test_random_genome_in_bounds_and_repaired PASSED [ 27%]
+tests/test_evolution.py::test_mutation_clamps_to_bounds PASSED           [ 28%]
+tests/test_evolution.py::test_mutation_does_not_touch_parent PASSED      [ 29%]
+tests/test_evolution.py::test_crossover_same_archetype_picks_from_parents PASSED [ 31%]
+tests/test_evolution.py::test_crossover_different_archetypes_takes_fitter_body PASSED [ 32%]
+tests/test_evolution.py::test_archetype_hop_redraws_params PASSED        [ 33%]
+tests/test_evolution.py::test_gene_flip_toggles_pool_membership PASSED   [ 35%]
+tests/test_evolution.py::test_fitness_zero_before_min_age PASSED         [ 36%]
+tests/test_evolution.py::test_fitness_rewards_growth_penalizes_drawdown PASSED [ 37%]
+tests/test_evolution.py::test_fitness_none_first_snapshot_is_zero PASSED [ 38%]
+tests/test_evolution.py::test_adaptive_sigma_widens_on_stagnation_narrows_on_improvement PASSED [ 40%]
+tests/test_evolution.py::test_adaptive_sigma_clamped PASSED              [ 41%]
+tests/test_evolution.py::test_diversity_and_shares PASSED                [ 42%]
+tests/test_ledger.py::test_simple_transfer_moves_money PASSED            [ 44%]
+tests/test_ledger.py::test_agent_overdraw_rejected PASSED                [ 45%]
+tests/test_ledger.py::test_treasury_overdraw_rejected PASSED             [ 46%]
+tests/test_ledger.py::test_arena_may_go_negative PASSED                  [ 48%]
+tests/test_ledger.py::test_bad_amounts_rejected PASSED                   [ 49%]
+tests/test_ledger.py::test_unknown_accounts_rejected PASSED              [ 50%]
+tests/test_ledger.py::test_cache_matches_ledger_sums PASSED              [ 51%]
+tests/test_ledger.py::test_conservation_under_random_transfers PASSED    [ 53%]
+tests/test_lifecycle.py::test_sitters_die_of_stagnation_and_never_survive_past_grace PASSED [ 54%]
+tests/test_lifecycle.py::test_bankruptcy_is_full_liquidation_with_residue PASSED [ 55%]
+tests/test_lifecycle.py::test_rent_shortfall_forces_full_liquidation PASSED [ 57%]
+tests/test_lifecycle.py::test_old_age_death PASSED                       [ 58%]
+tests/test_lifecycle.py::test_breeding_produces_funded_children PASSED   [ 59%]
+tests/test_lifecycle.py::test_atomic_birth_rolls_back_on_injected_crash PASSED [ 61%]
+tests/test_lifecycle.py::test_quota_sweep_never_dips_below_baseline PASSED [ 62%]
+tests/test_lifecycle.py::test_agent_with_debt_never_enters_breeding_queue PASSED [ 63%]
+tests/test_lifecycle.py::test_only_house_funded_agents_carry_debt PASSED [ 64%]
+tests/test_lifecycle.py::test_immigration_holds_population_floor PASSED  [ 66%]
+tests/test_lifecycle.py::test_population_never_exceeds_cap_plus_elites PASSED [ 67%]
+tests/test_records.py::test_record_has_header_and_indexes PASSED         [ 68%]
+tests/test_records.py::test_record_refuses_overwrite PASSED              [ 70%]
+tests/test_records.py::test_record_rejects_unknown_kind PASSED           [ 71%]
+tests/test_server.py::test_dashboard_served_at_root PASSED               [ 72%]
+tests/test_server.py::test_summary_shape PASSED                          [ 74%]
+tests/test_server.py::test_timeseries_incremental PASSED                 [ 75%]
+tests/test_server.py::test_deaths_leaderboard_agent_runs PASSED          [ 76%]
+tests/test_server.py::test_records_listing_and_traversal_guard PASSED    [ 77%]
+tests/test_server.py::test_non_get_rejected PASSED                       [ 79%]
+tests/test_server.py::test_server_connection_is_readonly PASSED          [ 80%]
+tests/test_server.py::test_handler_exposes_no_write_routes PASSED        [ 81%]
+tests/test_strategies.py::test_zstats_needs_lookback_plus_one PASSED     [ 83%]
+tests/test_strategies.py::test_zstats_flat_window_is_zero PASSED         [ 84%]
+tests/test_strategies.py::test_sitter_never_trades PASSED                [ 85%]
+tests/test_strategies.py::test_momentum_buys_spike_with_sized_order PASSED [ 87%]
+tests/test_strategies.py::test_momentum_ignores_dip_when_flat PASSED     [ 88%]
+tests/test_strategies.py::test_momentum_exits_down_through_signed_exit_z PASSED [ 89%]
+tests/test_strategies.py::test_momentum_exits_on_hold_max PASSED         [ 90%]
+tests/test_strategies.py::test_mean_revert_buys_dip_and_exits_up PASSED  [ 92%]
+tests/test_strategies.py::test_fee_aware_blocks_thin_edges PASSED        [ 93%]
+tests/test_strategies.py::test_risk_caps_buy_at_max_action_fraction PASSED [ 94%]
+tests/test_strategies.py::test_risk_caps_buy_at_cash_including_fee PASSED [ 96%]
+tests/test_strategies.py::test_risk_rejects_unaffordable_buy PASSED      [ 97%]
+tests/test_strategies.py::test_risk_caps_sell_at_position PASSED         [ 98%]
+tests/test_strategies.py::test_risk_passes_none_through PASSED           [100%]
+
+============================= 77 passed in 12.05s =============================
+
+=== RESULT: pytest PASS

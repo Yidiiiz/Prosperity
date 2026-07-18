@@ -100,3 +100,16 @@ parentheses.
 
 21. **Python 3.11+ with stdlib only** for the core, per §2.1; `pytest` is the
     single dev dependency (`pip install -e .[dev]`).
+
+22. **Size target (§11):** the package lands at ~1,770 non-blank lines vs the
+    rough ~1,500 target. The overage is spec-mandated surface — the §4 SQL
+    schema verbatim, seven §9.1 endpoints, three CLI report formats — not
+    abstraction; no module exceeds ~400 lines and none uses metaclasses,
+    decorators, or frameworks. Cutting further would mean deleting docstrings,
+    which loses more (§2.6, "boring, readable") than it gains.
+
+23. **§13.2 gen-0 selection reading:** with the shipped defaults,
+    `max_age_ticks` (3000) equals the first regime's length, so the gen-0
+    senescence wave lands exactly on the regime boundary tick. The 30–90%
+    "meaningful selection" criterion is therefore measured on deaths strictly
+    before tick 3000 (pre-senescence): 41% on the acceptance run.

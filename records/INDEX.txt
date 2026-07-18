@@ -1,1 +1,4 @@
 20260718T221427Z | experiments | experiments/profit_matrix_20260718T221426Z.txt | PASS
+20260718T222314Z | experiments | experiments/regime_flip_20260718T221503Z.txt | PASS
+20260718T222417Z | runs | runs/run_1_20260718T222108Z.txt | completed @ tick 10000 | population 41 | treasury $231,405.17 | invariants OK
+20260718T225043Z | tests | tests/pytest_20260718T225030Z.txt | pytest PASS
