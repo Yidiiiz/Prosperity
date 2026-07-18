@@ -124,11 +124,14 @@ class Orchestrator:
     # ------------------------------------------------------------------ loop
 
     def run(self, n_ticks, checkpoint_cb=None):
-        """Run up to n_ticks (fewer if a finite arena runs out of data).
-        Returns the number of ticks actually executed."""
+        """Run up to n_ticks (fewer if a finite arena runs out of data, or a
+        live feed goes stale). Returns the number of ticks actually executed."""
         start = self.tick
         end = start + n_ticks
+        wait = getattr(self.arena, "wait_for_data", None)
         while self.tick < end and not self.arena.exhausted():
+            if wait is not None and not wait():
+                break  # live feed went stale; state is saved, rerun to resume
             self.step()
             if checkpoint_cb and self.tick % 2000 == 0:
                 checkpoint_cb(self.tick)

@@ -91,6 +91,29 @@ Small-stakes colonies (down to $10.00 total) are supported via
 different economics at that scale: the 1-cent integer floor makes the minimum
 fee ~100 bps on a $1 trade, and rent rounds to 0.
 
+## v3: live market data (paper)
+
+The colony can run against the **live tape** — real prices, right now, still
+virtual money, and no orders sent anywhere:
+
+```
+python tools/live_feed.py BTC-USD -o data/live_btc.csv --interval 5   # terminal 1
+python -m colony --db colony_live.db init --config config.live.json   # terminal 2
+python -m colony --db colony_live.db run --ticks 1000                 # paced by the feed
+python tools/verify_live_run.py --db colony_live.db                   # afterwards
+```
+
+The feed daemon appends quotes to an append-only journal CSV; the Live arena
+**tails the file** — one appended row is one tick, so the wall clock paces
+the colony but the core never touches the network. If the feed goes stale
+the run stops cleanly and resumes later.
+
+The journal is the session's permanent tape, which buys back determinism:
+`verify_live_run.py` replays the journal offline through the v2 replay arena
+(same config, same seed) and proves the two ledgers are byte-identical. A
+live run is exactly as auditable as a simulated one — the wall clock only
+decided *when* ticks happened, never what they did.
+
 ## Experiments
 
 ```
@@ -136,16 +159,18 @@ violation raises and halts the run. `colony verify` audits it on demand.
 
 ## Safety by construction
 
-- **Simulation only.** Virtual money; no exchange APIs, no payment rails,
-  no network calls in the core (the dashboard is a localhost read-only view;
-  `tools/fetch_market_data.py` downloads historical CSVs and is the only
-  network code in the repository).
+- **Simulation only.** Virtual money; no payment rails and no
+  order-placement code anywhere in the repository. The core makes no network
+  calls (the dashboard is a localhost read-only view); the only network code
+  is in `tools/` — `fetch_market_data.py` downloads historical CSVs and
+  `live_feed.py` appends live quotes to a journal the core merely reads.
 - **No self-modification.** Genomes change only between generations, via the
   orchestrator's genetic operators; agents cannot rewrite themselves or the
   rules.
 - **Airtight accounting.** Double-entry ledger, integer cents, conservation
   checked continuously, crash-on-violation.
-- v2 delivers the replay arena (real historical data, still offline and
-  deterministic). Remaining seams (an LLM cognition layer, live paper-trading
-  feeds, treasury withdrawal) stay documented interfaces only — none of that
-  code exists here.
+- v2 delivers the replay arena (real historical data, offline and
+  deterministic); v3 delivers the live arena (real-time prices, still paper,
+  reproducible from its journal). Remaining seams (an LLM cognition layer,
+  treasury withdrawal, order execution) stay documented interfaces only —
+  none of that code exists here.

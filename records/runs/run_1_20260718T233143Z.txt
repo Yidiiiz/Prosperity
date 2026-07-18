@@ -1,0 +1,33 @@
+record: runs/run_1_20260718T233143Z.txt
+utc: 2026-07-18T23:31:43+00:00
+git: 4716d76-dirty
+rng_seed: 42
+config: {"rng_seed": 42, "debug": false, "initial_treasury_cents": 2000000, "gen0_population": 20, "gen0_seed_cents": 100000, "max_population": 60, "population_floor": 8, "death_floor_cents": 10000, "rent_min_cents": 0, "rent_bps_of_equity": 0, "fee_bps": 20, "repro_multiple": 1.25, "repay_multiple": 0.15, "reserve_floor_cents": 15000, "breed_cooldown_ticks": 50, "solo_breed_patience": 10, "max_age_ticks": 3000, "stagnation_ticks": 400, "max_action_fraction": 0.8, "min_ticks_for_fitness": 75, "snapshot_every": 25, "hall_size": 100, "hall_immigrant_prob": 0.4, "mutation": {"sigma_fraction": 0.1, "gene_flip_prob": 0.05, "archetype_hop_prob": 0.01, "adaptive": {"window_generations": 5, "stagnant_multiplier": 1.5, "improving_multiplier": 0.8, "sigma_min": 0.02, "sigma_max": 0.3}}, "elitism_top_k": 3, "arena": {"kind": "live", "name": "btc_live", "csv": "data/live_btc.csv", "lot_denominator": 100000, "poll_timeout_seconds": 60}}
+resume_from_tick: 0 | ticks_requested: 100
+========================================================================
+
+--- final state -------------------------------------------------
+=== colony report @ tick 100
+
+TREASURY (north star)
+  balance          $0.00  (-100.0% vs initial $20,000.00)
+  inflows          rent $0.00 | death residues $0.00 | debt repaid $0.00
+  outflows         gen-0 seeds $20,000.00 | immigrant seeds $0.00
+
+COLONY
+  population       20
+  colony wealth    $20,000.00
+  system total     $20,000.00
+  extracted from market  $0.00
+  price / regime   $0.65 / live
+
+FLUX (all time)
+  births           0
+  deaths           0
+
+LIVING POPULATION
+  archetypes       momentum 35%  mean_revert 35%  sitter 30%
+  diversity        2.996 (Shannon entropy, nats)
+  outstanding debt $3,000.00
+
+=== RESULT: completed @ tick 100 | population 20 | treasury $0.00 | invariants OK

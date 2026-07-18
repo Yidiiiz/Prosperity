@@ -58,7 +58,7 @@ def cmd_run(args):
     if interrupted:
         status = "INTERRUPTED"
     elif executed < args.ticks:
-        status = f"completed (arena data exhausted after {executed} ticks)"
+        status = f"completed (arena out of data after {executed} ticks)"
     else:
         status = "completed"
     record.finish(
@@ -69,7 +69,8 @@ def cmd_run(args):
     if interrupted:
         print(f"\ninterrupted at tick {orch.tick}; state saved, run again to continue")
     elif executed < args.ticks:
-        print(f"\narena data exhausted after {executed} ticks; history fully replayed")
+        print(f"\narena out of data after {executed} ticks"
+              " (history fully replayed, or the live feed went stale)")
     return 0
 
 

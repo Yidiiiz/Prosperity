@@ -168,3 +168,31 @@ parentheses.
     wealth (measured on seed 42: agents held $30.9k of appreciated lots
     against $4.9k realized). After the audit the claim is exact and in
     cash: every deployed cent recovered, plus profit, at real prices.
+
+## v3 — live market data (paper)
+
+30. **Live mode is a journal tail, not a network client.** The feed daemon
+    (`tools/live_feed.py`, Yahoo quotes) appends `Date,Close` rows to an
+    append-only journal CSV; the Live arena only reads that file, blocking
+    (outside the tick transaction) until an unconsumed row appears. The
+    simulation core stays offline; the wall clock paces ticks but never
+    decides anything. A torn tail line (feed caught mid-write) is ignored
+    until its newline arrives. If no row arrives within
+    `poll_timeout_seconds` the run stops cleanly and can resume later —
+    stale is not exhausted.
+
+31. **Live runs are reproducible after the fact.** The journal doubles as
+    the session's permanent tape: replaying it through the v2 replay arena
+    with the same config and seed produces a byte-identical ledger.
+    `tools/verify_live_run.py` rebuilds the twin offline and compares
+    ledger hashes; `tests/test_live.py::test_live_run_equals_replay_twin`
+    pins the property in CI. Resume of a live run is guarded by a digest of
+    the CONSUMED PREFIX only (the journal legitimately grows), unlike
+    replay's whole-series digest.
+
+32. **Live mode is still paper.** Prices are real and current; money is
+    virtual. No orders are sent anywhere — there is no order-placement code
+    in the repository. The live demo config (`config.live.json`) sets rent
+    to zero because a per-tick rent calibrated for simulated ticks would be
+    absurd at seconds-per-tick pacing; senescence and death residues remain
+    the treasury's return path.

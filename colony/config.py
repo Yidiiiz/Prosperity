@@ -48,13 +48,16 @@ def validate(cfg):
                 raise ConfigError(f"unknown regime kind {regime.get('kind')!r}")
             if regime.get("ticks", 0) <= 0:
                 raise ConfigError("regime ticks must be positive")
-    elif kind == "replay":
+    elif kind in ("replay", "live"):
         for key in ("name", "csv"):
             if key not in arena:
                 raise ConfigError(f"missing arena key {key!r}")
         denom = arena.get("lot_denominator", 1)
         if not isinstance(denom, int) or denom < 1:
             raise ConfigError("arena.lot_denominator must be a positive integer")
+        timeout = arena.get("poll_timeout_seconds", 120)
+        if not isinstance(timeout, (int, float)) or timeout <= 0:
+            raise ConfigError("arena.poll_timeout_seconds must be positive")
     else:
         raise ConfigError(f"unknown arena kind {kind!r}")
 
