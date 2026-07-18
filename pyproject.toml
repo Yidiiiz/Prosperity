@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "darwin-wallet"
+version = "1.0.0"
+description = "An evolutionary colony of wallet-isolated trading agents in a simulated market arena"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.setuptools]
+packages = ["colony", "colony.arenas", "colony.web"]
+
+[tool.setuptools.package-data]
+"colony.web" = ["dashboard.html"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

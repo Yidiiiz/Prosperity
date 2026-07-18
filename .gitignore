@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+.venv/
+venv/
+
+# simulation databases (the ledger lives in git as plain-text records, not binaries)
+*.db
+*.db-wal
+*.db-shm
+
+tree.dot
