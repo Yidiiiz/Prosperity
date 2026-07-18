@@ -113,3 +113,58 @@ parentheses.
     senescence wave lands exactly on the regime boundary tick. The 30–90%
     "meaningful selection" criterion is therefore measured on deaths strictly
     before tick 3000 (pre-senescence): 41% on the acceptance run.
+
+## v2 — real market data
+
+24. **Replay arena (v2) is deterministic by construction.** It replays a
+    local CSV of real daily closes, one row per tick; `step` ignores the RNG
+    because the past is already written. `lot_denominator` scales the asset
+    so one lot is an affordable slice (`round(close × 100 / denominator)`,
+    floored at 1 cent). Resume is guarded by a digest of the price series:
+    resuming against a changed CSV refuses to run rather than silently
+    diverging. When the data ends the arena reports `exhausted()` and the
+    run loop stops cleanly (`run` returns ticks actually executed).
+
+25. **The network stays out of the core.** `tools/fetch_market_data.py`
+    (Yahoo Finance daily closes) is the only network code in the project;
+    the simulation replays the fetched file offline. The fetched SPY history
+    is committed under `data/` so results stay reproducible without a
+    network. Stooq was tried first but sits behind a JavaScript challenge;
+    Yahoo's `range=max` silently degrades to monthly bars, so the fetcher
+    pins `period1=0&period2=…&interval=1d`.
+
+26. **Lot-granularity check moves to init for replay arenas, with an
+    explicit waiver.** The §3.11 rule (`gen0_seed ≥ 200 × start price`)
+    needs the CSV's first price, which the pure config validator never sees;
+    `init_colony` re-checks it against the constructed arena. Setting
+    `'small_stakes': true` waives the rule (both arena kinds) — that is the
+    documented, deliberate way to run tiny-capital colonies, and the report
+    still prints the granularity warning.
+
+27. **Zero rent is a no-op, not a ledger row.** At small stakes
+    `equity × rent_bps // 10⁴` rounds to 0; the ledger correctly refuses
+    0-cent rows, so the orchestrator skips the transfer. Small-stakes
+    colonies therefore live nearly rent-free until equity reaches
+    `10⁴ / rent_bps` cents — reported as a caveat, not hidden.
+
+28. **The v2 acceptance experiment is a capitalization ladder run in order:
+    $200,000, then $100, then $10.00 total** (`experiments/real_market.py`,
+    33 years of real SPY daily closes, seeds {42, 7, 2026}). The pass bar
+    lowers as integer-cent friction rises: full and micro stakes must
+    survive AND end with an audited cash profit; the $10 rung must survive
+    with invariants intact, its economics reported per seed. Measured
+    results (2026-07-18): full +4.7/+4.5/+6.3%; micro +40.9/+28.5/+1853.3%;
+    tiny +26.5/−67.3/−4.1% — at $10 the 1-cent floor (min fee ≈ 100 bps on
+    a $1 trade, rent rounding to 0, 2–3 affordable lots late in the series)
+    makes profit seed-dependent. That finding is the point of the rung, not
+    a defect to hide.
+
+29. **Finite replays end with a terminal audit** (`Orchestrator.wind_down`):
+    when the data runs out, every living agent is liquidated at the last
+    real price and its whole estate returns to the treasury. Requiring
+    `treasury > initial` DURING a finite replay would penalize holding the
+    winning asset — by conservation, the treasury can only exceed initial
+    while realized extraction beats the colony's retained mark-to-market
+    wealth (measured on seed 42: agents held $30.9k of appreciated lots
+    against $4.9k realized). After the audit the claim is exact and in
+    cash: every deployed cent recovered, plus profit, at real prices.

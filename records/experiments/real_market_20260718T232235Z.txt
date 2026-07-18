@@ -1,0 +1,73 @@
+record: experiments/real_market_20260718T232235Z.txt
+utc: 2026-07-18T23:22:35+00:00
+git: bd60f01-dirty
+rng_seed: [42, 7, 2026]
+config: {"csv": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\spy_d.csv", "seeds": [42, 7, 2026], "rung": "all"}
+========================================================================
+
+--- results -----------------------------------------------------
+real market replay: SPY daily closes, capitalization ladder
+
+== rung 1: full stakes ($200,000, lot = 1/100 share) ==
+
+seed 42  [PASS]
+  8422 ticks (trading days) | pop 40 | births 130 deaths 190 | survived: ok
+  at data end: colony wealth $31,151.30 | lot price $7.43 | mom 57% mr 40% sit 2%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $209,439.38 cash vs $200,000.00 initial  (+4.7%: ok)
+
+seed 7  [PASS]
+  8422 ticks (trading days) | pop 40 | births 121 deaths 181 | survived: ok
+  at data end: colony wealth $29,364.96 | lot price $7.43 | mom 52% mr 48% sit 0%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $209,067.12 cash vs $200,000.00 initial  (+4.5%: ok)
+
+seed 2026  [PASS]
+  8422 ticks (trading days) | pop 40 | births 151 deaths 211 | survived: ok
+  at data end: colony wealth $31,729.96 | lot price $7.43 | mom 45% mr 50% sit 5%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $212,591.49 cash vs $200,000.00 initial  (+6.3%: ok)
+
+== rung 2: micro stakes ($100.00 TOTAL, lot = 1/1000 share) ==
+
+seed 42  [PASS]
+  8422 ticks (trading days) | pop 8 | births 33 deaths 35 | survived: ok
+  at data end: colony wealth $63.62 | lot price $0.74 | mom 50% mr 50% sit 0%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $140.89 cash vs $100.00 initial  (+40.9%: ok)
+
+seed 7  [PASS]
+  8422 ticks (trading days) | pop 12 | births 30 deaths 28 | survived: ok
+  at data end: colony wealth $29.72 | lot price $0.74 | mom 0% mr 100% sit 0%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $128.46 cash vs $100.00 initial  (+28.5%: ok)
+
+seed 2026  [PASS]
+  8422 ticks (trading days) | pop 41 | births 120 deaths 89 | survived: ok
+  at data end: colony wealth $293.53 | lot price $0.74 | mom 0% mr 100% sit 0%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $1,953.34 cash vs $100.00 initial  (+1853.3%: ok)
+
+== rung 3: tiny stakes ($10.00 TOTAL, lot = 1/1000 share) ==
+
+seed 42  [PASS]
+  8422 ticks (trading days) | pop 4 | births 20 deaths 20 | survived: ok
+  at data end: colony wealth $9.20 | lot price $0.74 | mom 100% mr 0% sit 0%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $12.65 cash vs $10.00 initial  (+26.5%: ok)
+
+seed 7  [PASS]
+  8422 ticks (trading days) | pop 1 | births 8 deaths 11 | survived: ok
+  at data end: colony wealth $1.59 | lot price $0.74 | mom 100% mr 0% sit 0%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $3.27 cash vs $10.00 initial  (-67.3%: reported only)
+
+seed 2026  [PASS]
+  8422 ticks (trading days) | pop 4 | births 17 deaths 17 | survived: ok
+  at data end: colony wealth $8.48 | lot price $0.74 | mom 0% mr 50% sit 50%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $9.59 cash vs $10.00 initial  (-4.1%: reported only)
+
+REAL MARKET PASS  (full stakes: pass, micro stakes: pass, tiny stakes: pass)
+
+=== RESULT: PASS

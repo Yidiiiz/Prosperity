@@ -45,8 +45,9 @@ def cmd_run(args):
         record.section(f"checkpoint @ tick {tick}", report.summary_text(con))
 
     interrupted = False
+    executed = 0
     try:
-        orch.run(args.ticks, checkpoint_cb=checkpoint)
+        executed = orch.run(args.ticks, checkpoint_cb=checkpoint)
     except KeyboardInterrupt:
         interrupted = True
     ledger.verify_invariants(con, orch.cfg["initial_treasury_cents"])
@@ -54,7 +55,12 @@ def cmd_run(args):
     record.section("final state", summary)
     metrics = report.latest_metrics(con)
     treasury = metrics["treasury_cents"] if metrics else 0
-    status = "INTERRUPTED" if interrupted else "completed"
+    if interrupted:
+        status = "INTERRUPTED"
+    elif executed < args.ticks:
+        status = f"completed (arena data exhausted after {executed} ticks)"
+    else:
+        status = "completed"
     record.finish(
         f"{status} @ tick {orch.tick} | population {len(orch.agents)}"
         f" | treasury {report.money(treasury)} | invariants OK"
@@ -62,6 +68,8 @@ def cmd_run(args):
     print(summary)
     if interrupted:
         print(f"\ninterrupted at tick {orch.tick}; state saved, run again to continue")
+    elif executed < args.ticks:
+        print(f"\narena data exhausted after {executed} ticks; history fully replayed")
     return 0
 
 

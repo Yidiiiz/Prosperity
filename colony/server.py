@@ -95,7 +95,7 @@ def api_leaderboard(con, query):
     limit = min(int(query.get("limit", ["20"])[0]), 100)
     cfg = _config(con)
     m = _latest_metrics(con)
-    price = m["price_cents"] if m else cfg["arena"]["start_price_cents"]
+    price = m["price_cents"] if m else cfg["arena"].get("start_price_cents", 0)
     tick = m["tick"] if m else 0
     min_age = max(cfg["min_ticks_for_fitness"], 3 * cfg["snapshot_every"])
     rows = con.execute(

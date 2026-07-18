@@ -1,0 +1,21 @@
+record: experiments/real_market_full_2026_20260718T231517Z.txt
+utc: 2026-07-18T23:15:17+00:00
+git: bd60f01-dirty
+rng_seed: [2026]
+config: {"csv": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\spy_d.csv", "seeds": [2026], "rung": "full"}
+========================================================================
+
+--- results -----------------------------------------------------
+real market replay: SPY daily closes, capitalization ladder
+
+== rung 1: full stakes ($200,000, lot = 1/100 share) ==
+
+seed 2026  [FAIL]
+  8422 ticks (trading days) | pop 40 | births 151 deaths 211
+  system wealth $212,599.43 vs $200,000.00 initial  (+6.3%: ok)
+  treasury $181,085.39 vs $200,000.00 initial  (FAIL)
+  colony wealth $31,514.04 | final lot price $7.43 | mom 45% mr 50% sit 5%
+
+REAL MARKET FAIL  (full stakes: FAIL)
+
+=== RESULT: FAIL

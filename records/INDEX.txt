@@ -2,3 +2,16 @@
 20260718T222314Z | experiments | experiments/regime_flip_20260718T221503Z.txt | PASS
 20260718T222417Z | runs | runs/run_1_20260718T222108Z.txt | completed @ tick 10000 | population 41 | treasury $231,405.17 | invariants OK
 20260718T225043Z | tests | tests/pytest_20260718T225030Z.txt | pytest PASS
+20260718T225614Z | runs | runs/run_1_20260718T225549Z.txt | completed @ tick 12000 | population 40 | treasury $245,430.33 | invariants OK
+20260718T230446Z | runs | runs/run_1_20260718T225941Z.txt | completed @ tick 32000 | population 40 | treasury $241,509.10 | invariants OK
+20260718T231526Z | experiments | experiments/real_market_small_42_7_2026_20260718T231519Z.txt | FAIL
+20260718T231632Z | experiments | experiments/real_market_full_42_20260718T231513Z.txt | FAIL
+20260718T231636Z | experiments | experiments/real_market_full_7_20260718T231515Z.txt | FAIL
+20260718T231636Z | experiments | experiments/real_market_full_2026_20260718T231517Z.txt | FAIL
+20260718T232109Z | experiments | experiments/real_market_micro_42_20260718T232104Z.txt | PASS
+20260718T232110Z | experiments | experiments/real_market_micro_7_20260718T232106Z.txt | PASS
+20260718T232116Z | experiments | experiments/real_market_tiny_42_7_2026_20260718T232110Z.txt | PASS
+20260718T232121Z | experiments | experiments/real_market_micro_2026_20260718T232108Z.txt | PASS
+20260718T232126Z | experiments | experiments/real_market_full_20260718T232122Z.txt | PASS
+20260718T232150Z | experiments | experiments/real_market_20260718T232145Z.txt | PASS
+20260718T232240Z | experiments | experiments/real_market_20260718T232235Z.txt | PASS

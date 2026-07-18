@@ -1,0 +1,295 @@
+record: runs/run_1_20260718T225941Z.txt
+utc: 2026-07-18T22:59:41+00:00
+git: bd60f01-dirty
+rng_seed: 42
+config: {"rng_seed": 42, "debug": false, "initial_treasury_cents": 20000000, "gen0_population": 100, "gen0_seed_cents": 100000, "max_population": 400, "population_floor": 40, "death_floor_cents": 10000, "rent_min_cents": 10, "rent_bps_of_equity": 2, "fee_bps": 20, "repro_multiple": 1.25, "repay_multiple": 0.15, "reserve_floor_cents": 15000, "breed_cooldown_ticks": 50, "solo_breed_patience": 10, "max_age_ticks": 3000, "stagnation_ticks": 400, "max_action_fraction": 0.8, "min_ticks_for_fitness": 75, "snapshot_every": 25, "hall_size": 100, "hall_immigrant_prob": 0.4, "mutation": {"sigma_fraction": 0.1, "gene_flip_prob": 0.05, "archetype_hop_prob": 0.01, "adaptive": {"window_generations": 5, "stagnant_multiplier": 1.5, "improving_multiplier": 0.8, "sigma_min": 0.02, "sigma_max": 0.3}}, "elitism_top_k": 3, "arena": {"name": "petri", "start_price_cents": 200, "price_floor_cents": 20, "regimes": [{"kind": "trend_up", "ticks": 3000, "drift_bps": 12, "vol_bps": 60}, {"kind": "mean_revert", "ticks": 3000, "kappa": 0.15, "vol_bps": 200}, {"kind": "crash", "ticks": 100, "drift_bps": -80, "vol_bps": 200}, {"kind": "mean_revert", "ticks": 2000, "kappa": 0.15, "vol_bps": 200}]}}
+resume_from_tick: 12000 | ticks_requested: 20000
+========================================================================
+
+--- checkpoint @ tick 14000 -------------------------------------
+=== colony report @ tick 14000
+
+TREASURY (north star)
+  balance          $249,447.78  (+24.7% vs initial $200,000.00)
+  all deployed capital recovered; profit banked and withdrawal-ready
+  inflows          rent $100,358.06 | death residues $223,317.93 | debt repaid $7,771.79
+  outflows         gen-0 seeds $100,000.00 | immigrant seeds $182,000.00
+
+COLONY
+  population       40
+  colony wealth    $27,626.84
+  system total     $277,074.62
+  extracted from market  $77,074.62
+  price / regime   $553.52 / mean_revert
+
+FLUX (all time)
+  births           277
+  deaths           337:  old_age 158, stagnation 136, bankrupt 43
+
+LIVING POPULATION
+  archetypes       momentum 62%  mean_revert 32%  sitter 5%
+  diversity        3.385 (Shannon entropy, nats)
+  outstanding debt $4,380.79
+  WARNING: price per lot is large vs median equity (lot granularity risk, spec 3.11)
+
+--- checkpoint @ tick 16000 -------------------------------------
+=== colony report @ tick 16000
+
+TREASURY (north star)
+  balance          $246,743.57  (+23.4% vs initial $200,000.00)
+  all deployed capital recovered; profit banked and withdrawal-ready
+  inflows          rent $110,221.71 | death residues $238,058.54 | debt repaid $8,463.32
+  outflows         gen-0 seeds $100,000.00 | immigrant seeds $210,000.00
+
+COLONY
+  population       40
+  colony wealth    $24,114.53
+  system total     $270,858.10
+  extracted from market  $67,159.50
+  price / regime   $184.93 / mean_revert
+
+FLUX (all time)
+  births           312
+  deaths           372:  old_age 182, stagnation 147, bankrupt 43
+
+LIVING POPULATION
+  archetypes       momentum 48%  mean_revert 50%  sitter 2%
+  diversity        3.433 (Shannon entropy, nats)
+  outstanding debt $3,989.26
+  WARNING: price per lot is large vs median equity (lot granularity risk, spec 3.11)
+
+--- checkpoint @ tick 18000 -------------------------------------
+=== colony report @ tick 18000
+
+TREASURY (north star)
+  balance          $248,094.55  (+24.0% vs initial $200,000.00)
+  all deployed capital recovered; profit banked and withdrawal-ready
+  inflows          rent $122,447.12 | death residues $267,152.74 | debt repaid $10,494.69
+  outflows         gen-0 seeds $100,000.00 | immigrant seeds $252,000.00
+
+COLONY
+  population       40
+  colony wealth    $32,051.29
+  system total     $280,145.84
+  extracted from market  $80,145.84
+  price / regime   $1,121.88 / trend_up
+
+FLUX (all time)
+  births           360
+  deaths           420:  old_age 202, stagnation 172, bankrupt 46
+
+LIVING POPULATION
+  archetypes       momentum 62%  mean_revert 35%  sitter 2%
+  diversity        3.329 (Shannon entropy, nats)
+  outstanding debt $2,676.81
+  WARNING: price per lot is large vs median equity (lot granularity risk, spec 3.11)
+
+--- checkpoint @ tick 20000 -------------------------------------
+=== colony report @ tick 20000
+
+TREASURY (north star)
+  balance          $242,309.42  (+21.2% vs initial $200,000.00)
+  all deployed capital recovered; profit banked and withdrawal-ready
+  inflows          rent $136,331.40 | death residues $386,483.33 | debt repaid $10,494.69
+  outflows         gen-0 seeds $100,000.00 | immigrant seeds $391,000.00
+
+COLONY
+  population       40
+  colony wealth    $37,836.42
+  system total     $280,145.84
+  extracted from market  $80,145.84
+  price / regime   $3,996.20 / mean_revert
+
+FLUX (all time)
+  births           499
+  deaths           559:  stagnation 287, old_age 224, bankrupt 48
+
+LIVING POPULATION
+  archetypes       momentum 70%  mean_revert 18%  sitter 12%
+  diversity        3.455 (Shannon entropy, nats)
+  outstanding debt $5,550.00
+  WARNING: price per lot is large vs median equity (lot granularity risk, spec 3.11)
+
+--- checkpoint @ tick 22000 -------------------------------------
+=== colony report @ tick 22000
+
+TREASURY (north star)
+  balance          $241,509.10  (+20.8% vs initial $200,000.00)
+  all deployed capital recovered; profit banked and withdrawal-ready
+  inflows          rent $151,209.86 | death residues $570,804.55 | debt repaid $10,494.69
+  outflows         gen-0 seeds $100,000.00 | immigrant seeds $591,000.00
+
+COLONY
+  population       40
+  colony wealth    $38,636.74
+  system total     $280,145.84
+  extracted from market  $80,145.84
+  price / regime   $4,330.91 / mean_revert
+
+FLUX (all time)
+  births           699
+  deaths           759:  stagnation 484, old_age 227, bankrupt 48
+
+LIVING POPULATION
+  archetypes       momentum 57%  mean_revert 22%  sitter 20%
+  diversity        3.503 (Shannon entropy, nats)
+  outstanding debt $6,000.00
+  WARNING: price per lot is large vs median equity (lot granularity risk, spec 3.11)
+
+--- checkpoint @ tick 24000 -------------------------------------
+=== colony report @ tick 24000
+
+TREASURY (north star)
+  balance          $241,509.10  (+20.8% vs initial $200,000.00)
+  all deployed capital recovered; profit banked and withdrawal-ready
+  inflows          rent $166,139.86 | death residues $755,874.55 | debt repaid $10,494.69
+  outflows         gen-0 seeds $100,000.00 | immigrant seeds $791,000.00
+
+COLONY
+  population       40
+  colony wealth    $38,636.74
+  system total     $280,145.84
+  extracted from market  $80,145.84
+  price / regime   $1,309.85 / mean_revert
+
+FLUX (all time)
+  births           899
+  deaths           959:  stagnation 684, old_age 227, bankrupt 48
+
+LIVING POPULATION
+  archetypes       momentum 50%  mean_revert 28%  sitter 22%
+  diversity        3.516 (Shannon entropy, nats)
+  outstanding debt $6,000.00
+  WARNING: price per lot is large vs median equity (lot granularity risk, spec 3.11)
+
+--- checkpoint @ tick 26000 -------------------------------------
+=== colony report @ tick 26000
+
+TREASURY (north star)
+  balance          $241,509.10  (+20.8% vs initial $200,000.00)
+  all deployed capital recovered; profit banked and withdrawal-ready
+  inflows          rent $181,069.86 | death residues $940,944.55 | debt repaid $10,494.69
+  outflows         gen-0 seeds $100,000.00 | immigrant seeds $991,000.00
+
+COLONY
+  population       40
+  colony wealth    $38,636.74
+  system total     $280,145.84
+  extracted from market  $80,145.84
+  price / regime   $11,476.57 / trend_up
+
+FLUX (all time)
+  births           1099
+  deaths           1159:  stagnation 884, old_age 227, bankrupt 48
+
+LIVING POPULATION
+  archetypes       momentum 42%  mean_revert 28%  sitter 30%
+  diversity        3.620 (Shannon entropy, nats)
+  outstanding debt $6,000.00
+  WARNING: price per lot is large vs median equity (lot granularity risk, spec 3.11)
+
+--- checkpoint @ tick 28000 -------------------------------------
+=== colony report @ tick 28000
+
+TREASURY (north star)
+  balance          $241,509.10  (+20.8% vs initial $200,000.00)
+  all deployed capital recovered; profit banked and withdrawal-ready
+  inflows          rent $195,999.86 | death residues $1,126,014.55 | debt repaid $10,494.69
+  outflows         gen-0 seeds $100,000.00 | immigrant seeds $1,191,000.00
+
+COLONY
+  population       40
+  colony wealth    $38,636.74
+  system total     $280,145.84
+  extracted from market  $80,145.84
+  price / regime   $56,286.55 / mean_revert
+
+FLUX (all time)
+  births           1299
+  deaths           1359:  stagnation 1084, old_age 227, bankrupt 48
+
+LIVING POPULATION
+  archetypes       momentum 55%  mean_revert 12%  sitter 32%
+  diversity        3.516 (Shannon entropy, nats)
+  outstanding debt $6,000.00
+  WARNING: price per lot is large vs median equity (lot granularity risk, spec 3.11)
+
+--- checkpoint @ tick 30000 -------------------------------------
+=== colony report @ tick 30000
+
+TREASURY (north star)
+  balance          $241,509.10  (+20.8% vs initial $200,000.00)
+  all deployed capital recovered; profit banked and withdrawal-ready
+  inflows          rent $210,929.86 | death residues $1,311,084.55 | debt repaid $10,494.69
+  outflows         gen-0 seeds $100,000.00 | immigrant seeds $1,391,000.00
+
+COLONY
+  population       40
+  colony wealth    $38,636.74
+  system total     $280,145.84
+  extracted from market  $80,145.84
+  price / regime   $58,754.66 / mean_revert
+
+FLUX (all time)
+  births           1499
+  deaths           1559:  stagnation 1284, old_age 227, bankrupt 48
+
+LIVING POPULATION
+  archetypes       momentum 52%  mean_revert 20%  sitter 28%
+  diversity        3.537 (Shannon entropy, nats)
+  outstanding debt $6,000.00
+  WARNING: price per lot is large vs median equity (lot granularity risk, spec 3.11)
+
+--- checkpoint @ tick 32000 -------------------------------------
+=== colony report @ tick 32000
+
+TREASURY (north star)
+  balance          $241,509.10  (+20.8% vs initial $200,000.00)
+  all deployed capital recovered; profit banked and withdrawal-ready
+  inflows          rent $225,859.86 | death residues $1,496,154.55 | debt repaid $10,494.69
+  outflows         gen-0 seeds $100,000.00 | immigrant seeds $1,591,000.00
+
+COLONY
+  population       40
+  colony wealth    $38,636.74
+  system total     $280,145.84
+  extracted from market  $80,145.84
+  price / regime   $29,305.94 / mean_revert
+
+FLUX (all time)
+  births           1699
+  deaths           1759:  stagnation 1484, old_age 227, bankrupt 48
+
+LIVING POPULATION
+  archetypes       momentum 45%  mean_revert 30%  sitter 25%
+  diversity        3.585 (Shannon entropy, nats)
+  outstanding debt $6,000.00
+  WARNING: price per lot is large vs median equity (lot granularity risk, spec 3.11)
+
+--- final state -------------------------------------------------
+=== colony report @ tick 32000
+
+TREASURY (north star)
+  balance          $241,509.10  (+20.8% vs initial $200,000.00)
+  all deployed capital recovered; profit banked and withdrawal-ready
+  inflows          rent $225,859.86 | death residues $1,496,154.55 | debt repaid $10,494.69
+  outflows         gen-0 seeds $100,000.00 | immigrant seeds $1,591,000.00
+
+COLONY
+  population       40
+  colony wealth    $38,636.74
+  system total     $280,145.84
+  extracted from market  $80,145.84
+  price / regime   $29,305.94 / mean_revert
+
+FLUX (all time)
+  births           1699
+  deaths           1759:  stagnation 1484, old_age 227, bankrupt 48
+
+LIVING POPULATION
+  archetypes       momentum 45%  mean_revert 30%  sitter 25%
+  diversity        3.585 (Shannon entropy, nats)
+  outstanding debt $6,000.00
+  WARNING: price per lot is large vs median equity (lot granularity risk, spec 3.11)
+
+=== RESULT: completed @ tick 32000 | population 40 | treasury $241,509.10 | invariants OK

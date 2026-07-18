@@ -1,0 +1,61 @@
+record: runs/run_1_20260718T225549Z.txt
+utc: 2026-07-18T22:55:49+00:00
+git: bd60f01
+rng_seed: 42
+config: {"rng_seed": 42, "debug": false, "initial_treasury_cents": 20000000, "gen0_population": 100, "gen0_seed_cents": 100000, "max_population": 400, "population_floor": 40, "death_floor_cents": 10000, "rent_min_cents": 10, "rent_bps_of_equity": 2, "fee_bps": 20, "repro_multiple": 1.25, "repay_multiple": 0.15, "reserve_floor_cents": 15000, "breed_cooldown_ticks": 50, "solo_breed_patience": 10, "max_age_ticks": 3000, "stagnation_ticks": 400, "max_action_fraction": 0.8, "min_ticks_for_fitness": 75, "snapshot_every": 25, "hall_size": 100, "hall_immigrant_prob": 0.4, "mutation": {"sigma_fraction": 0.1, "gene_flip_prob": 0.05, "archetype_hop_prob": 0.01, "adaptive": {"window_generations": 5, "stagnant_multiplier": 1.5, "improving_multiplier": 0.8, "sigma_min": 0.02, "sigma_max": 0.3}}, "elitism_top_k": 3, "arena": {"name": "petri", "start_price_cents": 200, "price_floor_cents": 20, "regimes": [{"kind": "trend_up", "ticks": 3000, "drift_bps": 12, "vol_bps": 60}, {"kind": "mean_revert", "ticks": 3000, "kappa": 0.15, "vol_bps": 200}, {"kind": "crash", "ticks": 100, "drift_bps": -80, "vol_bps": 200}, {"kind": "mean_revert", "ticks": 2000, "kappa": 0.15, "vol_bps": 200}]}}
+resume_from_tick: 10000 | ticks_requested: 2000
+========================================================================
+
+--- checkpoint @ tick 12000 -------------------------------------
+=== colony report @ tick 12000
+
+TREASURY (north star)
+  balance          $245,430.33  (+22.7% vs initial $200,000.00)
+  all deployed capital recovered; profit banked and withdrawal-ready
+  inflows          rent $88,709.18 | death residues $167,668.57 | debt repaid $7,052.58
+  outflows         gen-0 seeds $100,000.00 | immigrant seeds $118,000.00
+
+COLONY
+  population       40
+  colony wealth    $31,381.08
+  system total     $276,811.41
+  extracted from market  $75,165.61
+  price / regime   $548.60 / mean_revert
+
+FLUX (all time)
+  births           201
+  deaths           261:  old_age 136, stagnation 83, bankrupt 42
+
+LIVING POPULATION
+  archetypes       momentum 68%  mean_revert 28%  sitter 5%
+  diversity        3.468 (Shannon entropy, nats)
+  outstanding debt $3,417.67
+  WARNING: price per lot is large vs median equity (lot granularity risk, spec 3.11)
+
+--- final state -------------------------------------------------
+=== colony report @ tick 12000
+
+TREASURY (north star)
+  balance          $245,430.33  (+22.7% vs initial $200,000.00)
+  all deployed capital recovered; profit banked and withdrawal-ready
+  inflows          rent $88,709.18 | death residues $167,668.57 | debt repaid $7,052.58
+  outflows         gen-0 seeds $100,000.00 | immigrant seeds $118,000.00
+
+COLONY
+  population       40
+  colony wealth    $31,381.08
+  system total     $276,811.41
+  extracted from market  $75,165.61
+  price / regime   $548.60 / mean_revert
+
+FLUX (all time)
+  births           201
+  deaths           261:  old_age 136, stagnation 83, bankrupt 42
+
+LIVING POPULATION
+  archetypes       momentum 68%  mean_revert 28%  sitter 5%
+  diversity        3.468 (Shannon entropy, nats)
+  outstanding debt $3,417.67
+  WARNING: price per lot is large vs median equity (lot granularity risk, spec 3.11)
+
+=== RESULT: completed @ tick 12000 | population 40 | treasury $245,430.33 | invariants OK

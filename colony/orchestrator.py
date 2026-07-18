@@ -7,7 +7,8 @@ import random
 import statistics
 
 from . import agents, db, evolution, ledger, risk, strategies
-from .arenas.petri import Petri
+from .arenas import make_arena
+from .config import ConfigError
 
 TREASURY = "TREASURY"
 EPSILON = 1e-6  # matchmaker weight floor so zero-fitness agents can still pair
@@ -28,7 +29,15 @@ def init_colony(con, cfg):
     if con.execute("SELECT COUNT(*) FROM runs").fetchone()[0]:
         raise RuntimeError("database already initialized; init refuses to run twice")
     rng = random.Random(cfg["rng_seed"])
-    arena = Petri(cfg["arena"])
+    arena = make_arena(cfg["arena"])
+    # Lot granularity (spec 3.11): replay start prices come from the CSV, so
+    # this check can only happen here. small_stakes acknowledges the risk.
+    if cfg["gen0_seed_cents"] < 200 * arena.price() and not cfg.get("small_stakes"):
+        raise ConfigError(
+            f"gen0_seed_cents must be at least 200 x the starting lot price"
+            f" ({arena.price()} cents); set 'small_stakes': true to accept the"
+            " lot-granularity risk"
+        )
     with db.tx(con):
         ledger.create_account(con, TREASURY, "TREASURY")
         con.execute(
@@ -77,7 +86,7 @@ class Orchestrator:
         self.rng.setstate(_decode_rng(state["rng"]))
         self.sigma = state["sigma"]
         self.max_gen_seen = state["max_gen_seen"]
-        self.arena = Petri(self.cfg["arena"])
+        self.arena = make_arena(self.cfg["arena"])
         self.arena.set_state(state["arena"])
         self.arena_account = f"ARENA:{self.arena.name}"
         self.agents = agents.load_living(con)
@@ -115,12 +124,16 @@ class Orchestrator:
     # ------------------------------------------------------------------ loop
 
     def run(self, n_ticks, checkpoint_cb=None):
-        end = self.tick + n_ticks
-        while self.tick < end:
+        """Run up to n_ticks (fewer if a finite arena runs out of data).
+        Returns the number of ticks actually executed."""
+        start = self.tick
+        end = start + n_ticks
+        while self.tick < end and not self.arena.exhausted():
             self.step()
             if checkpoint_cb and self.tick % 2000 == 0:
                 checkpoint_cb(self.tick)
         ledger.verify_invariants(self.con, self.cfg["initial_treasury_cents"])
+        return self.tick - start
 
     def step(self):
         cfg = self.cfg
@@ -138,6 +151,17 @@ class Orchestrator:
         self.tick = t
         if cfg["debug"] or t % 100 == 0:
             ledger.verify_invariants(self.con, cfg["initial_treasury_cents"])
+
+    def wind_down(self, cause="horizon"):
+        """Terminal audit for finite arenas: liquidate every living agent at
+        the current price and return all estates to the treasury. After this,
+        colony wealth is 0 and the treasury holds the system's entire cash."""
+        price = self.arena.price()
+        with db.tx(self.con):
+            for aid in sorted(list(self.agents)):
+                self._die(self.tick, self.agents[aid], cause, price)
+            self._flush(self.tick)
+        ledger.verify_invariants(self.con, self.cfg["initial_treasury_cents"])
 
     # ---------------------------------------------------------------- phases
 
@@ -170,8 +194,9 @@ class Orchestrator:
             if c < rent:
                 self._die(t, agent, "liquidity_death", price)
                 continue
-            ledger.transfer(self.con, t, agents.account_id(aid), TREASURY, rent, "rent")
-            c -= rent
+            if rent > 0:  # can round to 0 at small stakes; a 0-cent row is no row
+                ledger.transfer(self.con, t, agents.account_id(aid), TREASURY, rent, "rent")
+                c -= rent
             equity = c + agent.lots * price
             decision = strategies.decide(
                 agent.genome, history, agent.lots, agent.hold, equity, cfg["fee_bps"]

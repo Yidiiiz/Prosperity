@@ -1,0 +1,33 @@
+record: experiments/real_market_full_20260718T232122Z.txt
+utc: 2026-07-18T23:21:22+00:00
+git: bd60f01-dirty
+rng_seed: [42, 7, 2026]
+config: {"csv": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\spy_d.csv", "seeds": [42, 7, 2026], "rung": "full"}
+========================================================================
+
+--- results -----------------------------------------------------
+real market replay: SPY daily closes, capitalization ladder
+
+== rung 1: full stakes ($200,000, lot = 1/100 share) ==
+
+seed 42  [PASS]
+  8422 ticks (trading days) | pop 40 | births 130 deaths 190 | survived: ok
+  at data end: colony wealth $30,912.40 | lot price $7.43 | mom 57% mr 40% sit 2%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $209,439.38 cash vs $200,000.00 initial  (+4.7%: ok)
+
+seed 7  [PASS]
+  8422 ticks (trading days) | pop 40 | births 121 deaths 181 | survived: ok
+  at data end: colony wealth $29,152.08 | lot price $7.43 | mom 52% mr 48% sit 0%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $209,067.12 cash vs $200,000.00 initial  (+4.5%: ok)
+
+seed 2026  [PASS]
+  8422 ticks (trading days) | pop 40 | births 151 deaths 211 | survived: ok
+  at data end: colony wealth $31,514.04 | lot price $7.43 | mom 45% mr 50% sit 5%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $212,591.49 cash vs $200,000.00 initial  (+6.3%: ok)
+
+REAL MARKET PASS  (full stakes: pass)
+
+=== RESULT: PASS

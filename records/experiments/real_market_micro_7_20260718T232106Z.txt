@@ -1,0 +1,21 @@
+record: experiments/real_market_micro_7_20260718T232106Z.txt
+utc: 2026-07-18T23:21:06+00:00
+git: bd60f01-dirty
+rng_seed: [7]
+config: {"csv": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\spy_d.csv", "seeds": [7], "rung": "micro"}
+========================================================================
+
+--- results -----------------------------------------------------
+real market replay: SPY daily closes, capitalization ladder
+
+== rung 2: micro stakes ($100.00 TOTAL, lot = 1/1000 share) ==
+
+seed 7  [PASS]
+  8422 ticks (trading days) | pop 12 | births 30 deaths 28 | survived: ok
+  at data end: colony wealth $29.61 | lot price $0.74 | mom 0% mr 100% sit 0%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $128.46 cash vs $100.00 initial  (+28.5%: ok)
+
+REAL MARKET PASS  (micro stakes: pass)
+
+=== RESULT: PASS

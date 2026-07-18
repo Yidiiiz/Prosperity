@@ -36,24 +36,38 @@ def validate(cfg):
             raise ConfigError(f"{key} must be an integer number of cents, got {value!r}")
 
     arena = cfg["arena"]
-    for key in ("name", "start_price_cents", "price_floor_cents", "regimes"):
-        if key not in arena:
-            raise ConfigError(f"missing arena key {key!r}")
-    if not arena["regimes"]:
-        raise ConfigError("arena.regimes must not be empty")
-    for regime in arena["regimes"]:
-        if regime.get("kind") not in REGIME_KINDS:
-            raise ConfigError(f"unknown regime kind {regime.get('kind')!r}")
-        if regime.get("ticks", 0) <= 0:
-            raise ConfigError("regime ticks must be positive")
+    kind = arena.get("kind", "petri")
+    if kind == "petri":
+        for key in ("name", "start_price_cents", "price_floor_cents", "regimes"):
+            if key not in arena:
+                raise ConfigError(f"missing arena key {key!r}")
+        if not arena["regimes"]:
+            raise ConfigError("arena.regimes must not be empty")
+        for regime in arena["regimes"]:
+            if regime.get("kind") not in REGIME_KINDS:
+                raise ConfigError(f"unknown regime kind {regime.get('kind')!r}")
+            if regime.get("ticks", 0) <= 0:
+                raise ConfigError("regime ticks must be positive")
+    elif kind == "replay":
+        for key in ("name", "csv"):
+            if key not in arena:
+                raise ConfigError(f"missing arena key {key!r}")
+        denom = arena.get("lot_denominator", 1)
+        if not isinstance(denom, int) or denom < 1:
+            raise ConfigError("arena.lot_denominator must be a positive integer")
+    else:
+        raise ConfigError(f"unknown arena kind {kind!r}")
 
     if not cfg["death_floor_cents"] < cfg["gen0_seed_cents"]:
         raise ConfigError("death_floor_cents must be below gen0_seed_cents")
     if not cfg["reserve_floor_cents"] >= cfg["death_floor_cents"]:
         raise ConfigError("reserve_floor_cents must be at least death_floor_cents")
-    # Lot granularity can silently kill the colony (spec 3.11).
-    if cfg["gen0_seed_cents"] < 200 * arena["start_price_cents"]:
-        raise ConfigError("gen0_seed_cents must be at least 200 x arena.start_price_cents")
+    # Lot granularity can silently kill the colony (spec 3.11). Replay start
+    # prices come from the CSV, so init_colony re-checks against real data.
+    if (kind == "petri" and not cfg.get("small_stakes")
+            and cfg["gen0_seed_cents"] < 200 * arena["start_price_cents"]):
+        raise ConfigError("gen0_seed_cents must be at least 200 x arena.start_price_cents"
+                          " (or set 'small_stakes': true to accept the risk)")
     max_lookback = PARAM_BOUNDS["lookback"][1]
     if not cfg["stagnation_ticks"] > max_lookback:
         raise ConfigError(f"stagnation_ticks must exceed the max lookback bound ({max_lookback})")

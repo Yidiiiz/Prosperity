@@ -44,6 +44,9 @@ class Petri:
     def regime_kind(self):
         return self.regimes[self._regime_idx]["kind"]
 
+    def exhausted(self):
+        return False  # the regime list loops forever
+
     def get_state(self):
         return {
             "price": self._price,

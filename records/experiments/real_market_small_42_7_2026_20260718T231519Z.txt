@@ -1,0 +1,33 @@
+record: experiments/real_market_small_42_7_2026_20260718T231519Z.txt
+utc: 2026-07-18T23:15:19+00:00
+git: bd60f01-dirty
+rng_seed: [42, 7, 2026]
+config: {"csv": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\spy_d.csv", "seeds": [42, 7, 2026], "rung": "small"}
+========================================================================
+
+--- results -----------------------------------------------------
+real market replay: SPY daily closes, capitalization ladder
+
+== rung 2: small stakes ($10.00 TOTAL, lot = 1/1000 share) ==
+
+seed 42  [PASS]
+  8422 ticks (trading days) | pop 4 | births 20 deaths 20
+  system wealth $12.66 vs $10.00 initial  (+26.6%: ok)
+  treasury $3.50 vs $10.00 initial  (not required)
+  colony wealth $9.16 | final lot price $0.74 | mom 100% mr 0% sit 0%
+
+seed 7  [FAIL]
+  8422 ticks (trading days) | pop 1 | births 8 deaths 11
+  system wealth $3.27 vs $10.00 initial  (-67.3%: FAIL)
+  treasury $1.68 vs $10.00 initial  (not required)
+  colony wealth $1.59 | final lot price $0.74 | mom 100% mr 0% sit 0%
+
+seed 2026  [FAIL]
+  8422 ticks (trading days) | pop 4 | births 17 deaths 17
+  system wealth $9.59 vs $10.00 initial  (-4.1%: FAIL)
+  treasury $1.11 vs $10.00 initial  (not required)
+  colony wealth $8.48 | final lot price $0.74 | mom 0% mr 50% sit 50%
+
+REAL MARKET FAIL  (small stakes: FAIL)
+
+=== RESULT: FAIL
