@@ -1,0 +1,171 @@
+"""CLI entry point: python -m colony <command>."""
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+
+from . import db, ledger, orchestrator, report, records
+from .config import ConfigError, load_config
+
+RECORDS_ROOT = "records"
+
+
+def cmd_init(args):
+    if os.path.exists(args.db):
+        print(f"refusing to init: {args.db} already exists (no silent resets)", file=sys.stderr)
+        return 1
+    cfg = load_config(args.config)
+    con = db.connect(args.db)
+    orch = orchestrator.init_colony(con, cfg)
+    print(f"initialized {args.db}: {len(orch.agents)} gen-0 agents seeded from treasury")
+    print(f"treasury {report.money(ledger.balance(con, 'TREASURY'))}")
+    return 0
+
+
+def _open(args):
+    if not os.path.exists(args.db):
+        print(f"no database at {args.db} — run `colony init` first", file=sys.stderr)
+        raise SystemExit(1)
+    return db.connect(args.db)
+
+
+def cmd_run(args):
+    con = _open(args)
+    cfg = load_config(args.config) if args.config else None
+    orch = orchestrator.Orchestrator(con, cfg)
+    record = records.Record(
+        RECORDS_ROOT, "runs", f"run_{orch.run_id}",
+        config=orch.cfg, seed=orch.cfg["rng_seed"],
+        extra_header=f"resume_from_tick: {orch.tick} | ticks_requested: {args.ticks}",
+    )
+
+    def checkpoint(tick):
+        record.section(f"checkpoint @ tick {tick}", report.summary_text(con))
+
+    interrupted = False
+    try:
+        orch.run(args.ticks, checkpoint_cb=checkpoint)
+    except KeyboardInterrupt:
+        interrupted = True
+    ledger.verify_invariants(con, orch.cfg["initial_treasury_cents"])
+    summary = report.summary_text(con)
+    record.section("final state", summary)
+    metrics = report.latest_metrics(con)
+    treasury = metrics["treasury_cents"] if metrics else 0
+    status = "INTERRUPTED" if interrupted else "completed"
+    record.finish(
+        f"{status} @ tick {orch.tick} | population {len(orch.agents)}"
+        f" | treasury {report.money(treasury)} | invariants OK"
+    )
+    print(summary)
+    if interrupted:
+        print(f"\ninterrupted at tick {orch.tick}; state saved, run again to continue")
+    return 0
+
+
+def cmd_report(args):
+    con = _open(args)
+    print(report.summary_text(con, last_n=args.last))
+    return 0
+
+
+def cmd_tree(args):
+    con = _open(args)
+    print(report.tree_dot(con))
+    return 0
+
+
+def cmd_inspect(args):
+    con = _open(args)
+    print(report.inspect_text(con, args.agent_id))
+    return 0
+
+
+def cmd_verify(args):
+    con = _open(args)
+    cfg = json.loads(
+        con.execute("SELECT config_json FROM runs ORDER BY id DESC LIMIT 1").fetchone()[0]
+    )
+    try:
+        ledger.verify_invariants(con, cfg["initial_treasury_cents"])
+    except ledger.AccountingError as exc:
+        print(f"INVARIANT VIOLATION: {exc}", file=sys.stderr)
+        return 1
+    total = con.execute("SELECT SUM(balance_cents) FROM balances").fetchone()[0]
+    print(f"invariants OK: all balances match the ledger;"
+          f" system total {report.money(total)} == initial capitalization")
+    return 0
+
+
+def cmd_serve(args):
+    from . import server  # imported lazily; the sim core never needs http
+
+    server.serve(args.db, args.port)
+    return 0
+
+
+def cmd_test(args):
+    record = records.Record(RECORDS_ROOT, "tests", "pytest")
+    proc = subprocess.run(
+        [sys.executable, "-m", "pytest", "-v"], capture_output=True, text=True
+    )
+    record.append(proc.stdout)
+    if proc.stderr:
+        record.section("stderr", proc.stderr)
+    verdict = "PASS" if proc.returncode == 0 else f"FAIL (exit {proc.returncode})"
+    record.finish(f"pytest {verdict}")
+    print(proc.stdout[-4000:])
+    print(f"full output -> {record.path}")
+    return proc.returncode
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(
+        prog="colony", description="darwin-wallet: evolutionary colony simulation"
+    )
+    parser.add_argument("--db", default="colony.db", help="path to the colony database")
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    p = sub.add_parser("init", help="create db, accounts, gen-0 agents")
+    p.add_argument("--config", default="config.default.json")
+    p.set_defaults(fn=cmd_init)
+
+    p = sub.add_parser("run", help="run/continue the simulation")
+    p.add_argument("--ticks", type=int, required=True)
+    p.add_argument("--config", default=None,
+                   help="override the stored config (breaks reproducibility; default: stored)")
+    p.set_defaults(fn=cmd_run)
+
+    p = sub.add_parser("report", help="colony summary report")
+    p.add_argument("--last", type=int, default=None, help="restrict flux stats to last N ticks")
+    p.set_defaults(fn=cmd_report)
+
+    p = sub.add_parser("tree", help="family tree as Graphviz DOT on stdout")
+    p.set_defaults(fn=cmd_tree)
+
+    p = sub.add_parser("inspect", help="genome, P&L, trades, fitness of one agent")
+    p.add_argument("agent_id")
+    p.set_defaults(fn=cmd_inspect)
+
+    p = sub.add_parser("verify", help="verify all ledger invariants")
+    p.set_defaults(fn=cmd_verify)
+
+    p = sub.add_parser("serve", help="read-only Observatory dashboard")
+    p.add_argument("--port", type=int, default=8477)
+    p.set_defaults(fn=cmd_serve)
+
+    p = sub.add_parser("test", help="run pytest, tee output into records/tests/")
+    p.set_defaults(fn=cmd_test)
+
+    args = parser.parse_args(argv)
+    try:
+        return args.fn(args)
+    except ConfigError as exc:
+        print(f"config error: {exc}", file=sys.stderr)
+        return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())
