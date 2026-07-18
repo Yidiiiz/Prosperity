@@ -1,0 +1,72 @@
+import pytest
+
+from colony.config import ConfigError, load_config, validate
+from tests.conftest import make_cfg
+
+
+def test_default_config_is_valid():
+    load_config("config.default.json")
+
+
+def test_missing_key_rejected():
+    cfg = make_cfg()
+    del cfg["fee_bps"]
+    with pytest.raises(ConfigError):
+        validate(cfg)
+
+
+def test_float_cents_rejected():
+    cfg = make_cfg()
+    cfg["death_floor_cents"] = 10_000.5
+    with pytest.raises(ConfigError):
+        validate(cfg)
+
+
+def test_death_floor_must_be_below_seed():
+    with pytest.raises(ConfigError):
+        make_cfg(death_floor_cents=100_000)
+
+
+def test_reserve_floor_at_least_death_floor():
+    with pytest.raises(ConfigError):
+        make_cfg(reserve_floor_cents=9_999)
+
+
+def test_lot_granularity_constraint():
+    # gen0_seed_cents must be >= 200 x start_price_cents (spec 3.11)
+    with pytest.raises(ConfigError):
+        make_cfg(arena={"start_price_cents": 600})
+
+
+def test_stagnation_must_exceed_max_lookback():
+    with pytest.raises(ConfigError):
+        make_cfg(stagnation_ticks=100)
+
+
+def test_rent_bps_capped():
+    with pytest.raises(ConfigError):
+        make_cfg(rent_bps_of_equity=3)
+
+
+def test_treasury_must_fund_gen0():
+    with pytest.raises(ConfigError):
+        make_cfg(gen0_population=100)  # 100 x 100k > 2M
+
+
+def test_repay_multiple_hard_cliff():
+    with pytest.raises(ConfigError):
+        make_cfg(repay_multiple=0.26)
+    with pytest.raises(ConfigError):
+        make_cfg(repay_multiple=0.26, revalidated=True)  # never allowed above 0.25
+
+
+def test_repay_multiple_above_validated_needs_flag():
+    with pytest.raises(ConfigError):
+        make_cfg(repay_multiple=0.20)
+    make_cfg(repay_multiple=0.20, revalidated=True)  # allowed with the flag
+    make_cfg(repay_multiple=0.15)  # the shipped default needs no flag
+
+
+def test_unknown_regime_kind_rejected():
+    with pytest.raises(ConfigError):
+        make_cfg(arena={"regimes": [{"kind": "sideways", "ticks": 100}]})
