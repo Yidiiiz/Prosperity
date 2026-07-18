@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>darwin-wallet — Observatory</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0B0E14; --panel: #11151F; --border: #1D2433;
+    --momentum: #E8A33D; --mean-revert: #3DBFB0; --sitter: #6B7280;
+    --bone: #EFE7D3; --alert: #E5484D; --text: #B8C0CF; --dim: #6B7280;
+    --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+    --grot: "Space Grotesk", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--bg); color: var(--text); font-family: var(--grot);
+    font-size: 13px; padding: 10px;
+  }
+  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 10px; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--border); padding: 10px 12px;
+    min-width: 0;
+  }
+  .panel h2 {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase;
+    font-variant: small-caps; color: var(--dim); margin-bottom: 8px;
+  }
+  .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  /* hero */
+  #hero { grid-column: span 12; }
+  #hero .chartbox { position: relative; height: 260px; }
+  /* KPI row */
+  .kpi { grid-column: span 2; }
+  .kpi .value { font-family: var(--mono); font-variant-numeric: tabular-nums;
+                font-size: 20px; color: var(--text); }
+  .kpi .sub { font-family: var(--mono); font-size: 11px; color: var(--dim); margin-top: 2px; }
+  #kpi-treasury .value { font-size: 26px; color: var(--bone); }
+  .badge {
+    display: none; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--bg); background: var(--bone); padding: 1px 6px; margin-top: 4px;
+  }
+  .badge.on { display: inline-block; }
+  #kpi-invariant .value.ok { color: var(--mean-revert); }
+  #kpi-invariant .value.halt { color: var(--alert); }
+  /* charts */
+  .half { grid-column: span 6; } .third { grid-column: span 4; } .quarter { grid-column: span 3; }
+  .chartbox { position: relative; height: 200px; }
+  .nochart { color: var(--dim); font-family: var(--mono); font-size: 11px; padding: 20px 0; }
+  /* death bars, gauge — pure CSS, render without the CDN */
+  .bar-row { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+  .bar-row .label { width: 110px; font-family: var(--mono); font-size: 11px; }
+  .bar-row .bar { height: 10px; background: var(--sitter); min-width: 1px; }
+  .bar-row .count { font-family: var(--mono); font-size: 11px; color: var(--dim); }
+  #gauge-track { height: 12px; background: var(--bg); border: 1px solid var(--border); }
+  #gauge-fill { height: 100%; width: 0%; background: var(--momentum); }
+  canvas.spark { width: 100%; height: 60px; }
+  /* leaderboard */
+  #leaders { grid-column: span 12; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: right; padding: 3px 10px; font-family: var(--mono);
+           font-variant-numeric: tabular-nums; font-size: 12px; }
+  th { color: var(--dim); font-weight: 400; border-bottom: 1px solid var(--border);
+       letter-spacing: 0.08em; text-transform: uppercase; font-size: 10px; }
+  th:first-child, td:first-child, th.left, td.left { text-align: left; }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover { background: #171c29; }
+  tbody tr:focus-visible { outline: 1px solid var(--bone); outline-offset: -1px; }
+  .dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; }
+  /* agent drawer */
+  #drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: 420px; max-width: 90vw;
+    background: var(--panel); border-left: 1px solid var(--border); padding: 16px;
+    transform: translateX(100%); transition: transform 200ms; overflow-y: auto; z-index: 10;
+  }
+  #drawer.open { transform: translateX(0); }
+  #drawer pre { font-family: var(--mono); font-size: 11px; white-space: pre-wrap;
+                color: var(--text); background: var(--bg); padding: 8px;
+                border: 1px solid var(--border); overflow-x: auto; }
+  #drawer h3 { font-family: var(--mono); color: var(--bone); margin-bottom: 8px; }
+  #drawer button {
+    background: none; border: 1px solid var(--border); color: var(--dim); float: right;
+    cursor: pointer; font-family: var(--mono); padding: 2px 8px;
+  }
+  #drawer button:focus-visible { outline: 1px solid var(--bone); }
+  #drawer table { margin-top: 8px; }
+  .legend { display: flex; gap: 14px; font-size: 11px; color: var(--dim); margin-bottom: 6px;
+            font-family: var(--mono); }
+  @media (prefers-reduced-motion: reduce) {
+    #drawer { transition: none; }
+  }
+  @media (max-width: 900px) {
+    .kpi { grid-column: span 4; }
+    .half, .third, .quarter { grid-column: span 12; }
+  }
+</style>
+</head>
+<body>
+<div class="grid">
+
+  <section id="hero" class="panel">
+    <h2>Strata — archetype shares over time</h2>
+    <div class="legend">
+      <span style="color:var(--momentum)">■ momentum</span>
+      <span style="color:var(--mean-revert)">■ mean_revert</span>
+      <span style="color:var(--sitter)">■ sitter</span>
+      <span>▨ regime bands</span>
+      <span>· birth+death rate</span>
+    </div>
+    <div class="chartbox"><canvas id="strata"></canvas></div>
+    <div class="nochart" id="strata-fallback" hidden>charts unavailable (CDN unreachable) — all figures below remain live</div>
+  </section>
+
+  <section class="panel kpi" id="kpi-treasury">
+    <h2>Treasury ★</h2>
+    <div class="value num" id="v-treasury">—</div>
+    <div class="sub" id="v-treasury-delta">Δ since start —</div>
+    <span class="badge" id="badge-recovered">all capital recovered</span>
+  </section>
+  <section class="panel kpi"><h2>System total</h2>
+    <div class="value" id="v-system">—</div><div class="sub">treasury + colony</div></section>
+  <section class="panel kpi"><h2>Colony wealth</h2>
+    <div class="value" id="v-colony">—</div><div class="sub">living agents’ equity</div></section>
+  <section class="panel kpi"><h2>Extracted from market</h2>
+    <div class="value" id="v-extracted">—</div><div class="sub">− arena account</div></section>
+  <section class="panel kpi"><h2>Population</h2>
+    <div class="value" id="v-population">—</div>
+    <div class="sub" id="v-flux">births — · deaths —</div></section>
+  <section class="panel kpi" id="kpi-invariant"><h2>Invariant</h2>
+    <div class="value" id="v-invariant">—</div>
+    <div class="sub" id="v-tick">tick — · —</div></section>
+
+  <section class="panel half">
+    <h2>Wealth — treasury vs colony vs system</h2>
+    <div class="chartbox"><canvas id="wealth"></canvas></div>
+  </section>
+  <section class="panel half">
+    <h2>Price &amp; population</h2>
+    <div class="chartbox"><canvas id="price"></canvas></div>
+  </section>
+
+  <section class="panel third">
+    <h2>Deaths by cause</h2>
+    <div id="deaths"></div>
+  </section>
+  <section class="panel third">
+    <h2>Diversity (Shannon entropy)</h2>
+    <canvas id="spark" class="spark" width="360" height="60"></canvas>
+    <div class="sub num" id="v-diversity">—</div>
+  </section>
+  <section class="panel third">
+    <h2>Outstanding seed debt</h2>
+    <div id="gauge-track"><div id="gauge-fill"></div></div>
+    <div class="sub num" id="v-debt">—</div>
+  </section>
+
+  <section class="panel" id="leaders">
+    <h2>Leaderboard — top living agents by equity</h2>
+    <table>
+      <thead><tr>
+        <th class="left">agent</th><th>gen</th><th class="left">archetype</th>
+        <th>equity</th><th>fitness</th><th>age</th><th>lineage</th>
+      </tr></thead>
+      <tbody id="leader-rows"></tbody>
+    </table>
+  </section>
+</div>
+
+<aside id="drawer" aria-label="agent inspector">
+  <button id="drawer-close">close</button>
+  <h3 id="drawer-title">agent</h3>
+  <div id="drawer-body"></div>
+</aside>
+
+<script>
+"use strict";
+const COLORS = {
+  momentum: "#E8A33D", mean_revert: "#3DBFB0", sitter: "#6B7280",
+  bone: "#EFE7D3", alert: "#E5484D", dim: "#6B7280", border: "#1D2433",
+};
+const REGIME_TINT = {
+  trend_up: "rgba(232,163,61,0.05)", mean_revert: "rgba(61,191,176,0.05)",
+  crash: "rgba(229,72,77,0.08)",
+};
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const THIN = " ";
+
+const S = {  // accumulated timeseries (incremental fetches)
+  tick: [], treasury: [], colony: [], population: [], price: [], regime: [],
+  mom: [], mr: [], sit: [], div: [], births: [], deaths: [],
+  system: [], fluxRate: [],
+  lastTick: 0, initialTreasury: null, charts: {}, timer: null,
+};
+
+function money(cents) {
+  const sign = cents < 0 ? "-" : "";
+  const s = Math.abs(cents / 100).toFixed(2);
+  const parts = s.split(".");
+  return sign + "$" + parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, THIN) + "." + parts[1];
+}
+
+// eased number ticks (300ms); instant under prefers-reduced-motion
+const tweens = new Map();
+function setNum(id, cents, fmt) {
+  fmt = fmt || money;
+  const el = document.getElementById(id);
+  const from = tweens.has(id) ? tweens.get(id) : cents;
+  tweens.set(id, cents);
+  if (REDUCED || from === cents) { el.textContent = fmt(cents); return; }
+  const t0 = performance.now();
+  function frame(t) {
+    const k = Math.min(1, (t - t0) / 300);
+    const eased = 1 - (1 - k) * (1 - k);
+    el.textContent = fmt(Math.round(from + (cents - from) * eased));
+    if (k < 1 && tweens.get(id) === cents) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+async function getJSON(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(url + " -> " + r.status);
+  return r.json();
+}
+
+// ---- regime band painter (shared Chart.js plugin) ----
+const regimeBands = {
+  id: "regimeBands",
+  beforeDraw(chart) {
+    const { ctx, chartArea, scales } = chart;
+    if (!chartArea || !S.tick.length) return;
+    let start = 0;
+    for (let i = 1; i <= S.regime.length; i++) {
+      if (i === S.regime.length || S.regime[i] !== S.regime[start]) {
+        const x0 = Math.max(chartArea.left, scales.x.getPixelForValue(start));
+        const x1 = Math.min(chartArea.right, scales.x.getPixelForValue(i - 1));
+        ctx.fillStyle = REGIME_TINT[S.regime[start]] || "transparent";
+        ctx.fillRect(x0, chartArea.top, x1 - x0, chartArea.bottom - chartArea.top);
+        start = i;
+      }
+    }
+  },
+};
+
+const AXIS = { ticks: { color: COLORS.dim, font: { family: "IBM Plex Mono, monospace", size: 10 } },
+               grid: { color: COLORS.border } };
+
+function makeCharts() {
+  if (!window.Chart) {
+    document.getElementById("strata-fallback").hidden = false;
+    return;
+  }
+  Chart.defaults.animation = REDUCED ? false : { duration: 300 };
+  Chart.defaults.elements.point.radius = 0;
+  Chart.defaults.elements.line.borderWidth = 1.4;
+  Chart.defaults.plugins.legend.display = false;
+
+  S.charts.strata = new Chart(document.getElementById("strata"), {
+    type: "line",
+    data: { labels: S.tick, datasets: [
+      { label: "momentum", data: S.mom, backgroundColor: COLORS.momentum + "CC",
+        borderColor: COLORS.momentum, fill: true, stack: "s" },
+      { label: "mean_revert", data: S.mr, backgroundColor: COLORS.mean_revert + "CC",
+        borderColor: COLORS.mean_revert, fill: true, stack: "s" },
+      { label: "sitter", data: S.sit, backgroundColor: COLORS.sitter + "CC",
+        borderColor: COLORS.sitter, fill: true, stack: "s" },
+      { label: "flux", data: S.fluxRate, yAxisID: "y2",
+        borderColor: "rgba(239,231,211,0.35)", fill: false },
+    ]},
+    options: {
+      maintainAspectRatio: false, animation: false,
+      scales: {
+        x: AXIS,
+        y: { ...AXIS, stacked: true, min: 0, max: 1,
+             ticks: { ...AXIS.ticks, callback: v => (v * 100) + "%" } },
+        y2: { display: false, min: 0 },
+      },
+      plugins: { tooltip: { mode: "index", intersect: false } },
+    },
+    plugins: [regimeBands],
+  });
+
+  S.charts.wealth = new Chart(document.getElementById("wealth"), {
+    type: "line",
+    data: { labels: S.tick, datasets: [
+      { label: "treasury", data: S.treasury, borderColor: COLORS.bone },
+      { label: "colony", data: S.colony, borderColor: COLORS.mean_revert },
+      { label: "system", data: S.system, borderColor: COLORS.momentum },
+    ]},
+    options: { maintainAspectRatio: false, animation: false,
+      scales: { x: AXIS, y: { ...AXIS, ticks: { ...AXIS.ticks, callback: v => money(v) } } },
+      plugins: { legend: { display: true, labels: { color: COLORS.dim, boxWidth: 8 } } } },
+  });
+
+  S.charts.price = new Chart(document.getElementById("price"), {
+    type: "line",
+    data: { labels: S.tick, datasets: [
+      { label: "price", data: S.price, borderColor: COLORS.bone },
+      { label: "population", data: S.population, yAxisID: "y2", borderColor: COLORS.sitter },
+    ]},
+    options: { maintainAspectRatio: false, animation: false,
+      scales: { x: AXIS,
+        y: { ...AXIS, ticks: { ...AXIS.ticks, callback: v => money(v) } },
+        y2: { ...AXIS, position: "right", grid: { display: false } } },
+      plugins: { legend: { display: true, labels: { color: COLORS.dim, boxWidth: 8 } } } },
+    plugins: [regimeBands],
+  });
+}
+
+function refreshCharts() {
+  S.system = S.treasury.map((t, i) => t + S.colony[i]);
+  S.fluxRate = S.tick.map((_, i) => {
+    if (i === 0) return 0;
+    const dt = S.tick[i] - S.tick[i - 1] || 1;
+    return ((S.births[i] - S.births[i - 1]) + (S.deaths[i] - S.deaths[i - 1])) / dt;
+  });
+  for (const chart of Object.values(S.charts)) {
+    chart.data.labels = S.tick;
+  }
+  if (S.charts.strata) {
+    const ds = S.charts.strata.data.datasets;
+    ds[0].data = S.mom; ds[1].data = S.mr; ds[2].data = S.sit; ds[3].data = S.fluxRate;
+    S.charts.strata.update("none");
+  }
+  if (S.charts.wealth) {
+    const ds = S.charts.wealth.data.datasets;
+    ds[0].data = S.treasury; ds[1].data = S.colony; ds[2].data = S.system;
+    S.charts.wealth.update("none");
+  }
+  if (S.charts.price) {
+    const ds = S.charts.price.data.datasets;
+    ds[0].data = S.price; ds[1].data = S.population;
+    S.charts.price.update("none");
+  }
+}
+
+function drawSpark() {
+  const canvas = document.getElementById("spark");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const data = S.div.slice(-200);
+  if (data.length < 2) return;
+  const max = Math.max.apply(null, data.concat([0.001]));
+  ctx.strokeStyle = COLORS.mean_revert;
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  data.forEach((v, i) => {
+    const x = (i / (data.length - 1)) * (canvas.width - 4) + 2;
+    const y = canvas.height - 4 - (v / max) * (canvas.height - 8);
+    i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+  });
+  ctx.stroke();
+}
+
+function renderDeaths(hist) {
+  const el = document.getElementById("deaths");
+  const entries = Object.entries(hist).sort((a, b) => b[1] - a[1]);
+  const max = Math.max.apply(null, [1].concat(entries.map(e => e[1])));
+  el.innerHTML = entries.map(([cause, n]) =>
+    `<div class="bar-row"><span class="label">${cause}</span>` +
+    `<span class="bar" style="width:${(n / max) * 55}%;` +
+    `background:${cause === "old_age" ? COLORS.bone : cause === "bankrupt" ? COLORS.alert : COLORS.sitter}"></span>` +
+    `<span class="count">${n}</span></div>`).join("") || '<div class="nochart">no deaths yet</div>';
+}
+
+function renderLeaderboard(rows) {
+  const body = document.getElementById("leader-rows");
+  body.innerHTML = rows.map(r =>
+    `<tr tabindex="0" data-id="${r.id}">` +
+    `<td class="left">${r.id}</td><td>${r.generation}</td>` +
+    `<td class="left"><span class="dot" style="background:${COLORS[r.archetype]}"></span>${r.archetype}</td>` +
+    `<td>${money(r.equity_cents)}</td><td>${r.fitness.toExponential(2)}</td>` +
+    `<td>${r.age}</td><td>${r.lineage_depth}</td></tr>`).join("");
+}
+
+async function openDrawer(id) {
+  const a = await getJSON("/api/agent/" + id);
+  document.getElementById("drawer-title").textContent =
+    `agent ${a.id} · gen ${a.generation}` + (a.died_tick ? ` · dead: ${a.death_cause}` : "");
+  const trades = a.trades.map(t =>
+    `<tr><td>${t.tick}</td><td class="left">${t.side}</td><td>${t.lots}</td>` +
+    `<td>${money(t.price_cents)}</td><td>${money(t.fee_cents)}</td></tr>`).join("");
+  document.getElementById("drawer-body").innerHTML =
+    `<pre>${JSON.stringify(a.genome, null, 1)}</pre>` +
+    `<pre>born t=${a.born_tick}  parents ${a.parents.filter(Boolean).join(", ") || "house"}\n` +
+    `seed ${money(a.birth_seed_cents || 0)}  peak ${money(a.peak_equity_cents || 0)}\n` +
+    `debt ${money(a.debt_cents)}` +
+    (a.last_snapshot ? `\nlast snapshot t=${a.last_snapshot.tick}: equity ${money(a.last_snapshot.equity_cents)}` : "") +
+    `</pre>` +
+    `<table><thead><tr><th>tick</th><th class="left">side</th><th>lots</th>` +
+    `<th>price</th><th>fee</th></tr></thead><tbody>${trades}</tbody></table>`;
+  document.getElementById("drawer").classList.add("open");
+}
+document.getElementById("leader-rows").addEventListener("click", e => {
+  const tr = e.target.closest("tr[data-id]");
+  if (tr) openDrawer(tr.dataset.id);
+});
+document.getElementById("leader-rows").addEventListener("keydown", e => {
+  const tr = e.target.closest("tr[data-id]");
+  if (tr && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openDrawer(tr.dataset.id); }
+});
+document.getElementById("drawer-close").addEventListener("click", () =>
+  document.getElementById("drawer").classList.remove("open"));
+
+async function poll() {
+  if (document.hidden) return;  // pause when the tab is hidden
+  try {
+    const results = await Promise.all([
+      getJSON("/api/summary"),
+      getJSON("/api/timeseries?after_tick=" + S.lastTick),
+      getJSON("/api/deaths"),
+      getJSON("/api/leaderboard?limit=20"),
+    ]);
+    const summary = results[0], ts = results[1], deaths = results[2], leaders = results[3];
+    if (S.initialTreasury === null) S.initialTreasury = summary.config.initial_treasury_cents;
+    for (let i = 0; i < (ts.tick || []).length; i++) {
+      S.tick.push(ts.tick[i]); S.treasury.push(ts.treasury_cents[i]);
+      S.colony.push(ts.colony_wealth_cents[i]); S.population.push(ts.population[i]);
+      S.price.push(ts.price_cents[i]); S.regime.push(ts.regime_kind[i]);
+      S.mom.push(ts.share_momentum[i]); S.mr.push(ts.share_mean_revert[i]);
+      S.sit.push(ts.share_sitter[i]); S.div.push(ts.diversity[i]);
+      S.births.push(ts.births_cum[i]); S.deaths.push(ts.deaths_cum[i]);
+    }
+    if (S.tick.length) S.lastTick = S.tick[S.tick.length - 1];
+
+    setNum("v-treasury", summary.treasury_cents || 0);
+    const delta = (summary.treasury_cents || 0) - S.initialTreasury;
+    document.getElementById("v-treasury-delta").textContent =
+      "Δ since start " + (delta >= 0 ? "+" : "") + money(delta);
+    document.getElementById("badge-recovered").classList.toggle("on", delta > 0);
+    setNum("v-system", summary.system_total_cents || 0);
+    setNum("v-colony", summary.colony_wealth_cents || 0);
+    setNum("v-extracted", summary.arena_extracted_cents || 0);
+    setNum("v-population", summary.population || 0, v => String(v));
+    document.getElementById("v-flux").textContent =
+      `births ${summary.births_cum || 0} · deaths ${summary.deaths_cum || 0}`;
+    const inv = document.getElementById("v-invariant");
+    inv.textContent = summary.invariant_ok ? "OK" : "HALT";
+    inv.className = "value " + (summary.invariant_ok ? "ok" : "halt");
+    document.getElementById("v-tick").textContent =
+      `tick ${summary.tick} · ${summary.regime_kind || "—"}`;
+    document.getElementById("v-diversity").textContent =
+      (S.div.length ? S.div[S.div.length - 1] : 0).toFixed(3) + " nats";
+    const debt = summary.outstanding_debt_cents || 0;
+    document.getElementById("v-debt").textContent = money(debt) + " outstanding";
+    const debtScale = Math.max(debt, S.initialTreasury * 0.05);
+    document.getElementById("gauge-fill").style.width =
+      Math.min(100, (debt / debtScale) * 100) + "%";
+
+    renderDeaths(deaths);
+    renderLeaderboard(leaders);
+    refreshCharts();
+    drawSpark();
+  } catch (err) {
+    const inv = document.getElementById("v-invariant");
+    inv.textContent = "OFFLINE";
+    inv.className = "value halt";
+  }
+}
+
+makeCharts();
+poll();
+S.timer = setInterval(poll, 2000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) poll(); });
+</script>
+</body>
+</html>
