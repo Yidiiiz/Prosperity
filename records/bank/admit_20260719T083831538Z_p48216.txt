@@ -1,0 +1,11 @@
+record: bank/admit_20260719T083831538Z_p48216.txt
+utc: 2026-07-19T08:38:31+00:00
+git: 5340b72-dirty
+rng_seed: n/a
+config: n/a
+========================================================================
+
+--- events ------------------------------------------------------
+admit 2388a30a6475 agent 000010 +0.77 bps/day
+
+=== RESULT: 1 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\btc_1s_cost_free\s42\wf_42_w1.db

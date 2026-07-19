@@ -1,0 +1,18 @@
+record: bank/admit_20260719T081200387Z_p12780.txt
+utc: 2026-07-19T08:12:00+00:00
+git: 5340b72-dirty
+rng_seed: n/a
+config: n/a
+========================================================================
+
+--- events ------------------------------------------------------
+admit e90268eba686 agent 000025 +4.29 bps/day
+admit 5a43fb5d1eb1 agent 000006 +4.24 bps/day
+admit e7b3320946b5 agent 000068 +3.65 bps/day
+admit c21ec095d5e3 agent 000092 +2.92 bps/day
+admit 7810f871a5fe agent 000009 +2.26 bps/day
+admit 1b798e0a53b1 agent 000077 +1.92 bps/day
+admit 82a279234a2d agent 000052 +1.68 bps/day
+admit 3f5823e7ebeb agent 000089 +1.63 bps/day
+
+=== RESULT: 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\eth_1h\s7\wf_7_w3.db

@@ -1,0 +1,32 @@
+record: experiments/frequency_grid_qqq_1d_20260719T080607619Z_seed[2026]_p42732.txt
+utc: 2026-07-19T08:06:07+00:00
+git: 5340b72-dirty
+rng_seed: [2026]
+config: {"cell": "qqq_1d", "cost": "base", "csv": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\qqq_d.csv", "digest": "4e645c698e4d95ce", "grid_rows": 5504, "holdout": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\holdout\\qqq_1d.csv", "windows": 4, "seeds": [2026]}
+========================================================================
+
+--- results -----------------------------------------------------
+cell qqq_1d (daily bars, cost base taker/spread 10/2 bps): 5504 grid rows, holdout 1377 rows carved
+
+seed 2026:
+  window 1 -> test 2: admitted 8, certified 7/8 | evolve treasury 200782445279 u | oos pooled 8590671931 u vs B&H 10410873712 u (did not beat)
+  window 2 -> test 3: admitted 4, certified 4/4 | evolve treasury 201531091192 u | oos pooled 4238471206 u vs B&H 9974357796 u (did not beat)
+  window 3 -> test 4: admitted 8, certified 8/8 | evolve treasury 206754402756 u | oos pooled 9575009448 u vs B&H 23193181496 u (did not beat)
+  seed 2026: NO-EDGE (0/3 test windows beaten)
+  spx: seed 2026 oos window 2 buy-and-hold $7,925.37 (-0.17%/yr) | delta +1.48 pp/yr
+  spx: seed 2026 oos window 3 buy-and-hold $7,578.37 (+12.42%/yr) | delta -11.35 pp/yr
+  spx: seed 2026 oos window 4 buy-and-hold $14,600.55 (+11.64%/yr) | delta -8.29 pp/yr
+  seed 2026: NO-EDGE
+
+GRID CELL qqq_1d: NO-EDGE
+
+span: 1999-03-10T00:00:00+00:00 -> 2021-01-21T00:00:00+00:00 (21.87 years)
+wall: 34.5 s
+annualized: seed 2026 oos window 2 audited $8,590.67 vs initial $8,000.00 -> +1.31%/yr
+benchmark: seed 2026 oos window 2 buy-and-hold $10,410.87 (+4.94%/yr) | delta -3.63 pp/yr
+annualized: seed 2026 oos window 3 audited $4,238.47 vs initial $4,000.00 -> +1.07%/yr
+benchmark: seed 2026 oos window 3 buy-and-hold $9,974.36 (+18.22%/yr) | delta -17.15 pp/yr
+annualized: seed 2026 oos window 4 audited $9,575.01 vs initial $8,000.00 -> +3.34%/yr
+benchmark: seed 2026 oos window 4 buy-and-hold $23,193.18 (+21.50%/yr) | delta -18.16 pp/yr
+
+=== RESULT: GRID CELL qqq_1d: NO-EDGE

@@ -1,0 +1,32 @@
+record: experiments/frequency_grid_btc_1h_20260719T080618062Z_seed[42]_p33200.txt
+utc: 2026-07-19T08:06:18+00:00
+git: 5340b72-dirty
+rng_seed: [42]
+config: {"cell": "btc_1h", "cost": "base", "csv": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\btcusdt_1h.csv", "digest": "2eff4ddc58a4a701", "grid_rows": 28396, "holdout": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\holdout\\btc_1h.csv", "windows": 4, "seeds": [42]}
+========================================================================
+
+--- results -----------------------------------------------------
+cell btc_1h (hourly bars, cost base taker/spread 10/2 bps): 28396 grid rows, holdout 7100 rows carved
+
+seed 42:
+  window 1 -> test 2: admitted 8, certified 8/8 | evolve treasury 199153774919 u | oos pooled 9529438008 u vs B&H 14094496280 u (did not beat)
+  window 2 -> test 3: admitted 8, certified 5/8 | evolve treasury 201765884511 u | oos pooled 8687198124 u vs B&H 15481590304 u (did not beat)
+  window 3 -> test 4: admitted 8, certified 0/8 | evolve treasury 203727634744 u | oos pooled 7482108140 u vs B&H 9043234568 u (did not beat)
+  seed 42: NO-EDGE (0/3 test windows beaten)
+  spx: seed 42 oos window 2 buy-and-hold $9,691.00 (+26.72%/yr (projected)) | delta -2.60 pp/yr
+  spx: seed 42 oos window 3 buy-and-hold $9,816.99 (+28.76%/yr (projected)) | delta -18.05 pp/yr
+  spx: seed 42 oos window 4 buy-and-hold $8,708.08 (+11.04%/yr (projected)) | delta -18.98 pp/yr
+  seed 42: NO-EDGE
+
+GRID CELL btc_1h: NO-EDGE
+
+span: 2022-07-01T00:00:00+00:00 -> 2025-09-26T04:00:00+00:00 (3.24 years)
+wall: 182.6 s
+annualized: seed 42 oos window 2 audited $9,529.44 vs initial $8,000.00 -> +24.12%/yr (projected)
+benchmark: seed 42 oos window 2 buy-and-hold $14,094.50 (+101.26%/yr (projected)) | delta -77.14 pp/yr
+annualized: seed 42 oos window 3 audited $8,687.20 vs initial $8,000.00 -> +10.71%/yr (projected)
+benchmark: seed 42 oos window 3 buy-and-hold $15,481.59 (+126.00%/yr (projected)) | delta -115.28 pp/yr
+annualized: seed 42 oos window 4 audited $7,482.11 vs initial $8,000.00 -> -7.93%/yr (projected)
+benchmark: seed 42 oos window 4 buy-and-hold $9,043.23 (+16.34%/yr (projected)) | delta -24.28 pp/yr
+
+=== RESULT: GRID CELL btc_1h: NO-EDGE

@@ -1,0 +1,25 @@
+record: experiments/frequency_grid_btc_1m_20260719T081222282Z_seed[2026]_p54116.txt
+utc: 2026-07-19T08:12:22+00:00
+git: 5340b72-dirty
+rng_seed: [2026]
+config: {"cell": "btc_1m", "cost": "base", "csv": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\btcusdt_1m.csv", "digest": "4d7dc1aa6a2dbb43", "grid_rows": 420480, "holdout": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\holdout\\btc_1m.csv", "windows": 3, "seeds": [2026]}
+========================================================================
+
+--- results -----------------------------------------------------
+cell btc_1m (minute bars, cost base taker/spread 10/2 bps): 420480 grid rows, holdout 105121 rows carved
+
+seed 2026:
+  window 1 -> test 2: admitted 1, certified 0/1 | evolve treasury 199810131973 u | oos pooled 545483188 u vs B&H 763531008 u (did not beat)
+  window 2 -> test 3: admitted 0, certified 0/0 | evolve treasury 199718693946 u | oos pooled 0 u vs B&H 0 u (did not beat)
+  seed 2026: NO-EDGE (0/2 test windows beaten)
+  spx: seed 2026 oos window 2 buy-and-hold $1,010.56 (+4.02%/yr (projected)) | delta -93.73 pp/yr
+  seed 2026: NO-EDGE
+
+GRID CELL btc_1m: NO-EDGE
+
+span: 2025-07-19T00:00:00+00:00 -> 2026-05-06T23:59:00+00:00 (0.80 years)
+wall: 136.6 s
+annualized: seed 2026 oos window 2 audited $545.48 vs initial $1,000.00 -> -89.71%/yr (projected)
+benchmark: seed 2026 oos window 2 buy-and-hold $763.53 (-63.67%/yr (projected)) | delta -26.05 pp/yr
+
+=== RESULT: GRID CELL btc_1m: NO-EDGE

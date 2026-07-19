@@ -1,0 +1,22 @@
+record: experiments/frequency_grid_btc_1s_20260719T082600963Z_seed[42]_p37608.txt
+utc: 2026-07-19T08:26:00+00:00
+git: 5340b72-dirty
+rng_seed: [42]
+config: {"cell": "btc_1s", "cost": "base", "csv": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\btcusdt_1s.csv", "digest": "5f340e833e05efa9", "grid_rows": 483840, "holdout": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\holdout\\btc_1s.csv", "windows": 3, "seeds": [42]}
+========================================================================
+
+--- results -----------------------------------------------------
+cell btc_1s (second bars, cost base taker/spread 10/2 bps): 483840 grid rows, holdout 120961 rows carved
+
+seed 42:
+  window 1 -> test 2: admitted 0, certified 0/0 | evolve treasury 199987427019 u | oos pooled 0 u vs B&H 0 u (did not beat)
+  window 2 -> test 3: admitted 0, certified 0/0 | evolve treasury 199969231938 u | oos pooled 0 u vs B&H 0 u (did not beat)
+  seed 42: NO-EDGE (0/2 test windows beaten)
+  seed 42: NO-EDGE
+
+GRID CELL btc_1s: NO-EDGE
+
+span: 2026-07-12T00:00:00+00:00 -> 2026-07-17T14:23:59+00:00 (0.02 years)
+wall: 288.1 s
+
+=== RESULT: GRID CELL btc_1s: NO-EDGE

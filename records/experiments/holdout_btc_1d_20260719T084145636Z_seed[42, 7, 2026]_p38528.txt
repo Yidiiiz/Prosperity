@@ -1,0 +1,29 @@
+record: experiments/holdout_btc_1d_20260719T084145636Z_seed[42, 7, 2026]_p38528.txt
+utc: 2026-07-19T08:41:45+00:00
+git: 5340b72-dirty
+rng_seed: [42, 7, 2026]
+config: {"cell": "btc_1d", "holdout": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\holdout\\btc_1d.csv", "holdout_digest": "d12175cae3ac5d58", "seeds": [42, 7, 2026]}
+========================================================================
+
+--- results -----------------------------------------------------
+HOLDOUT SHOT btc_1d: evolve on final grid window (654 rows), certify on holdout (652 rows), base costs
+
+seed 42: certified 3/8 | pooled 7684325458 u vs tape B&H 8220258056 u vs SPX 10448851528 u -> NO
+  spx: holdout seed 42 buy-and-hold $10,448.85 (+16.16%/yr) | delta -18.40 pp/yr
+seed 7: certified 4/8 | pooled 8261652100 u vs tape B&H 8220258056 u vs SPX 10448851528 u -> NO
+  spx: holdout seed 7 buy-and-hold $10,448.85 (+16.16%/yr) | delta -14.34 pp/yr
+seed 2026: certified 3/8 | pooled 7842571283 u vs tape B&H 8220258056 u vs SPX 10448851528 u -> NO
+  spx: holdout seed 2026 buy-and-hold $10,448.85 (+16.16%/yr) | delta -17.27 pp/yr
+
+HOLDOUT btc_1d: NO-EDGE (0/3 seeds beat SPY on the holdout)
+
+span: 2024-10-06T00:00:00+00:00 -> 2026-07-19T00:00:00+00:00 (1.78 years)
+wall: 8.0 s
+annualized: holdout seed 42 audited $7,684.33 vs initial $8,000.00 -> -2.23%/yr
+benchmark: holdout seed 42 buy-and-hold $8,220.26 (+1.54%/yr) | delta -3.77 pp/yr
+annualized: holdout seed 7 audited $8,261.65 vs initial $8,000.00 -> +1.82%/yr
+benchmark: holdout seed 7 buy-and-hold $8,220.26 (+1.54%/yr) | delta +0.29 pp/yr
+annualized: holdout seed 2026 audited $7,842.57 vs initial $8,000.00 -> -1.11%/yr
+benchmark: holdout seed 2026 buy-and-hold $8,220.26 (+1.54%/yr) | delta -2.64 pp/yr
+
+=== RESULT: HOLDOUT btc_1d: NO-EDGE (0/3 seeds beat SPY on the holdout)

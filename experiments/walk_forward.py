@@ -11,13 +11,13 @@ buy-and-hold on a majority of test windows, else NO-EDGE — both are
 machinery-passing outcomes; the measurement is the deliverable.
 
 Usage: python -m experiments.walk_forward [--csv data/spy_d.csv]
-       [--windows 4] [--seeds 42,7,2026] [--workdir DIR] [--profile daily|minute]
+       [--windows 4] [--seeds 42,7,2026] [--workdir DIR]
+       [--profile second|minute|hourly|daily] (spec v4 3.2: the registry)
        [--digest HEX] [--min-fills N] [--parallel]
 """
 
 import argparse
 import datetime
-import json
 import subprocess
 import sys
 import tempfile
@@ -27,19 +27,12 @@ from colony import bank, benchmark, db, ledger, orchestrator
 from colony.arenas.replay import read_rows
 from colony.config import validate
 from colony.records import Record
-from experiments.minute_ladder import base_config as minute_config, tape_digest
+from experiments.minute_ladder import tape_digest
+from experiments.profiles import PROFILES, daily_config  # noqa: F401 (re-export
+# for bank_reuse; daily/minute factories are byte-identical to their v3 forms)
 
 ROOT = Path(__file__).resolve().parent.parent
 SEEDS = [42, 7, 2026]
-
-
-def daily_config(seed, csv_path):
-    with open(ROOT / "config.spy.json", encoding="utf-8") as f:
-        cfg = json.load(f)
-    cfg["rng_seed"] = seed
-    cfg["arena"]["csv"] = str(csv_path)
-    cfg["arena"]["name"] = "walk"
-    return cfg
 
 
 def write_window(times, closes, path):
@@ -82,11 +75,13 @@ def run_window(cfg, db_path):
     return treasury
 
 
-def run_seed(seed, windows, workdir, args, lines):
-    """One seed's full walk. Returns (verdict, footer entries)."""
+def run_seed(seed, windows, workdir, args, lines, make_cfg=None):
+    """One seed's full walk. Returns (verdict, footer entries). make_cfg
+    lets the v4 grid inject a per-cell factory (lot/venue overrides)."""
     workdir = Path(workdir)
+    workdir.mkdir(parents=True, exist_ok=True)
     bank_file = workdir / f"bank_{seed}.jsonl"
-    make_cfg = minute_config if args.profile == "minute" else daily_config
+    make_cfg = make_cfg or PROFILES[args.profile]
     entries, wins, tests = [], 0, 0
     for k in range(1, len(windows)):
         w_times, w_closes = windows[k - 1]
@@ -151,7 +146,7 @@ def main(argv=None):
     parser.add_argument("--windows", type=int, default=4)
     parser.add_argument("--seeds", default=None)
     parser.add_argument("--workdir", default=None)
-    parser.add_argument("--profile", choices=("daily", "minute"), default="daily")
+    parser.add_argument("--profile", choices=tuple(PROFILES), default="daily")
     parser.add_argument("--digest", default=None)
     parser.add_argument("--min-fills", type=int, default=20)
     parser.add_argument("--parallel", action="store_true")

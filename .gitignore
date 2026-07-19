@@ -16,3 +16,14 @@ tree.dot
 
 # experiment workdirs (windows, banks-in-progress; the evidence lives in records/)
 work_*/
+
+# operator-fetched big tapes + carved holdouts (digests pinned in records;
+# committed fixtures keep the test suite offline) — v4 7
+data/btcusdt_1s.csv
+data/btcusdt_1m.csv
+data/*_1h.csv
+data/holdout/*
+# the one-shot guard survives clones — a rerun refusal must not depend on
+# one machine's disk (v4 6.2)
+!data/holdout/*.SHOT
+fetch_err.log

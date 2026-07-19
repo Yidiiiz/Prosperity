@@ -1,0 +1,26 @@
+record: experiments/frequency_grid_btc_1s_cost_free_20260719T083607307Z_seed[7]_p46356.txt
+utc: 2026-07-19T08:36:07+00:00
+git: 5340b72-dirty
+rng_seed: [7]
+config: {"cell": "btc_1s", "cost": "free", "csv": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\btcusdt_1s.csv", "digest": "5f340e833e05efa9", "grid_rows": 483840, "holdout": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\holdout\\btc_1s.csv", "windows": 3, "seeds": [7]}
+========================================================================
+
+--- results -----------------------------------------------------
+cell btc_1s (second bars, cost free taker/spread 0/0 bps): 483840 grid rows, holdout 120961 rows carved
+COUNTERFACTUAL — no retail venue offers these costs; this arm isolates friction from signal (v4 5.2)
+
+seed 7:
+  window 1 -> test 2: admitted 0, certified 0/0 | evolve treasury 199999712552 u | oos pooled 0 u vs B&H 0 u (did not beat)
+  window 2 -> test 3: admitted 1, certified 0/1 | evolve treasury 200000671214 u | oos pooled 998485288 u vs B&H 973775440 u (beat)
+  seed 7: NO-EDGE (1/2 test windows beaten)
+  spx: seed 7 oos window 3 buy-and-hold $987.93 (-90.70%/yr (projected)) | delta +65.04 pp/yr (partial SPY coverage)
+  seed 7: BEATS-SPX
+
+GRID CELL btc_1s_cost_free: BEATS-SPX
+
+span: 2026-07-12T00:00:00+00:00 -> 2026-07-17T14:23:59+00:00 (0.02 years)
+wall: 289.7 s
+annualized: seed 7 oos window 3 audited $998.49 vs initial $1,000.00 -> -25.67%/yr (projected)
+benchmark: seed 7 oos window 3 buy-and-hold $973.78 (-99.45%/yr (projected)) | delta +73.78 pp/yr
+
+=== RESULT: GRID CELL btc_1s_cost_free: BEATS-SPX

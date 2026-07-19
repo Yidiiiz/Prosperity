@@ -1,0 +1,18 @@
+record: bank/certify_20260719T080619353Z_p10096.txt
+utc: 2026-07-19T08:06:19+00:00
+git: 5340b72-dirty
+rng_seed: n/a
+config: n/a
+========================================================================
+
+--- events ------------------------------------------------------
+certify 1ff7e6d31c36 pnl 215977557 u
+certify 26ccf0205caf pnl 767216227 u
+certify 547b86586990 pnl 140215412 u
+certify 7d1d051014d5 pnl 229415766 u
+certify 7fc78ef0581b pnl 300676429 u
+certify a8a1d43a6d7c pnl 12188488 u
+lapse b86be0564ae8 pnl -20501513 u
+lapse d76c09e87d84 pnl -39541187 u
+
+=== RESULT: 6/8 probe(s) certified on window_3.csv

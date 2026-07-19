@@ -1,0 +1,32 @@
+record: experiments/frequency_grid_eth_1d_20260719T080607574Z_seed[2026]_p39768.txt
+utc: 2026-07-19T08:06:07+00:00
+git: 5340b72-dirty
+rng_seed: [2026]
+config: {"cell": "eth_1d", "cost": "base", "csv": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\ethusdt_1d.csv", "digest": "f39be30bca94c97f", "grid_rows": 2607, "holdout": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\holdout\\eth_1d.csv", "windows": 4, "seeds": [2026]}
+========================================================================
+
+--- results -----------------------------------------------------
+cell eth_1d (daily bars, cost base taker/spread 10/2 bps): 2607 grid rows, holdout 652 rows carved
+
+seed 2026:
+  window 1 -> test 2: admitted 8, certified 8/8 | evolve treasury 214133046201 u | oos pooled 15456442433 u vs B&H 56264206304 u (did not beat)
+  window 2 -> test 3: admitted 8, certified 4/8 | evolve treasury 234629975734 u | oos pooled 8634573115 u vs B&H 5306393200 u (beat)
+  window 3 -> test 4: admitted 1, certified 0/1 | evolve treasury 199987946597 u | oos pooled 991169878 u vs B&H 1978461659 u (did not beat)
+  seed 2026: NO-EDGE (1/3 test windows beaten)
+  spx: seed 2026 oos window 2 buy-and-hold $11,143.99 (+20.47%/yr) | delta +24.31 pp/yr
+  spx: seed 2026 oos window 3 buy-and-hold $7,834.40 (-1.17%/yr) | delta +5.55 pp/yr
+  spx: seed 2026 oos window 4 buy-and-hold $1,500.97 (+25.50%/yr) | delta -26.00 pp/yr
+  seed 2026: BEATS-SPX
+
+GRID CELL eth_1d: BEATS-SPX
+
+span: 2017-08-17T00:00:00+00:00 -> 2024-10-05T00:00:00+00:00 (7.13 years)
+wall: 20.3 s
+annualized: seed 2026 oos window 2 audited $15,456.44 vs initial $8,000.00 -> +44.78%/yr
+benchmark: seed 2026 oos window 2 buy-and-hold $56,264.21 (+199.25%/yr) | delta -154.46 pp/yr
+annualized: seed 2026 oos window 3 audited $8,634.57 vs initial $8,000.00 -> +4.38%/yr
+benchmark: seed 2026 oos window 3 buy-and-hold $5,306.39 (-20.60%/yr) | delta +24.98 pp/yr
+annualized: seed 2026 oos window 4 audited $991.17 vs initial $1,000.00 -> -0.49%/yr
+benchmark: seed 2026 oos window 4 buy-and-hold $1,978.46 (+46.47%/yr) | delta -46.96 pp/yr
+
+=== RESULT: GRID CELL eth_1d: BEATS-SPX

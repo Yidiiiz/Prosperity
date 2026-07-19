@@ -68,3 +68,149 @@
 20260719T044420396Z | bank | bank/certify_20260719T044420364Z_p33380.txt | 5/5 probe(s) certified on window_4.csv
 20260719T044420399Z | experiments | experiments/walk_forward_20260719T044248428Z_seed[42, 7, 2026]_p33380.txt | WALK-FORWARD seed 42: NO-EDGE, seed 7: NO-EDGE, seed 2026: NO-EDGE
 20260719T044521592Z | experiments | experiments/bank_reuse_20260719T044420580Z_seed[42, 7, 2026]_p40024.txt | REUSE A/B measured — direction reported, not demanded
+20260719T080612407Z | bank | bank/admit_20260719T080612374Z_p19488.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\eth_1d\s7\wf_7_w1.db
+20260719T080612475Z | bank | bank/admit_20260719T080612449Z_p10096.txt | 7 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\eth_1d\s42\wf_42_w1.db
+20260719T080612496Z | bank | bank/certify_20260719T080612468Z_p19488.txt | 8/8 probe(s) certified on window_2.csv
+20260719T080612497Z | bank | bank/admit_20260719T080612467Z_p50296.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\btc_1d\s42\wf_42_w1.db
+20260719T080612515Z | bank | bank/admit_20260719T080612488Z_p40452.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\btc_1d\s7\wf_7_w1.db
+20260719T080612568Z | bank | bank/certify_20260719T080612537Z_p10096.txt | 7/7 probe(s) certified on window_2.csv
+20260719T080612609Z | bank | bank/certify_20260719T080612576Z_p50296.txt | 8/8 probe(s) certified on window_2.csv
+20260719T080612625Z | bank | bank/certify_20260719T080612596Z_p40452.txt | 8/8 probe(s) certified on window_2.csv
+20260719T080612876Z | bank | bank/admit_20260719T080612848Z_p52328.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\btc_1d\s2026\wf_2026_w1.db
+20260719T080612991Z | bank | bank/admit_20260719T080612963Z_p39768.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\eth_1d\s2026\wf_2026_w1.db
+20260719T080612992Z | bank | bank/certify_20260719T080612964Z_p52328.txt | 8/8 probe(s) certified on window_2.csv
+20260719T080613093Z | bank | bank/certify_20260719T080613063Z_p39768.txt | 8/8 probe(s) certified on window_2.csv
+20260719T080617300Z | bank | bank/admit_20260719T080617251Z_p53240.txt | 7 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\qqq_1d\s7\wf_7_w1.db
+20260719T080617412Z | bank | bank/admit_20260719T080617377Z_p43540.txt | 6 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\qqq_1d\s42\wf_42_w1.db
+20260719T080617434Z | bank | bank/certify_20260719T080617405Z_p53240.txt | 6/7 probe(s) certified on window_2.csv
+20260719T080617553Z | bank | bank/certify_20260719T080617515Z_p43540.txt | 4/6 probe(s) certified on window_2.csv
+20260719T080618479Z | bank | bank/admit_20260719T080618436Z_p42732.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\qqq_1d\s2026\wf_2026_w1.db
+20260719T080618631Z | bank | bank/certify_20260719T080618592Z_p42732.txt | 7/8 probe(s) certified on window_2.csv
+20260719T080619057Z | bank | bank/admit_20260719T080619003Z_p21476.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\spy_1d\s7\wf_7_w1.db
+20260719T080619095Z | bank | bank/admit_20260719T080619051Z_p40452.txt | 3 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\btc_1d\s7\wf_7_w2.db
+20260719T080619095Z | bank | bank/admit_20260719T080619051Z_p24804.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\spy_1d\s42\wf_42_w1.db
+20260719T080619203Z | bank | bank/certify_20260719T080619157Z_p40452.txt | 0/3 probe(s) certified on window_3.csv
+20260719T080619225Z | bank | bank/admit_20260719T080619161Z_p19488.txt | 6 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\eth_1d\s7\wf_7_w2.db
+20260719T080619259Z | bank | bank/admit_20260719T080619200Z_p50296.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\btc_1d\s42\wf_42_w2.db
+20260719T080619259Z | bank | bank/admit_20260719T080619191Z_p10096.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\eth_1d\s42\wf_42_w2.db
+20260719T080619271Z | bank | bank/certify_20260719T080619225Z_p21476.txt | 3/8 probe(s) certified on window_2.csv
+20260719T080619271Z | bank | bank/certify_20260719T080619229Z_p24804.txt | 1/8 probe(s) certified on window_2.csv
+20260719T080619360Z | bank | bank/certify_20260719T080619317Z_p19488.txt | 3/6 probe(s) certified on window_3.csv
+20260719T080619388Z | bank | bank/certify_20260719T080619352Z_p50296.txt | 1/8 probe(s) certified on window_3.csv
+20260719T080619390Z | bank | bank/certify_20260719T080619353Z_p10096.txt | 6/8 probe(s) certified on window_3.csv
+20260719T080619599Z | bank | bank/admit_20260719T080619534Z_p52328.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\btc_1d\s2026\wf_2026_w2.db
+20260719T080619740Z | bank | bank/certify_20260719T080619704Z_p52328.txt | 0/8 probe(s) certified on window_3.csv
+20260719T080619861Z | bank | bank/admit_20260719T080619838Z_p39768.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\eth_1d\s2026\wf_2026_w2.db
+20260719T080619883Z | bank | bank/admit_20260719T080619861Z_p18576.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\spy_1d\s2026\wf_2026_w1.db
+20260719T080620572Z | bank | bank/certify_20260719T080620548Z_p39768.txt | 4/8 probe(s) certified on window_3.csv
+20260719T080620604Z | bank | bank/certify_20260719T080620581Z_p18576.txt | 2/8 probe(s) certified on window_2.csv
+20260719T080625747Z | experiments | experiments/frequency_grid_eth_1d_20260719T080607575Z_seed[7]_p19488.txt | GRID CELL eth_1d: NO-EDGE
+20260719T080625925Z | bank | bank/admit_20260719T080625900Z_p10096.txt | 3 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\eth_1d\s42\wf_42_w3.db
+20260719T080626364Z | experiments | experiments/frequency_grid_btc_1d_20260719T080607555Z_seed[7]_p40452.txt | GRID CELL btc_1d: NO-EDGE
+20260719T080626415Z | experiments | experiments/frequency_grid_btc_1d_20260719T080607538Z_seed[42]_p50296.txt | GRID CELL btc_1d: NO-EDGE
+20260719T080626419Z | experiments | experiments/frequency_grid_btc_1d_20260719T080607554Z_seed[2026]_p52328.txt | GRID CELL btc_1d: NO-EDGE
+20260719T080626430Z | bank | bank/certify_20260719T080626405Z_p10096.txt | 3/3 probe(s) certified on window_4.csv
+20260719T080626462Z | experiments | experiments/frequency_grid_eth_1d_20260719T080607557Z_seed[42]_p10096.txt | GRID CELL eth_1d: BEATS-SPX
+20260719T080627773Z | bank | bank/admit_20260719T080627746Z_p39768.txt | 1 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\eth_1d\s2026\wf_2026_w3.db
+20260719T080627848Z | bank | bank/certify_20260719T080627819Z_p39768.txt | 0/1 probe(s) certified on window_4.csv
+20260719T080627880Z | experiments | experiments/frequency_grid_eth_1d_20260719T080607574Z_seed[2026]_p39768.txt | GRID CELL eth_1d: BEATS-SPX
+20260719T080628346Z | bank | bank/admit_20260719T080628320Z_p53240.txt | 6 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\qqq_1d\s7\wf_7_w2.db
+20260719T080628421Z | bank | bank/admit_20260719T080628387Z_p43540.txt | 3 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\qqq_1d\s42\wf_42_w2.db
+20260719T080628484Z | bank | bank/certify_20260719T080628459Z_p53240.txt | 6/6 probe(s) certified on window_3.csv
+20260719T080628524Z | bank | bank/certify_20260719T080628500Z_p43540.txt | 3/3 probe(s) certified on window_3.csv
+20260719T080629731Z | bank | bank/admit_20260719T080629706Z_p42732.txt | 4 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\qqq_1d\s2026\wf_2026_w2.db
+20260719T080629841Z | bank | bank/certify_20260719T080629817Z_p42732.txt | 4/4 probe(s) certified on window_3.csv
+20260719T080631402Z | bank | bank/admit_20260719T080631381Z_p21476.txt | 7 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\spy_1d\s7\wf_7_w2.db
+20260719T080631664Z | bank | bank/admit_20260719T080631552Z_p24804.txt | 6 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\spy_1d\s42\wf_42_w2.db
+20260719T080632938Z | bank | bank/certify_20260719T080632915Z_p21476.txt | 1/7 probe(s) certified on window_3.csv
+20260719T080632973Z | bank | bank/certify_20260719T080632950Z_p24804.txt | 2/6 probe(s) certified on window_3.csv
+20260719T080633921Z | bank | bank/admit_20260719T080633897Z_p18576.txt | 7 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\spy_1d\s2026\wf_2026_w2.db
+20260719T080634045Z | bank | bank/certify_20260719T080634020Z_p18576.txt | 0/7 probe(s) certified on window_3.csv
+20260719T080640581Z | bank | bank/admit_20260719T080640554Z_p53240.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\qqq_1d\s7\wf_7_w3.db
+20260719T080640586Z | bank | bank/admit_20260719T080640560Z_p43540.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\qqq_1d\s42\wf_42_w3.db
+20260719T080640712Z | bank | bank/certify_20260719T080640688Z_p43540.txt | 8/8 probe(s) certified on window_4.csv
+20260719T080640725Z | bank | bank/certify_20260719T080640702Z_p53240.txt | 8/8 probe(s) certified on window_4.csv
+20260719T080640737Z | experiments | experiments/frequency_grid_qqq_1d_20260719T080607620Z_seed[42]_p43540.txt | GRID CELL qqq_1d: NO-EDGE
+20260719T080640758Z | experiments | experiments/frequency_grid_qqq_1d_20260719T080607606Z_seed[7]_p53240.txt | GRID CELL qqq_1d: NO-EDGE
+20260719T080641968Z | bank | bank/admit_20260719T080641939Z_p42732.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\qqq_1d\s2026\wf_2026_w3.db
+20260719T080642107Z | bank | bank/certify_20260719T080642077Z_p42732.txt | 8/8 probe(s) certified on window_4.csv
+20260719T080642140Z | experiments | experiments/frequency_grid_qqq_1d_20260719T080607619Z_seed[2026]_p42732.txt | GRID CELL qqq_1d: NO-EDGE
+20260719T080644309Z | bank | bank/admit_20260719T080644285Z_p21476.txt | 6 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\spy_1d\s7\wf_7_w3.db
+20260719T080644348Z | bank | bank/admit_20260719T080644322Z_p24804.txt | 5 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\spy_1d\s42\wf_42_w3.db
+20260719T080644417Z | bank | bank/certify_20260719T080644393Z_p21476.txt | 3/6 probe(s) certified on window_4.csv
+20260719T080644447Z | experiments | experiments/frequency_grid_spy_1d_20260719T080607608Z_seed[7]_p21476.txt | GRID CELL spy_1d: NO-EDGE
+20260719T080644463Z | bank | bank/certify_20260719T080644438Z_p24804.txt | 3/5 probe(s) certified on window_4.csv
+20260719T080644490Z | experiments | experiments/frequency_grid_spy_1d_20260719T080607595Z_seed[42]_p24804.txt | GRID CELL spy_1d: NO-EDGE
+20260719T080645387Z | bank | bank/admit_20260719T080645364Z_p18576.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\spy_1d\s2026\wf_2026_w3.db
+20260719T080645508Z | bank | bank/certify_20260719T080645485Z_p18576.txt | 6/8 probe(s) certified on window_4.csv
+20260719T080645534Z | experiments | experiments/frequency_grid_spy_1d_20260719T080607606Z_seed[2026]_p18576.txt | GRID CELL spy_1d: NO-EDGE
+20260719T080721628Z | bank | bank/admit_20260719T080721605Z_p29836.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\eth_1h\s42\wf_42_w1.db
+20260719T080721926Z | bank | bank/certify_20260719T080721901Z_p29836.txt | 6/8 probe(s) certified on window_2.csv
+20260719T080722040Z | bank | bank/admit_20260719T080722014Z_p33200.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\btc_1h\s42\wf_42_w1.db
+20260719T080722406Z | bank | bank/certify_20260719T080722383Z_p33200.txt | 8/8 probe(s) certified on window_2.csv
+20260719T080722443Z | bank | bank/admit_20260719T080722420Z_p49476.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\btc_1h\s2026\wf_2026_w1.db
+20260719T080722790Z | bank | bank/certify_20260719T080722765Z_p49476.txt | 8/8 probe(s) certified on window_2.csv
+20260719T080723028Z | bank | bank/admit_20260719T080723004Z_p43616.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\btc_1h\s7\wf_7_w1.db
+20260719T080723089Z | bank | bank/admit_20260719T080723065Z_p12784.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\eth_1h\s2026\wf_2026_w1.db
+20260719T080723347Z | bank | bank/certify_20260719T080723322Z_p43616.txt | 7/8 probe(s) certified on window_2.csv
+20260719T080723364Z | bank | bank/certify_20260719T080723338Z_p12784.txt | 6/8 probe(s) certified on window_2.csv
+20260719T080818891Z | bank | bank/admit_20260719T080818866Z_p33200.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\btc_1h\s42\wf_42_w2.db
+20260719T080821613Z | bank | bank/certify_20260719T080821587Z_p33200.txt | 5/8 probe(s) certified on window_3.csv
+20260719T080821869Z | bank | bank/admit_20260719T080821844Z_p29836.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\eth_1h\s42\wf_42_w2.db
+20260719T080822909Z | bank | bank/certify_20260719T080822884Z_p29836.txt | 1/8 probe(s) certified on window_3.csv
+20260719T080823273Z | bank | bank/admit_20260719T080823243Z_p49476.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\btc_1h\s2026\wf_2026_w2.db
+20260719T080823675Z | bank | bank/certify_20260719T080823651Z_p49476.txt | 5/8 probe(s) certified on window_3.csv
+20260719T080825037Z | bank | bank/admit_20260719T080825010Z_p12784.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\eth_1h\s2026\wf_2026_w2.db
+20260719T080825371Z | bank | bank/certify_20260719T080825347Z_p12784.txt | 2/8 probe(s) certified on window_3.csv
+20260719T080826017Z | bank | bank/admit_20260719T080825983Z_p43616.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\btc_1h\s7\wf_7_w2.db
+20260719T080826494Z | bank | bank/certify_20260719T080826471Z_p43616.txt | 7/8 probe(s) certified on window_3.csv
+20260719T080920304Z | bank | bank/admit_20260719T080920278Z_p33200.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\btc_1h\s42\wf_42_w3.db
+20260719T080920680Z | bank | bank/certify_20260719T080920656Z_p33200.txt | 0/8 probe(s) certified on window_4.csv
+20260719T080920702Z | experiments | experiments/frequency_grid_btc_1h_20260719T080618062Z_seed[42]_p33200.txt | GRID CELL btc_1h: NO-EDGE
+20260719T080920874Z | bank | bank/admit_20260719T080920848Z_p29836.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\eth_1h\s42\wf_42_w3.db
+20260719T080921153Z | bank | bank/certify_20260719T080921129Z_p29836.txt | 3/8 probe(s) certified on window_4.csv
+20260719T080921176Z | experiments | experiments/frequency_grid_eth_1h_20260719T080618072Z_seed[42]_p29836.txt | GRID CELL eth_1h: NO-EDGE
+20260719T080923095Z | bank | bank/admit_20260719T080923073Z_p49476.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\btc_1h\s2026\wf_2026_w3.db
+20260719T080923401Z | bank | bank/certify_20260719T080923376Z_p49476.txt | 1/8 probe(s) certified on window_4.csv
+20260719T080923423Z | experiments | experiments/frequency_grid_btc_1h_20260719T080618089Z_seed[2026]_p49476.txt | GRID CELL btc_1h: NO-EDGE
+20260719T080923613Z | bank | bank/admit_20260719T080923591Z_p12784.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\eth_1h\s2026\wf_2026_w3.db
+20260719T080923885Z | bank | bank/certify_20260719T080923864Z_p12784.txt | 4/8 probe(s) certified on window_4.csv
+20260719T080923911Z | experiments | experiments/frequency_grid_eth_1h_20260719T080618123Z_seed[2026]_p12784.txt | GRID CELL eth_1h: NO-EDGE
+20260719T080924015Z | bank | bank/admit_20260719T080923993Z_p43616.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\btc_1h\s7\wf_7_w3.db
+20260719T080924319Z | bank | bank/certify_20260719T080924295Z_p43616.txt | 2/8 probe(s) certified on window_4.csv
+20260719T080924342Z | experiments | experiments/frequency_grid_btc_1h_20260719T080618102Z_seed[7]_p43616.txt | GRID CELL btc_1h: NO-EDGE
+20260719T081053214Z | bank | bank/admit_20260719T081053191Z_p12780.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\eth_1h\s7\wf_7_w1.db
+20260719T081053455Z | bank | bank/certify_20260719T081053434Z_p12780.txt | 3/8 probe(s) certified on window_2.csv
+20260719T081126734Z | bank | bank/admit_20260719T081126713Z_p12780.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\eth_1h\s7\wf_7_w2.db
+20260719T081127010Z | bank | bank/certify_20260719T081126988Z_p12780.txt | 1/8 probe(s) certified on window_3.csv
+20260719T081200408Z | bank | bank/admit_20260719T081200387Z_p12780.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\eth_1h\s7\wf_7_w3.db
+20260719T081200661Z | bank | bank/certify_20260719T081200640Z_p12780.txt | 5/8 probe(s) certified on window_4.csv
+20260719T081200682Z | experiments | experiments/frequency_grid_eth_1h_20260719T081017597Z_seed[7]_p12780.txt | GRID CELL eth_1h: NO-EDGE
+20260719T081328634Z | bank | bank/admit_20260719T081328609Z_p54116.txt | 1 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\btc_1m\s2026\wf_2026_w1.db
+20260719T081329532Z | bank | bank/certify_20260719T081329510Z_p54116.txt | 0/1 probe(s) certified on window_2.csv
+20260719T081436602Z | experiments | experiments/frequency_grid_btc_1m_20260719T081222253Z_seed[42]_p34884.txt | GRID CELL btc_1m: NO-EDGE
+20260719T081438937Z | experiments | experiments/frequency_grid_btc_1m_20260719T081222282Z_seed[2026]_p54116.txt | GRID CELL btc_1m: NO-EDGE
+20260719T081706704Z | experiments | experiments/frequency_grid_btc_1m_20260719T081517567Z_seed[7]_p5648.txt | GRID CELL btc_1m: NO-EDGE
+20260719T083047926Z | experiments | experiments/frequency_grid_btc_1s_20260719T082600964Z_seed[2026]_p36700.txt | GRID CELL btc_1s: NO-EDGE
+20260719T083049069Z | experiments | experiments/frequency_grid_btc_1s_20260719T082600963Z_seed[42]_p37608.txt | GRID CELL btc_1s: NO-EDGE
+20260719T083049211Z | experiments | experiments/frequency_grid_btc_1s_20260719T082600963Z_seed[7]_p54176.txt | GRID CELL btc_1s: NO-EDGE
+20260719T083605315Z | experiments | experiments/frequency_grid_btc_1s_cost_cheap_20260719T083125295Z_seed[2026]_p20472.txt | GRID CELL btc_1s_cost_cheap: NO-EDGE
+20260719T083605476Z | experiments | experiments/frequency_grid_btc_1s_cost_cheap_20260719T083125293Z_seed[42]_p49352.txt | GRID CELL btc_1s_cost_cheap: NO-EDGE
+20260719T083605750Z | experiments | experiments/frequency_grid_btc_1s_cost_cheap_20260719T083125290Z_seed[7]_p45456.txt | GRID CELL btc_1s_cost_cheap: NO-EDGE
+20260719T083831572Z | bank | bank/admit_20260719T083831538Z_p48216.txt | 1 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\btc_1s_cost_free\s42\wf_42_w1.db
+20260719T083832869Z | bank | bank/certify_20260719T083832838Z_p48216.txt | 0/1 probe(s) certified on window_2.csv
+20260719T084055440Z | bank | bank/admit_20260719T084055404Z_p46356.txt | 1 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\btc_1s_cost_free\s7\wf_7_w2.db
+20260719T084055701Z | bank | bank/admit_20260719T084055671Z_p48216.txt | 2 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\btc_1s_cost_free\s42\wf_42_w2.db
+20260719T084055968Z | experiments | experiments/frequency_grid_btc_1s_cost_free_20260719T083607310Z_seed[2026]_p47228.txt | GRID CELL btc_1s_cost_free: NO-EDGE
+20260719T084057004Z | bank | bank/certify_20260719T084056975Z_p46356.txt | 0/1 probe(s) certified on window_3.csv
+20260719T084057028Z | experiments | experiments/frequency_grid_btc_1s_cost_free_20260719T083607307Z_seed[7]_p46356.txt | GRID CELL btc_1s_cost_free: BEATS-SPX
+20260719T084057545Z | bank | bank/certify_20260719T084057514Z_p48216.txt | 1/2 probe(s) certified on window_3.csv
+20260719T084057568Z | experiments | experiments/frequency_grid_btc_1s_cost_free_20260719T083607313Z_seed[42]_p48216.txt | GRID CELL btc_1s_cost_free: NO-EDGE
+20260719T084118247Z | experiments | experiments/frequency_grid_summary_20260719T084118215Z_seed[2026, 42, 7, 2026, 42, 7, 2026, 42, 7, 2026, 42, 7, 2026, 42, 7, 2026, 42, 7, 2026, 42, 7, 2026, 42, 7, 2026, 42, 7, 2026, 42, 7]_p36944.txt | FRONTIER: best base-cost cell btc_1d seed 7 (NO-EDGE)
+20260719T084148188Z | bank | bank/admit_20260719T084148152Z_p38528.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\holdout_btc_1d\evolve_42.db
+20260719T084148246Z | bank | bank/certify_20260719T084148215Z_p38528.txt | 3/8 probe(s) certified on btc_1d.csv
+20260719T084150727Z | bank | bank/admit_20260719T084150695Z_p38528.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\holdout_btc_1d\evolve_7.db
+20260719T084150798Z | bank | bank/certify_20260719T084150763Z_p38528.txt | 4/8 probe(s) certified on btc_1d.csv
+20260719T084153580Z | bank | bank/admit_20260719T084153549Z_p38528.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\holdout_btc_1d\evolve_2026.db
+20260719T084153642Z | bank | bank/certify_20260719T084153612Z_p38528.txt | 3/8 probe(s) certified on btc_1d.csv
+20260719T084153645Z | experiments | experiments/holdout_btc_1d_20260719T084145636Z_seed[42, 7, 2026]_p38528.txt | HOLDOUT btc_1d: NO-EDGE (0/3 seeds beat SPY on the holdout)

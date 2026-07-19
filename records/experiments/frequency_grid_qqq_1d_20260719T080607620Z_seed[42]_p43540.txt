@@ -1,0 +1,32 @@
+record: experiments/frequency_grid_qqq_1d_20260719T080607620Z_seed[42]_p43540.txt
+utc: 2026-07-19T08:06:07+00:00
+git: 5340b72-dirty
+rng_seed: [42]
+config: {"cell": "qqq_1d", "cost": "base", "csv": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\qqq_d.csv", "digest": "4e645c698e4d95ce", "grid_rows": 5504, "holdout": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\holdout\\qqq_1d.csv", "windows": 4, "seeds": [42]}
+========================================================================
+
+--- results -----------------------------------------------------
+cell qqq_1d (daily bars, cost base taker/spread 10/2 bps): 5504 grid rows, holdout 1377 rows carved
+
+seed 42:
+  window 1 -> test 2: admitted 6, certified 4/6 | evolve treasury 200079379752 u | oos pooled 6698717016 u vs B&H 7808155284 u (did not beat)
+  window 2 -> test 3: admitted 3, certified 3/3 | evolve treasury 202430410146 u | oos pooled 3482462112 u vs B&H 7480768347 u (did not beat)
+  window 3 -> test 4: admitted 8, certified 8/8 | evolve treasury 208360030925 u | oos pooled 9288656983 u vs B&H 23193181496 u (did not beat)
+  seed 42: NO-EDGE (0/3 test windows beaten)
+  spx: seed 42 oos window 2 buy-and-hold $5,944.02 (-0.17%/yr) | delta +2.21 pp/yr
+  spx: seed 42 oos window 3 buy-and-hold $5,683.53 (+12.42%/yr) | delta -9.65 pp/yr
+  spx: seed 42 oos window 4 buy-and-hold $14,600.55 (+11.64%/yr) | delta -8.87 pp/yr
+  seed 42: NO-EDGE
+
+GRID CELL qqq_1d: NO-EDGE
+
+span: 1999-03-10T00:00:00+00:00 -> 2021-01-21T00:00:00+00:00 (21.87 years)
+wall: 33.1 s
+annualized: seed 42 oos window 2 audited $6,698.72 vs initial $6,000.00 -> +2.04%/yr
+benchmark: seed 42 oos window 2 buy-and-hold $7,808.16 (+4.94%/yr) | delta -2.90 pp/yr
+annualized: seed 42 oos window 3 audited $3,482.46 vs initial $3,000.00 -> +2.77%/yr
+benchmark: seed 42 oos window 3 buy-and-hold $7,480.77 (+18.22%/yr) | delta -15.45 pp/yr
+annualized: seed 42 oos window 4 audited $9,288.66 vs initial $8,000.00 -> +2.77%/yr
+benchmark: seed 42 oos window 4 buy-and-hold $23,193.18 (+21.50%/yr) | delta -18.73 pp/yr
+
+=== RESULT: GRID CELL qqq_1d: NO-EDGE

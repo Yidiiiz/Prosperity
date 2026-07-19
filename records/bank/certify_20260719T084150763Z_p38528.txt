@@ -1,0 +1,18 @@
+record: bank/certify_20260719T084150763Z_p38528.txt
+utc: 2026-07-19T08:41:50+00:00
+git: 5340b72-dirty
+rng_seed: n/a
+config: n/a
+========================================================================
+
+--- events ------------------------------------------------------
+lapse 0829d909aae1 pnl -68661372 u
+certify 1b798e0a53b1 pnl 98304957 u
+certify 22376daf21bf pnl 175302306 u
+lapse 6f676c74de66 pnl -61839648 u
+lapse 708688561050 pnl -164362040 u
+certify 810cc4fead32 pnl 124942159 u
+certify d284ca2e8b5e pnl 167258155 u
+lapse e42f789e225f pnl -9292417 u
+
+=== RESULT: 4/8 probe(s) certified on btc_1d.csv

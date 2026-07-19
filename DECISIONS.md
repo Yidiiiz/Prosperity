@@ -608,3 +608,114 @@ parentheses.
     --parallel` with ≥1y of BTCUSDT 1m), (b) 24h live soak
     (`python -m experiments.live_soak --hours 24`), (c) green CI matrix
     on GitHub's Windows and Linux runners.
+
+80. **BUILD_SPEC_V4.md ("The Edge Hunt") authored on operator directive.**
+    The operator asked to sweep trading frequency (second → daily) and
+    assets (crypto, index ETFs) for "a way to earn money faster than the
+    S&P". The spec turns that into a falsifiable measurement: a frequency
+    × asset grid where every cell is walk-forward certified out-of-sample
+    and judged against SPY buy-and-hold over the *same calendar window*.
+    As with v3's EDGE (#75), BEATS-SPX is reported, never demanded — the
+    acceptance criterion is the measurement, not the direction.
+
+81. **Cadence profiles are a registry; daily and minute are byte-identical
+    to v3.** `experiments/profiles.py` holds four factories. `daily`
+    replicates walk_forward's config (walk_forward now imports it back,
+    so v3 experiments re-run unchanged); `minute` wraps
+    minute_ladder.base_config. Only `hourly` (max_age 365d, stagnation
+    30d, min_ticks 200) and `second` (config.live.json lifecycle with
+    hourly snapshots, min_ticks 300) are new. The fairness rule (v4
+    §3.3): capital, archetypes, gates, and venue costs are identical
+    across cadences — only tick cadence, lot size, and wall-time
+    lifecycle vary, so a frequency comparison compares frequency and
+    nothing else. A test asserts the invariant field-by-field.
+
+82. **The SPY yardstick compares same-window CAGR only, at base venue
+    costs.** `yardstick.spx_over` runs buy-and-hold on SPY over exactly
+    the cell's test-window dates; comparing a cell against SPY's long-run
+    CAGR is forbidden (a 2026 crypto window vs 1993–2026 SPY is not a
+    comparison). SPY coverage below 0.9 of the window is labeled
+    "(partial SPY coverage)"; a window with zero SPY rows is *skipped* —
+    it does not count as an SPX test, because a comparison with no
+    yardstick data is not a comparison either way. The yardstick always
+    charges base venue costs even in cost-arm runs: the counterfactual
+    applies to the strategy, not to the benchmark.
+
+83. **BEATS-SPX requires a strict majority of test windows (wins × 2 >
+    tests), same rule as EDGE (#75).** Consequence, accepted: btc_1d
+    shows mean OOS +17.5–33.3 %/yr vs SPY's +9.65 across seeds yet
+    verdicts NO-EDGE, because the wins concentrate in a minority of
+    windows. A mean can be rescued by one lucky window; a majority
+    cannot. The rule stands even where it costs us the headline.
+
+84. **The holdout is 20% of every tape, carved before windowing, spent
+    once.** The grid driver slices the final 20% of rows to
+    data/holdout/<cell>.csv before split_windows ever sees the tape, and
+    asserts the last window ends before the holdout begins. The one-shot
+    `--holdout` run writes a `.SHOT` guard file and refuses to run again
+    — a second look at a holdout is data snooping, and the machinery
+    enforces the discipline rather than trusting the operator's memory.
+
+85. **Holdout carving is atomic; Windows contention is verified, not
+    retried.** Parallel seeds of one cell carve concurrently, so the
+    carve writes to a pid-suffixed tmp file and os.replace()s it into
+    place. On Windows, replace fails with PermissionError when another
+    seed holds the target open for reading; the loser deletes its tmp
+    and *verifies* the existing file's rows equal what it would have
+    written (SystemExit on drift). Both races were observed live
+    (eth_1h seed 7, btc_1m seed 7) before the fix.
+
+86. **Big tapes stay out of git; digests are pinned in records.** The 1s
+    tape alone is 604,802 rows; btcusdt_1s/1m, all *_1h tapes, and
+    data/holdout/ are gitignored. Every grid record pins the tape's
+    digest and row count in its config line, so a re-run on different
+    bytes is detectable even though the bytes aren't versioned.
+
+87. **The cost arm ran on btc_1s and separated friction from signal.**
+    At base costs (10/2 bps) and cheap (2/1), zero lineages certified on
+    second bars across all seeds — friction kills every candidate before
+    out-of-sample. At free (0/0, labeled COUNTERFACTUAL — no retail
+    venue offers these costs), champions certify at last: seed 7
+    "BEATS-SPX" on its single test window by losing 25.7 %/yr while SPY
+    annualized −90.7 over the same 1.9 down days; seeds 42/2026 NO-EDGE.
+    Conclusion, recorded not assumed: second-scale trading fails on
+    friction *first* (any real venue) and signal *second* (even free,
+    the best result is losing slower than a falling yardstick). The
+    operator's 1 %/hour hypothesis is dead at both layers.
+
+88. **The holdout went to btc_1d by the pre-registered rule, not to
+    eth_1d by its verdicts — and said NO-EDGE.** Spec §6.2 fixes the
+    holdout cell as best OOS annualized delta vs SPY; that is btc_1d
+    (deltas +7.9/+17.8/+23.7 pp/yr, sum ≈ 49 vs eth_1d's ≈ 30) even
+    though only eth_1d earned BEATS-SPX verdicts in-grid. Overriding
+    the rule after seeing verdicts is the post-hoc selection the rule
+    exists to prevent, so the rule fired as written. Result, one shot,
+    2024-10-06 → 2026-07-19 (1.78y, 652 rows): 0/3 seeds beat SPY
+    (champions −2.23/+1.82/−1.11 %/yr vs SPY +16.16; BTC B&H itself
+    only +1.54). The grid's star cell was riding an asset whose beta
+    then went flat — which is precisely what a holdout is for. The
+    .SHOT guard now forbids reruns; a second look requires data that
+    postdates 2026-07-19.
+
+89. **v4.0 acceptance status at build completion.** All five §10
+    criteria hold. (1) 214 tests green (198 v3 + 16 v4). (2) Every §4.1
+    cell recorded with digest, span, per-seed verdicts, three-way
+    footer; frontier table in the summary record. Grid verdicts, base
+    costs, mean OOS %/yr vs SPY same-window: spy_1d −0.4..−0.6 vs +4.6;
+    qqq_1d +1.9..+2.5 vs +8.0; btc_1d +17.5..+33.3 vs +9.7 yet NO-EDGE
+    by window majority (#83); eth_1d BEATS-SPX ×2 seeds (+16.2, +27.2
+    vs +14.9), NO-EDGE ×1; btc_1h +5.8..+9.4 vs +22.2; eth_1h
+    −6.4..−0.8 vs +22.2; btc_1m one certified line at −89.7, two seeds
+    zero champions; btc_1s zero champions certified at any seed. The
+    frequency gradient is monotone the *wrong* way for the fast-trading
+    thesis: daily > hourly ≫ minute > second. (3) Cost arm recorded
+    with counterfactual labels (#87). (4) The holdout ran exactly once:
+    **HOLDOUT btc_1d: NO-EDGE, 0/3 seeds** (#88) — the recorded v4
+    headline. (5) BEATS-SPX was not required, and indeed did not
+    survive the holdout: at retail costs on these tapes, nothing here
+    earns faster than the S&P out-of-sample. That sentence is the
+    deliverable. Line budget: experiments/ is 1,618 non-blank against
+    the ~1,600 ceiling (+18, accepted — the overage is the holdout
+    guard and the Windows carve-race handling, both mandated);
+    colony/ untouched at v3's surface. The .SHOT guard is committed
+    (gitignore exception) so the rerun refusal survives clones.

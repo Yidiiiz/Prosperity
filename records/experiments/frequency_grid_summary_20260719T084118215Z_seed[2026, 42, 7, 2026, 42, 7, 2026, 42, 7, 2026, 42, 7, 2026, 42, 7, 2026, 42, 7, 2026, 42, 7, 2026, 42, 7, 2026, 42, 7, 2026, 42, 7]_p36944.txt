@@ -1,0 +1,45 @@
+record: experiments/frequency_grid_summary_20260719T084118215Z_seed[2026, 42, 7, 2026, 42, 7, 2026, 42, 7, 2026, 42, 7, 2026, 42, 7, 2026, 42, 7, 2026, 42, 7, 2026, 42, 7, 2026, 42, 7, 2026, 42, 7]_p36944.txt
+utc: 2026-07-19T08:41:18+00:00
+git: 5340b72-dirty
+rng_seed: [2026, 42, 7, 2026, 42, 7, 2026, 42, 7, 2026, 42, 7, 2026, 42, 7, 2026, 42, 7, 2026, 42, 7, 2026, 42, 7, 2026, 42, 7, 2026, 42, 7]
+config: {"workdir": "work_grid", "results": 30}
+========================================================================
+
+--- frontier ----------------------------------------------------
+cell        cost   seed  verdict     oos%/yr   tape%/yr   spx%/yr
+
+btc_1d      base   2026  NO-EDGE       +17.50     +71.04     +9.65
+btc_1d      base   42    NO-EDGE       +27.41     +71.04     +9.65
+btc_1d      base   7     NO-EDGE       +33.30     +71.04     +9.65
+btc_1h      base   2026  NO-EDGE        +5.80     +81.20    +22.17
+btc_1h      base   42    NO-EDGE        +8.97     +81.20    +22.17
+btc_1h      base   7     NO-EDGE        +9.36     +81.20    +22.17
+btc_1m      base   2026  NO-EDGE       -89.71     -63.67     +4.02
+btc_1m      base   42    NO-EDGE      no certified champions
+btc_1m      base   7     NO-EDGE      no certified champions
+btc_1s      base   2026  NO-EDGE      no certified champions
+btc_1s      base   42    NO-EDGE      no certified champions
+btc_1s      base   7     NO-EDGE      no certified champions
+btc_1s      cheap  2026  NO-EDGE      no certified champions
+btc_1s      cheap  42    NO-EDGE      no certified champions
+btc_1s      cheap  7     NO-EDGE      no certified champions
+btc_1s      free   2026  NO-EDGE      no certified champions
+btc_1s      free   42    NO-EDGE       -42.09 +321944.73    -25.01
+btc_1s      free   7     BEATS-SPX     -25.67     -99.45    -90.70
+eth_1d      base   2026  BEATS-SPX     +16.22     +75.04    +14.94
+eth_1d      base   42    BEATS-SPX     +27.21     +75.04    +14.95
+eth_1d      base   7     NO-EDGE       +26.39     +89.32     +9.65
+eth_1h      base   2026  NO-EDGE        -0.76     +36.89    +22.17
+eth_1h      base   42    NO-EDGE        -1.07     +36.89    +22.17
+eth_1h      base   7     NO-EDGE        -6.44     +36.89    +22.17
+qqq_1d      base   2026  NO-EDGE        +1.91     +14.89     +7.96
+qqq_1d      base   42    NO-EDGE        +2.53     +14.89     +7.96
+qqq_1d      base   7     NO-EDGE        +2.42     +14.89     +7.96
+spy_1d      base   2026  NO-EDGE        -0.55      +4.55     +4.55
+spy_1d      base   42    NO-EDGE        -0.39      +4.55     +4.55
+spy_1d      base   7     NO-EDGE        -0.53      +4.55     +4.55
+
+(%/yr = mean CAGR across that seed's out-of-sample test windows; sub-year windows are projections — v3 2.3; cheap/free cost rows are counterfactual — v4 5.2)
+FRONTIER: best base-cost cell btc_1d seed 7 (NO-EDGE)
+
+=== RESULT: FRONTIER: best base-cost cell btc_1d seed 7 (NO-EDGE)

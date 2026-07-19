@@ -1,0 +1,29 @@
+record: experiments/frequency_grid_btc_1d_20260719T080607555Z_seed[7]_p40452.txt
+utc: 2026-07-19T08:06:07+00:00
+git: 5340b72-dirty
+rng_seed: [7]
+config: {"cell": "btc_1d", "cost": "base", "csv": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\btcusdt_1d.csv", "digest": "04a7ffaab7247e92", "grid_rows": 2607, "holdout": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\holdout\\btc_1d.csv", "windows": 4, "seeds": [7]}
+========================================================================
+
+--- results -----------------------------------------------------
+cell btc_1d (daily bars, cost base taker/spread 10/2 bps): 2607 grid rows, holdout 652 rows carved
+
+seed 7:
+  window 1 -> test 2: admitted 8, certified 8/8 | evolve treasury 214567118157 u | oos pooled 20808063067 u vs B&H 53911296832 u (did not beat)
+  window 2 -> test 3: admitted 3, certified 0/3 | evolve treasury 234231248454 u | oos pooled 2763313275 u vs B&H 871742673 u (beat)
+  window 3 -> test 4: admitted 0, certified 0/0 | evolve treasury 195163715218 u | oos pooled 0 u vs B&H 0 u (did not beat)
+  seed 7: NO-EDGE (1/3 test windows beaten)
+  spx: seed 7 oos window 2 buy-and-hold $11,143.99 (+20.47%/yr) | delta +50.64 pp/yr
+  spx: seed 7 oos window 3 buy-and-hold $2,937.92 (-1.17%/yr) | delta -3.34 pp/yr
+  seed 7: NO-EDGE
+
+GRID CELL btc_1d: NO-EDGE
+
+span: 2017-08-17T00:00:00+00:00 -> 2024-10-05T00:00:00+00:00 (7.13 years)
+wall: 18.8 s
+annualized: seed 7 oos window 2 audited $20,808.06 vs initial $8,000.00 -> +71.11%/yr
+benchmark: seed 7 oos window 2 buy-and-hold $53,911.30 (+192.15%/yr) | delta -121.04 pp/yr
+annualized: seed 7 oos window 3 audited $2,763.31 vs initial $3,000.00 -> -4.51%/yr
+benchmark: seed 7 oos window 3 buy-and-hold $871.74 (-50.07%/yr) | delta +45.55 pp/yr
+
+=== RESULT: GRID CELL btc_1d: NO-EDGE

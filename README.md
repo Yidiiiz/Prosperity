@@ -185,6 +185,49 @@ reports the delta whichever way it points. Every replay record ends with the
 mandatory footer: span, wall, annualized return (marked "(projected)" under
 a year), and the buy-and-hold benchmark with delta.
 
+## The frequency frontier (v4)
+
+```
+python -m experiments.frequency_grid --cells all --workdir work_grid --parallel
+python -m experiments.frequency_grid --summarize --workdir work_grid
+python -m experiments.frequency_grid --holdout <cell> --workdir work_grid   # fires ONCE
+```
+
+v4 asks one question: is there a trading cadence (second / minute / hourly /
+daily) and asset (BTC, ETH, SPY, QQQ) where certified champions earn faster
+than S&P-500 buy-and-hold over the same calendar window? Every cell is the
+v3 walk-forward — evolve on window k, certify on k+1 by frozen solo probe —
+judged against `spx_over` the same dates (never against SPY's long-run
+average), with the final 20 % of every tape carved off as a one-shot holdout
+before any window is cut. Intraday equities are absent by honesty, not
+oversight: no free intraday equity tape of fetchable quality exists, so
+crypto carries the intraday axis.
+
+Measured (mean OOS %/yr vs SPY same-window, seeds 42/7/2026, base retail
+costs 10 bps taker / 2 bps spread):
+
+| cell    | verdict        | champions %/yr | SPY %/yr |
+|---------|----------------|----------------|----------|
+| eth_1d  | BEATS-SPX ×2, NO-EDGE ×1 | +16.2 .. +27.2 | +14.9 |
+| btc_1d  | NO-EDGE (window majority) | +17.5 .. +33.3 | +9.7 |
+| qqq_1d  | NO-EDGE        | +1.9 .. +2.5   | +8.0     |
+| spy_1d  | NO-EDGE        | −0.6 .. −0.4   | +4.6     |
+| btc_1h  | NO-EDGE        | +5.8 .. +9.4   | +22.2    |
+| eth_1h  | NO-EDGE        | −6.4 .. −0.8   | +22.2    |
+| btc_1m  | NO-EDGE        | 1 seed −89.7; 2 seeds zero champions | +4.0 |
+| btc_1s  | NO-EDGE        | zero champions certified | — |
+
+The gradient is monotone the wrong way for the trade-faster thesis: daily >
+hourly ≫ minute > second. The cost arm (btc_1s at counterfactual 2/1 and
+0/0 bps) shows second-scale trading fails on friction first and signal
+second — even at free costs the best seed merely lost slower than a falling
+yardstick. The one-shot holdout went to the best cell by pre-registered rule
+(btc_1d, best OOS delta) and is the v4 headline: **HOLDOUT NO-EDGE — 0/3
+seeds beat SPY** on 2024-10-06 → 2026-07-19 (champions −2.2/+1.8/−1.1 %/yr
+vs SPY +16.2; BTC buy-and-hold itself +1.5). At retail costs on these
+tapes, nothing here earns faster than the S&P out-of-sample — that map is
+the deliverable, and it is cheaper than learning it with real money.
+
 ## Money conservation, stated plainly
 
 Every movement of money is one ledger row with a debit and a credit account.
