@@ -269,6 +269,48 @@ cross-asset momentum is the literature's most robust anomaly and also its
 most famous crasher. `data/holdout/alloc.SHOT` forbids reruns; a second
 look requires data that postdates 2026-07-19.
 
+## The universe bench (v6)
+
+```
+python -m experiments.allocation6                      # equity era (decisive)
+python -m experiments.allocation6 --bench full         # crypto era (exploratory)
+python -m experiments.allocation6 --holdout <family>   # fires ONCE
+```
+
+v6 stress-tests the v5 survivor on the two axes v5 couldn't: **more assets**
+(iwm, efa, gld, tlt join the universe) and **more history** (the equity-era
+bench reaches back to GLD inception, 2004-11-18, covering 2008/2011/2015/
+2018/2020). Six families with grids frozen in BUILD_SPEC_V6.md: three
+momentum expansions (`dm_topk` — top-K generalization, K=1 provably bridges
+to the v5 winner; `dm_1201` — classical skip-month; `dm_defensive` — tlt/gld
+fallback) and two new ideas (`sma_ew` — Faber tactical; `inv_vol` — risk
+parity lite), plus the `best_bh` control.
+
+Measured, 9 OOS windows each:
+
+| family | equity era 2004→2022 | crypto era 2017→2026 |
+|---|---|---|
+| dm_topk | 3/9, −3.19 pp/yr | **6/9, +31.70 pp/yr** |
+| dm_1201 | 5/9, −2.57 pp/yr | 4/9, +31.64 pp/yr |
+| dm_defensive | 1/9, −9.00 pp/yr | **6/9, +56.30 pp/yr** |
+| sma_ew | 1/9, −4.47 pp/yr | 3/9, +5.12 pp/yr |
+| inv_vol | 4/9, −0.86 pp/yr | 5/9, −0.47 pp/yr |
+| best_bh (control) | **6/9, +4.89 pp/yr** | 3/9, −11.34 pp/yr |
+
+The two columns invert. Rotation earns its keep only where the universe has
+real dispersion (crypto vs equities); on the correlated ETF universe the
+monthly rotators pay tolls to whipsaw, while the control's wins ride
+decade-scale regimes (gold 2005–2011, QQQ 2014–2020) — "hold last window's
+winner" is itself momentum at a ~1.7-year clock. The v6 one-shot holdout
+(final 1,089 equity-era days, 2022-03-15 → 2026-07-17, through the 2022
+bear) therefore went to the *control* by the pre-registered rule:
+**best_bh [asset=qqq] $10,000 → $21,142.69 (+18.83 %/yr) vs SPY $17,399.98
+(+13.61 %/yr), delta +5.22 pp/yr, BEATS-SPX**, robust at 2× and 5× costs
+(two trades). Honest reading: that verdict is concentrated growth beta, not
+skill — gld nearly matched ($20,547) and tlt lost a third — and its tail
+overlaps the spent v5 holdout (disclosed in the spec before the run).
+`data/holdout/alloc6.SHOT` forbids reruns.
+
 ## Money conservation, stated plainly
 
 Every movement of money is one ledger row with a debit and a credit account.

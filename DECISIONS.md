@@ -784,3 +784,64 @@ parentheses.
     committed tapes); the .SHOT is committed via the existing
     gitignore exception. Red lines untouched: virtual money only, no
     order placement, no self-modification, no network calls in core.
+
+95. **v6 spec ratified on operator directive ("take your learnings onto
+    v6. expand on the working idea and try new ones too").** Two
+    universes: U_FULL adds iwm/efa/gld/tlt to the v5 four (2017-08-17
+    span, crypto binds); U_ETF drops crypto and reaches back to GLD
+    inception 2004-11-18 (5,448 SPY days covering 2008/2011/2015/
+    2018/2020). Six families, grids frozen in the spec before code:
+    dm_topk (generalizes the v5 winner; K=1 bridges exactly, proven
+    by test), dm_1201 (classical skip-month), dm_defensive (tlt/gld
+    fallback instead of cash), sma_ew (Faber tactical), inv_vol
+    (risk-parity lite), best_bh (the control again). Bench A (U_FULL)
+    walks the whole span but is exploratory only: v5 spent that
+    span's holdout and the momentum result there is known. Bench B
+    (U_ETF) carves a fresh final-20% holdout (2022-03 -> 2026-07,
+    containing the 2022 bear) whose tail-overlap contamination is
+    disclosed in the spec *before* any run, plus a post-shot 2x/5x
+    cost ladder formalizing the v5 probe.
+
+96. **Bench B (equity era, decisive): momentum's edge does not
+    survive the crypto-free universe -- and the control is the
+    frontier.** Over 9 OOS windows 2004->2022: dm_topk 3/9 (mean
+    -3.19 pp/yr), dm_1201 5/9 BEATS-SPX on count but -2.57 pp/yr on
+    mean, dm_defensive 1/9 (-9.00), sma_ew 1/9 (-4.47), inv_vol 4/9
+    (-0.86), best_bh 6/9 and +4.89 pp/yr -- the only family positive
+    on both metrics. Its wins ride decade-scale regimes (GLD w2-w4,
+    QQQ w7-w9): on a homogeneous ETF universe, "hold last window's
+    winner" IS momentum at a ~1.7-year clock, and the monthly
+    rotation families mostly pay tolls to whipsaw between correlated
+    assets. Bench A (crypto era) shows the inverse: dm_topk 6/9
+    +31.70, dm_defensive 6/9 +56.30, best_bh 3/9 -11.34. Read
+    together: the v5 momentum edge is substantially crypto-dispersion
+    -- rotation earns its keep only when the universe contains assets
+    whose returns actually diverge.
+
+97. **The v6 holdout fired once at best_bh [asset=qqq] -- the
+    pre-registered rule chose the control, and the rule held.** v6 4
+    says highest bench-B mean OOS delta fires, no post-hoc overrides,
+    even though "the control won" is an awkward winner. Selection on
+    the 4,359-row grid span picked qqq; frozen; run on the carved
+    1,089 rows (2022-03-15 -> 2026-07-17, 4.34y): $10,000 ->
+    $21,142.69 (+18.83%/yr) vs SPY $17,399.98 (+13.61%/yr), delta
+    +5.22 pp/yr, BEATS-SPX. Cost ladder: beats at 2x ($21,093.82)
+    and 5x ($20,955.02) -- two trades, friction is noise. Holdout
+    context: gld $20,547.29 nearly matched, tlt $6,412.01 lost 36%.
+    Caveats recorded: the verdict is "concentrated growth beta beat
+    the index", not stock-picking skill; the tail overlaps the spent
+    v5 span (disclosed pre-run); QQQ underperformed SPY for a decade
+    after 2000 -- regime persistence is the entire bet.
+    data/holdout/alloc6.SHOT forbids reruns.
+
+98. **v6 acceptance status at build completion.** Records carry the
+    footer and per-window spx lines; tests (9) cover the equity-era
+    calendar join, future-corruption leakage across all six families,
+    the dm_topk K=1 == v5 dual_momentum bridge, no-leverage weight
+    invariants, inv_vol normalization, dm_defensive fallback,
+    flat-tape conservation, deterministic selection, and the alloc6
+    guard refusal; full suite 230 green. experiments/allocation6.py
+    reuses v5's CAPITAL_U/BASE_VENUE/fmt/split_bounds and the colony
+    risk/benchmark/yardstick/Record machinery; v5 code untouched
+    (frozen evidence). alloc6.csv stays gitignored; alloc6.SHOT
+    committed via the existing exception. Red lines untouched.

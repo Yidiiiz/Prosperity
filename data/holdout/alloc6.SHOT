@@ -1,0 +1,4 @@
+fired: 2026-07-19T20:00:42+00:00
+family: best_bh [asset=qqq]
+HOLDOUT alloc6 best_bh [asset=qqq]: BEATS-SPX (beat SPY on the holdout, delta +5.22 pp/yr)
+reruns refuse: a second look requires data that postdates the shot (v6 4)
