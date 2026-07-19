@@ -214,3 +214,5 @@
 20260719T084153580Z | bank | bank/admit_20260719T084153549Z_p38528.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_grid\holdout_btc_1d\evolve_2026.db
 20260719T084153642Z | bank | bank/certify_20260719T084153612Z_p38528.txt | 3/8 probe(s) certified on btc_1d.csv
 20260719T084153645Z | experiments | experiments/holdout_btc_1d_20260719T084145636Z_seed[42, 7, 2026]_p38528.txt | HOLDOUT btc_1d: NO-EDGE (0/3 seeds beat SPY on the holdout)
+20260719T194116713Z | experiments | experiments/alloc_bench_20260719T194116440Z_p38780.txt | ALLOC BENCH dual_momentum: BEATS-SPX (5/7, +122.20 pp/yr); trend: BEATS-SPX (4/7, +0.49 pp/yr); equal_weight: BEATS-SPX (4/7, +53.25 pp/yr); vol_target: NO-EDGE (2/7, -3.74 pp/yr); best_bh: NO-EDGE (3/7, -5.07 pp/yr) | FRONTIER dual_momentum (holdout target by v5 4)
+20260719T194141986Z | experiments | experiments/holdout_alloc_dual_momentum_20260719T194141950Z_p20452.txt | HOLDOUT alloc dual_momentum [L=252]: BEATS-SPX (beat SPY on the holdout, delta +18.00 pp/yr)

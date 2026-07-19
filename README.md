@@ -228,6 +228,47 @@ vs SPY +16.2; BTC buy-and-hold itself +1.5). At retail costs on these
 tapes, nothing here earns faster than the S&P out-of-sample — that map is
 the deliverable, and it is cheaper than learning it with real money.
 
+## The allocation bench (v5)
+
+```
+python -m experiments.allocation                       # all five families
+python -m experiments.allocation --holdout <family>    # fires ONCE
+```
+
+v4 settled *how fast* (daily, and still not fast enough); v5 tests *what to
+hold*: four deterministic daily strategy families over SPY/QQQ/BTC/ETH —
+dual momentum (hold the trailing-L winner or cash), trend (asset above its
+SMA or cash), equal-weight rebalancing, volatility targeting — plus a
+`best_bh` beta control that just buys last window's best asset. Parameter
+grids were pre-declared in BUILD_SPEC_V5.md; train window k selects, the
+frozen pick runs on window k+1; signals lag fills by one day; every fill
+pays base venue costs. No leverage, no seeds (nothing random to seed).
+
+Measured (7 test windows on 2017-08-17 → 2024-10-01, verdict by strict
+window majority vs SPY same-window):
+
+| family        | verdict   | windows beat SPY | mean OOS delta |
+|---------------|-----------|------------------|----------------|
+| dual_momentum | BEATS-SPX | 5/7              | +122.2 pp/yr¹  |
+| equal_weight  | BEATS-SPX | 4/7              | +53.3 pp/yr¹   |
+| trend         | BEATS-SPX | 4/7              | +0.5 pp/yr     |
+| vol_target    | NO-EDGE   | 2/7              | −3.7 pp/yr     |
+| best_bh (control) | NO-EDGE | 3/7            | −5.1 pp/yr     |
+
+¹ outlier-heavy: one 2020–21 window where momentum rode BTC/ETH to 7×.
+
+The control failing while momentum certifies means the majority is not
+asset selection in a costume. The one-shot holdout (final 448 days,
+2024-10-02 → 2026-07-17 — the same flat-crypto stretch that killed v4's
+btc_1d) went to dual_momentum by the pre-registered rule and is the first
+positive holdout in this repository: **[L=252] $10,000 → $16,871.76
+(+33.99 %/yr) vs SPY $13,035.91 (+15.99 %/yr), delta +18.00 pp/yr**, and it
+beat every single-asset buy-and-hold it could have hidden in (best was QQQ
+at $14,394). One window, one shot, 1.79 years: evidence, not proof —
+cross-asset momentum is the literature's most robust anomaly and also its
+most famous crasher. `data/holdout/alloc.SHOT` forbids reruns; a second
+look requires data that postdates 2026-07-19.
+
 ## Money conservation, stated plainly
 
 Every movement of money is one ledger row with a debit and a credit account.

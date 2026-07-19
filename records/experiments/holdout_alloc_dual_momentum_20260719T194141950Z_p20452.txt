@@ -1,0 +1,21 @@
+record: experiments/holdout_alloc_dual_momentum_20260719T194141950Z_p20452.txt
+utc: 2026-07-19T19:41:41+00:00
+git: a1cb4f9-dirty
+rng_seed: n/a
+config: {"tapes": {"btc": "04a7ffaab7247e92", "eth": "f39be30bca94c97f", "qqq": "4e645c698e4d95ce", "spy": "7f758062b681ee8e"}, "joint_rows": 2240, "grid_rows": 1792, "windows": 8, "capital_u": 10000000000, "venue": {"taker_bps": 10, "maker_bps": 0, "spread_bps": 2, "min_fee_u": 0, "fill_delay_ticks": 1}}
+========================================================================
+
+--- results -----------------------------------------------------
+holdout shot (v5 4): family dual_momentum, params [L=252] re-selected on the full grid span (1792 rows), frozen
+
+  holdout dual_momentum [L=252]: $16,871.76 vs SPY $13,035.91 (beat)
+  spx: holdout dual_momentum [L=252] buy-and-hold $13,035.91 (+15.99%/yr) | delta +18.00 pp/yr
+  context: holdout buy-and-hold btc $10,518.03, eth $7,773.73, qqq $14,394.40, spy $13,035.91
+HOLDOUT alloc dual_momentum [L=252]: BEATS-SPX (beat SPY on the holdout, delta +18.00 pp/yr)
+
+span: 2024-10-02T00:00:00+00:00 -> 2026-07-17T00:00:00+00:00 (1.79 years)
+wall: 0.0 s
+annualized: holdout dual_momentum [L=252] audited $16,871.76 vs initial $10,000.00 -> +33.99%/yr
+benchmark: holdout dual_momentum [L=252] buy-and-hold $13,035.91 (+15.99%/yr) | delta +18.00 pp/yr
+
+=== RESULT: HOLDOUT alloc dual_momentum [L=252]: BEATS-SPX (beat SPY on the holdout, delta +18.00 pp/yr)

@@ -1,0 +1,4 @@
+fired: 2026-07-19T19:41:41+00:00
+family: dual_momentum [L=252]
+HOLDOUT alloc dual_momentum [L=252]: BEATS-SPX (beat SPY on the holdout, delta +18.00 pp/yr)
+reruns refuse: a second look requires data that postdates the shot (v5 4)

@@ -719,3 +719,68 @@ parentheses.
     guard and the Windows carve-race handling, both mandated);
     colony/ untouched at v3's surface. The .SHOT guard is committed
     (gitignore exception) so the rerun refusal survives clones.
+
+90. **BUILD_SPEC_V5.md ("the Allocation Bench") authored on operator
+    directive.** The operator asked to "brainstorm ideas to beat s&p
+    and keep testing." v4 settled the frequency axis (daily won and
+    still lost the holdout), so v5 tests the axis v4 could not: which
+    assets to hold and when, at daily cadence only. Four hand-crafted
+    parameterized families (dual_momentum, trend, equal_weight,
+    vol_target) plus a best_bh beta control over SPY/QQQ/BTC/ETH, with
+    every parameter grid pre-declared in the spec before any code ran.
+    No leverage anywhere: a financing-cost model would be invented
+    rather than measured. No seeds: the families are deterministic
+    (deviation from the three-seed convention, accepted because there
+    is no RNG to vary — robustness is 7 test windows plus the holdout).
+
+91. **The joint calendar samples crypto backward, never forward, and
+    signals lag fills by one day.** Master clock = SPY trading days
+    inside the span all four tapes cover (2017-08-17 → 2026-07-17,
+    2,240 rows). Crypto trades weekends; each SPY day takes the latest
+    crypto close ≤ that day. Signals on day i use closes through i−1
+    and fill at day i's close, mirroring the colony's
+    fill_delay_ticks = 1. A machinery test corrupts all data ≥ i and
+    asserts targets are unchanged — future-leakage is a test failure,
+    not a code-review hope. All fills pay base venue costs (10 bps
+    taker, 2 bps spread) through the same risk helpers agents use.
+
+92. **Bench results (7 test windows, train-window selection, frozen
+    OOS): three families certified BEATS-SPX; the beta control did
+    not.** dual_momentum 5/7 windows beat SPY (mean OOS delta +122.2
+    pp/yr — dominated by the w4 melt-up window where L=252 held
+    BTC/ETH through Apr 2020→Feb 2021, $10,000 → $72,583); trend 4/7
+    (+0.5); equal_weight 4/7 (+53.3); vol_target 2/7 NO-EDGE (−3.7);
+    best_bh 3/7 NO-EDGE (−5.1). The control's failure is the point:
+    picking last window's best asset loses, so momentum's majority is
+    not explained by asset selection alone. Means are outlier-heavy;
+    the win-count majority (v4 §5 strict rule) is the verdict that
+    matters, and dual_momentum leads on both.
+
+93. **The v5 holdout fired once at dual_momentum [L=252] and said
+    BEATS-SPX — the first positive holdout in this repository.** The
+    pre-registered rule (v5 §4: highest mean OOS delta) chose the same
+    family the win counts chose. Params re-selected on the full 1,792-
+    row grid span, frozen, run on the carved final 448 rows
+    (2024-10-02 → 2026-07-17, 1.79y — the same flat-crypto period that
+    killed v4's btc_1d): $10,000 → $16,871.76 (+33.99%/yr) vs SPY
+    buy-and-hold $13,035.91 (+15.99%/yr), delta +18.00 pp/yr. It also
+    beat every single-asset buy-and-hold on the holdout (btc $10,518,
+    eth $7,774, qqq $14,394, spy $13,036): the rotation added value
+    over even the best asset it could have sat in. Caveats recorded
+    with the result: one window, one shot, 1.79 years; cross-asset
+    momentum is the best-documented anomaly in the literature *and*
+    is known for decade-scale crashes; this is evidence, not proof.
+    data/holdout/alloc.SHOT forbids reruns; a second look requires
+    data postdating 2026-07-19.
+
+94. **v5 acceptance status at build completion.** Spec §5 holds:
+    records carry the mandatory footer and per-window spx lines;
+    tests cover the calendar join, the cost round-trip (22 bps), the
+    future-corruption leakage check, deterministic selection from the
+    declared grid, the holdout guard refusal, and the no-leverage cap;
+    experiments/allocation.py is one module (~300 lines) reusing v3/v4
+    risk, benchmark, yardstick, and Record machinery unchanged. The
+    holdout CSV stays gitignored (digest-derivable from the four
+    committed tapes); the .SHOT is committed via the existing
+    gitignore exception. Red lines untouched: virtual money only, no
+    order placement, no self-modification, no network calls in core.
