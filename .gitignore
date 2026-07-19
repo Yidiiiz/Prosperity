@@ -26,4 +26,6 @@ data/holdout/*
 # the one-shot guard survives clones — a rerun refusal must not depend on
 # one machine's disk (v4 6.2)
 !data/holdout/*.SHOT
+# the forward-holdout declaration is a commitment, not data (v7 4)
+!data/holdout/*.FORWARD
 fetch_err.log

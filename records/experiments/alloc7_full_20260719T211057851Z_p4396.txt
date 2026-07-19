@@ -1,0 +1,211 @@
+record: experiments/alloc7_full_20260719T211057851Z_p4396.txt
+utc: 2026-07-19T21:10:57+00:00
+git: be03764
+rng_seed: n/a
+config: {"tapes": {"btc": "04a7ffaab7247e92", "efa": "e5d42c351173e9a4", "eth": "f39be30bca94c97f", "gld": "4029ec5933a6219d", "iwm": "2280b20d4e11a705", "qqq": "4e645c698e4d95ce", "spy": "7f758062b681ee8e", "tlt": "36f6789c28dee591"}, "universe": ["btc", "efa", "eth", "gld", "iwm", "qqq", "spy", "tlt"], "windows": 10, "capital_u": 10000000000, "venue": {"taker_bps": 10, "maker_bps": 0, "spread_bps": 2, "min_fee_u": 0, "fill_delay_ticks": 1}}
+========================================================================
+
+--- results -----------------------------------------------------
+dispersion-gate bench (full: btc,efa,eth,gld,iwm,qqq,spy,tlt): 2240 joint days / 10 windows, no historical carve — every past holdout span is spent (v7 1)
+
+family dm_gated:
+  dm_gated [Lf=126,G=0.15] w2: $9,428.67 vs SPY $9,982.67 (did not beat)
+  spx: dm_gated [Lf=126,G=0.15] w2 buy-and-hold $9,982.67 (-0.20%/yr (projected)) | delta -6.22 pp/yr
+  dm_gated [Lf=63,G=0.3] w3: $6,761.21 vs SPY $10,207.06 (did not beat)
+  spx: dm_gated [Lf=63,G=0.3] w3 buy-and-hold $10,207.06 (+2.33%/yr (projected)) | delta -37.92 pp/yr
+  dm_gated [Lf=63,G=0.3] w4: $51,784.27 vs SPY $14,236.37 (beat)
+  spx: dm_gated [Lf=63,G=0.3] w4 buy-and-hold $14,236.37 (+49.10%/yr (projected)) | delta +493.03 pp/yr
+  dm_gated [Lf=126,G=0.15] w5: $12,669.14 vs SPY $10,934.05 (beat)
+  spx: dm_gated [Lf=126,G=0.15] w5 buy-and-hold $10,934.05 (+10.66%/yr (projected)) | delta +20.12 pp/yr
+  dm_gated [Lf=126,G=0.15] w6: $8,945.59 vs SPY $8,653.32 (beat)
+  spx: dm_gated [Lf=126,G=0.15] w6 buy-and-hold $8,653.32 (-15.13%/yr (projected)) | delta +3.26 pp/yr
+  dm_gated [Lf=126,G=0.3] w7: $10,684.52 vs SPY $11,480.37 (did not beat)
+  spx: dm_gated [Lf=126,G=0.3] w7 buy-and-hold $11,480.37 (+16.84%/yr (projected)) | delta -9.09 pp/yr
+  dm_gated [Lf=126,G=0.15] w8: $16,388.99 vs SPY $13,077.25 (beat)
+  spx: dm_gated [Lf=126,G=0.15] w8 buy-and-hold $13,077.25 (+34.94%/yr (projected)) | delta +38.70 pp/yr
+  dm_gated [Lf=126,G=0.15] w9: $17,616.48 vs SPY $11,268.47 (beat)
+  spx: dm_gated [Lf=126,G=0.15] w9 buy-and-hold $11,268.47 (+14.27%/yr (projected)) | delta +73.96 pp/yr
+  dm_gated [Lf=63,G=0.15] w10: $9,869.32 vs SPY $11,495.41 (did not beat)
+  spx: dm_gated [Lf=63,G=0.15] w10 buy-and-hold $11,495.41 (+16.96%/yr (projected)) | delta -18.42 pp/yr
+  dm_gated: BEATS-SPX (5/9 windows beat SPY) | mean OOS delta +61.93 pp/yr
+
+family slow_bh:
+  slow_bh [L=252,R=63] w2: $6,505.08 vs SPY $9,982.67 (did not beat)
+  spx: slow_bh [L=252,R=63] w2 buy-and-hold $9,982.67 (-0.20%/yr (projected)) | delta -38.22 pp/yr
+  slow_bh [L=252,R=126] w3: $7,962.31 vs SPY $10,207.06 (did not beat)
+  spx: slow_bh [L=252,R=126] w3 buy-and-hold $10,207.06 (+2.33%/yr (projected)) | delta -24.92 pp/yr
+  slow_bh [L=378,R=126] w4: $44,415.16 vs SPY $14,236.37 (beat)
+  spx: slow_bh [L=378,R=126] w4 buy-and-hold $14,236.37 (+49.10%/yr (projected)) | delta +390.70 pp/yr
+  slow_bh [L=252,R=63] w5: $13,247.85 vs SPY $10,934.05 (beat)
+  spx: slow_bh [L=252,R=63] w5 buy-and-hold $10,934.05 (+10.66%/yr (projected)) | delta +26.92 pp/yr
+  slow_bh [L=252,R=63] w6: $6,445.52 vs SPY $8,653.32 (did not beat)
+  spx: slow_bh [L=252,R=63] w6 buy-and-hold $8,653.32 (-15.13%/yr (projected)) | delta -24.11 pp/yr
+  slow_bh [L=378,R=63] w7: $11,107.20 vs SPY $11,480.37 (did not beat)
+  spx: slow_bh [L=378,R=63] w7 buy-and-hold $11,480.37 (+16.84%/yr (projected)) | delta -4.27 pp/yr
+  slow_bh [L=252,R=63] w8: $16,531.37 vs SPY $13,077.25 (beat)
+  spx: slow_bh [L=252,R=63] w8 buy-and-hold $13,077.25 (+34.94%/yr (projected)) | delta +40.38 pp/yr
+  slow_bh [L=252,R=63] w9: $15,104.45 vs SPY $11,268.47 (beat)
+  spx: slow_bh [L=252,R=63] w9 buy-and-hold $11,268.47 (+14.27%/yr (projected)) | delta +44.24 pp/yr
+  slow_bh [L=378,R=63] w10: $7,622.19 vs SPY $11,495.41 (did not beat)
+  spx: slow_bh [L=378,R=63] w10 buy-and-hold $11,495.41 (+16.96%/yr (projected)) | delta -43.25 pp/yr
+  slow_bh: NO-EDGE (4/9 windows beat SPY) | mean OOS delta +40.83 pp/yr
+
+family dm_cadence:
+  dm_cadence [L=252,R=5] w2: $9,080.87 vs SPY $9,982.67 (did not beat)
+  spx: dm_cadence [L=252,R=5] w2 buy-and-hold $9,982.67 (-0.20%/yr (projected)) | delta -10.10 pp/yr
+  dm_cadence [L=252,R=21] w3: $7,962.31 vs SPY $10,207.06 (did not beat)
+  spx: dm_cadence [L=252,R=21] w3 buy-and-hold $10,207.06 (+2.33%/yr (projected)) | delta -24.92 pp/yr
+  dm_cadence [L=252,R=21] w4: $47,117.96 vs SPY $14,236.37 (beat)
+  spx: dm_cadence [L=252,R=21] w4 buy-and-hold $14,236.37 (+49.10%/yr (projected)) | delta +427.99 pp/yr
+  dm_cadence [L=126,R=5] w5: $11,746.29 vs SPY $10,934.05 (beat)
+  spx: dm_cadence [L=126,R=5] w5 buy-and-hold $10,934.05 (+10.66%/yr (projected)) | delta +9.37 pp/yr
+  dm_cadence [L=252,R=5] w6: $9,737.05 vs SPY $8,653.32 (beat)
+  spx: dm_cadence [L=252,R=5] w6 buy-and-hold $8,653.32 (-15.13%/yr (projected)) | delta +12.15 pp/yr
+  dm_cadence [L=126,R=63] w7: $14,988.30 vs SPY $11,480.37 (beat)
+  spx: dm_cadence [L=126,R=63] w7 buy-and-hold $11,480.37 (+16.84%/yr (projected)) | delta +40.97 pp/yr
+  dm_cadence [L=126,R=63] w8: $16,531.37 vs SPY $13,077.25 (beat)
+  spx: dm_cadence [L=126,R=63] w8 buy-and-hold $13,077.25 (+34.94%/yr (projected)) | delta +40.38 pp/yr
+  dm_cadence [L=126,R=63] w9: $11,354.04 vs SPY $11,268.47 (beat)
+  spx: dm_cadence [L=126,R=63] w9 buy-and-hold $11,268.47 (+14.27%/yr (projected)) | delta +0.97 pp/yr
+  dm_cadence [L=252,R=21] w10: $9,349.81 vs SPY $11,495.41 (did not beat)
+  spx: dm_cadence [L=252,R=21] w10 buy-and-hold $11,495.41 (+16.96%/yr (projected)) | delta -24.23 pp/yr
+  dm_cadence: BEATS-SPX (6/9 windows beat SPY) | mean OOS delta +52.51 pp/yr
+
+family dm_topk:
+  dm_topk [K=1,L=252] w2: $10,031.69 vs SPY $9,982.67 (beat)
+  spx: dm_topk [K=1,L=252] w2 buy-and-hold $9,982.67 (-0.20%/yr (projected)) | delta +0.55 pp/yr
+  dm_topk [K=2,L=63] w3: $5,147.47 vs SPY $10,207.06 (did not beat)
+  spx: dm_topk [K=2,L=63] w3 buy-and-hold $10,207.06 (+2.33%/yr (projected)) | delta -54.92 pp/yr
+  dm_topk [K=3,L=252] w4: $37,914.13 vs SPY $14,236.37 (beat)
+  spx: dm_topk [K=3,L=252] w4 buy-and-hold $14,236.37 (+49.10%/yr (projected)) | delta +302.25 pp/yr
+  dm_topk [K=1,L=126] w5: $12,669.14 vs SPY $10,934.05 (beat)
+  spx: dm_topk [K=1,L=126] w5 buy-and-hold $10,934.05 (+10.66%/yr (projected)) | delta +20.12 pp/yr
+  dm_topk [K=1,L=252] w6: $7,441.94 vs SPY $8,653.32 (did not beat)
+  spx: dm_topk [K=1,L=252] w6 buy-and-hold $8,653.32 (-15.13%/yr (projected)) | delta -13.34 pp/yr
+  dm_topk [K=3,L=126] w7: $12,986.16 vs SPY $11,480.37 (beat)
+  spx: dm_topk [K=3,L=126] w7 buy-and-hold $11,480.37 (+16.84%/yr (projected)) | delta +17.41 pp/yr
+  dm_topk [K=3,L=126] w8: $13,351.47 vs SPY $13,077.25 (beat)
+  spx: dm_topk [K=3,L=126] w8 buy-and-hold $13,077.25 (+34.94%/yr (projected)) | delta +3.16 pp/yr
+  dm_topk [K=2,L=63] w9: $13,756.28 vs SPY $11,268.47 (beat)
+  spx: dm_topk [K=2,L=63] w9 buy-and-hold $11,268.47 (+14.27%/yr (projected)) | delta +28.52 pp/yr
+  dm_topk [K=1,L=63] w10: $9,869.32 vs SPY $11,495.41 (did not beat)
+  spx: dm_topk [K=1,L=63] w10 buy-and-hold $11,495.41 (+16.96%/yr (projected)) | delta -18.42 pp/yr
+  dm_topk: BEATS-SPX (6/9 windows beat SPY) | mean OOS delta +31.70 pp/yr
+
+family best_bh:
+  best_bh [asset=eth] w2: $5,871.28 vs SPY $9,982.67 (did not beat)
+  spx: best_bh [asset=eth] w2 buy-and-hold $9,982.67 (-0.20%/yr (projected)) | delta -44.94 pp/yr
+  best_bh [asset=btc] w3: $7,962.31 vs SPY $10,207.06 (did not beat)
+  spx: best_bh [asset=btc] w3 buy-and-hold $10,207.06 (+2.33%/yr (projected)) | delta -24.92 pp/yr
+  best_bh [asset=gld] w4: $10,169.87 vs SPY $14,236.37 (did not beat)
+  spx: best_bh [asset=gld] w4 buy-and-hold $14,236.37 (+49.10%/yr (projected)) | delta -47.17 pp/yr
+  best_bh [asset=eth] w5: $13,247.85 vs SPY $10,934.05 (beat)
+  spx: best_bh [asset=eth] w5 buy-and-hold $10,934.05 (+10.66%/yr (projected)) | delta +26.92 pp/yr
+  best_bh [asset=eth] w6: $4,574.20 vs SPY $8,653.32 (did not beat)
+  spx: best_bh [asset=eth] w6 buy-and-hold $8,653.32 (-15.13%/yr (projected)) | delta -43.69 pp/yr
+  best_bh [asset=gld] w7: $10,844.79 vs SPY $11,480.37 (did not beat)
+  spx: best_bh [asset=gld] w7 buy-and-hold $11,480.37 (+16.84%/yr (projected)) | delta -7.27 pp/yr
+  best_bh [asset=btc] w8: $16,531.37 vs SPY $13,077.25 (beat)
+  spx: best_bh [asset=btc] w8 buy-and-hold $13,077.25 (+34.94%/yr (projected)) | delta +40.38 pp/yr
+  best_bh [asset=btc] w9: $18,115.55 vs SPY $11,268.47 (beat)
+  spx: best_bh [asset=btc] w9 buy-and-hold $11,268.47 (+14.27%/yr (projected)) | delta +79.92 pp/yr
+  best_bh [asset=eth] w10: $3,994.75 vs SPY $11,495.41 (did not beat)
+  spx: best_bh [asset=eth] w10 buy-and-hold $11,495.41 (+16.96%/yr (projected)) | delta -81.30 pp/yr
+  best_bh: NO-EDGE (3/9 windows beat SPY) | mean OOS delta -11.34 pp/yr
+
+ALLOC7 FULL dm_gated: BEATS-SPX (5/9, +61.93 pp/yr); slow_bh: NO-EDGE (4/9, +40.83 pp/yr); dm_cadence: BEATS-SPX (6/9, +52.51 pp/yr); dm_topk: BEATS-SPX (6/9, +31.70 pp/yr); best_bh: NO-EDGE (3/9, -11.34 pp/yr) | FRONTIER dm_gated (forward-holdout target by v7 4)
+
+span: 2017-08-17T00:00:00+00:00 -> 2026-07-17T00:00:00+00:00 (8.91 years)
+wall: 0.1 s
+annualized: dm_gated [Lf=126,G=0.15] w2 audited $9,428.67 vs initial $10,000.00 -> -6.42%/yr (projected)
+benchmark: dm_gated [Lf=126,G=0.15] w2 buy-and-hold $9,982.67 (-0.20%/yr (projected)) | delta -6.22 pp/yr
+annualized: dm_gated [Lf=63,G=0.3] w3 audited $6,761.21 vs initial $10,000.00 -> -35.59%/yr (projected)
+benchmark: dm_gated [Lf=63,G=0.3] w3 buy-and-hold $10,207.06 (+2.33%/yr (projected)) | delta -37.92 pp/yr
+annualized: dm_gated [Lf=63,G=0.3] w4 audited $51,784.27 vs initial $10,000.00 -> +542.12%/yr (projected)
+benchmark: dm_gated [Lf=63,G=0.3] w4 buy-and-hold $14,236.37 (+49.10%/yr (projected)) | delta +493.03 pp/yr
+annualized: dm_gated [Lf=126,G=0.15] w5 audited $12,669.14 vs initial $10,000.00 -> +30.78%/yr (projected)
+benchmark: dm_gated [Lf=126,G=0.15] w5 buy-and-hold $10,934.05 (+10.66%/yr (projected)) | delta +20.12 pp/yr
+annualized: dm_gated [Lf=126,G=0.15] w6 audited $8,945.59 vs initial $10,000.00 -> -11.87%/yr (projected)
+benchmark: dm_gated [Lf=126,G=0.15] w6 buy-and-hold $8,653.32 (-15.13%/yr (projected)) | delta +3.26 pp/yr
+annualized: dm_gated [Lf=126,G=0.3] w7 audited $10,684.52 vs initial $10,000.00 -> +7.75%/yr (projected)
+benchmark: dm_gated [Lf=126,G=0.3] w7 buy-and-hold $11,480.37 (+16.84%/yr (projected)) | delta -9.09 pp/yr
+annualized: dm_gated [Lf=126,G=0.15] w8 audited $16,388.99 vs initial $10,000.00 -> +73.64%/yr (projected)
+benchmark: dm_gated [Lf=126,G=0.15] w8 buy-and-hold $13,077.25 (+34.94%/yr (projected)) | delta +38.70 pp/yr
+annualized: dm_gated [Lf=126,G=0.15] w9 audited $17,616.48 vs initial $10,000.00 -> +88.23%/yr (projected)
+benchmark: dm_gated [Lf=126,G=0.15] w9 buy-and-hold $11,268.47 (+14.27%/yr (projected)) | delta +73.96 pp/yr
+annualized: dm_gated [Lf=63,G=0.15] w10 audited $9,869.32 vs initial $10,000.00 -> -1.47%/yr (projected)
+benchmark: dm_gated [Lf=63,G=0.15] w10 buy-and-hold $11,495.41 (+16.96%/yr (projected)) | delta -18.42 pp/yr
+annualized: slow_bh [L=252,R=63] w2 audited $6,505.08 vs initial $10,000.00 -> -38.41%/yr (projected)
+benchmark: slow_bh [L=252,R=63] w2 buy-and-hold $9,982.67 (-0.20%/yr (projected)) | delta -38.22 pp/yr
+annualized: slow_bh [L=252,R=126] w3 audited $7,962.31 vs initial $10,000.00 -> -22.59%/yr (projected)
+benchmark: slow_bh [L=252,R=126] w3 buy-and-hold $10,207.06 (+2.33%/yr (projected)) | delta -24.92 pp/yr
+annualized: slow_bh [L=378,R=126] w4 audited $44,415.16 vs initial $10,000.00 -> +439.80%/yr (projected)
+benchmark: slow_bh [L=378,R=126] w4 buy-and-hold $14,236.37 (+49.10%/yr (projected)) | delta +390.70 pp/yr
+annualized: slow_bh [L=252,R=63] w5 audited $13,247.85 vs initial $10,000.00 -> +37.58%/yr (projected)
+benchmark: slow_bh [L=252,R=63] w5 buy-and-hold $10,934.05 (+10.66%/yr (projected)) | delta +26.92 pp/yr
+annualized: slow_bh [L=252,R=63] w6 audited $6,445.52 vs initial $10,000.00 -> -39.24%/yr (projected)
+benchmark: slow_bh [L=252,R=63] w6 buy-and-hold $8,653.32 (-15.13%/yr (projected)) | delta -24.11 pp/yr
+annualized: slow_bh [L=378,R=63] w7 audited $11,107.20 vs initial $10,000.00 -> +12.57%/yr (projected)
+benchmark: slow_bh [L=378,R=63] w7 buy-and-hold $11,480.37 (+16.84%/yr (projected)) | delta -4.27 pp/yr
+annualized: slow_bh [L=252,R=63] w8 audited $16,531.37 vs initial $10,000.00 -> +75.33%/yr (projected)
+benchmark: slow_bh [L=252,R=63] w8 buy-and-hold $13,077.25 (+34.94%/yr (projected)) | delta +40.38 pp/yr
+annualized: slow_bh [L=252,R=63] w9 audited $15,104.45 vs initial $10,000.00 -> +58.51%/yr (projected)
+benchmark: slow_bh [L=252,R=63] w9 buy-and-hold $11,268.47 (+14.27%/yr (projected)) | delta +44.24 pp/yr
+annualized: slow_bh [L=378,R=63] w10 audited $7,622.19 vs initial $10,000.00 -> -26.30%/yr (projected)
+benchmark: slow_bh [L=378,R=63] w10 buy-and-hold $11,495.41 (+16.96%/yr (projected)) | delta -43.25 pp/yr
+annualized: dm_cadence [L=252,R=5] w2 audited $9,080.87 vs initial $10,000.00 -> -10.30%/yr (projected)
+benchmark: dm_cadence [L=252,R=5] w2 buy-and-hold $9,982.67 (-0.20%/yr (projected)) | delta -10.10 pp/yr
+annualized: dm_cadence [L=252,R=21] w3 audited $7,962.31 vs initial $10,000.00 -> -22.59%/yr (projected)
+benchmark: dm_cadence [L=252,R=21] w3 buy-and-hold $10,207.06 (+2.33%/yr (projected)) | delta -24.92 pp/yr
+annualized: dm_cadence [L=252,R=21] w4 audited $47,117.96 vs initial $10,000.00 -> +477.09%/yr (projected)
+benchmark: dm_cadence [L=252,R=21] w4 buy-and-hold $14,236.37 (+49.10%/yr (projected)) | delta +427.99 pp/yr
+annualized: dm_cadence [L=126,R=5] w5 audited $11,746.29 vs initial $10,000.00 -> +20.03%/yr (projected)
+benchmark: dm_cadence [L=126,R=5] w5 buy-and-hold $10,934.05 (+10.66%/yr (projected)) | delta +9.37 pp/yr
+annualized: dm_cadence [L=252,R=5] w6 audited $9,737.05 vs initial $10,000.00 -> -2.98%/yr (projected)
+benchmark: dm_cadence [L=252,R=5] w6 buy-and-hold $8,653.32 (-15.13%/yr (projected)) | delta +12.15 pp/yr
+annualized: dm_cadence [L=126,R=63] w7 audited $14,988.30 vs initial $10,000.00 -> +57.81%/yr (projected)
+benchmark: dm_cadence [L=126,R=63] w7 buy-and-hold $11,480.37 (+16.84%/yr (projected)) | delta +40.97 pp/yr
+annualized: dm_cadence [L=126,R=63] w8 audited $16,531.37 vs initial $10,000.00 -> +75.33%/yr (projected)
+benchmark: dm_cadence [L=126,R=63] w8 buy-and-hold $13,077.25 (+34.94%/yr (projected)) | delta +40.38 pp/yr
+annualized: dm_cadence [L=126,R=63] w9 audited $11,354.04 vs initial $10,000.00 -> +15.24%/yr (projected)
+benchmark: dm_cadence [L=126,R=63] w9 buy-and-hold $11,268.47 (+14.27%/yr (projected)) | delta +0.97 pp/yr
+annualized: dm_cadence [L=252,R=21] w10 audited $9,349.81 vs initial $10,000.00 -> -7.28%/yr (projected)
+benchmark: dm_cadence [L=252,R=21] w10 buy-and-hold $11,495.41 (+16.96%/yr (projected)) | delta -24.23 pp/yr
+annualized: dm_topk [K=1,L=252] w2 audited $10,031.69 vs initial $10,000.00 -> +0.36%/yr (projected)
+benchmark: dm_topk [K=1,L=252] w2 buy-and-hold $9,982.67 (-0.20%/yr (projected)) | delta +0.55 pp/yr
+annualized: dm_topk [K=2,L=63] w3 audited $5,147.47 vs initial $10,000.00 -> -52.59%/yr (projected)
+benchmark: dm_topk [K=2,L=63] w3 buy-and-hold $10,207.06 (+2.33%/yr (projected)) | delta -54.92 pp/yr
+annualized: dm_topk [K=3,L=252] w4 audited $37,914.13 vs initial $10,000.00 -> +351.35%/yr (projected)
+benchmark: dm_topk [K=3,L=252] w4 buy-and-hold $14,236.37 (+49.10%/yr (projected)) | delta +302.25 pp/yr
+annualized: dm_topk [K=1,L=126] w5 audited $12,669.14 vs initial $10,000.00 -> +30.78%/yr (projected)
+benchmark: dm_topk [K=1,L=126] w5 buy-and-hold $10,934.05 (+10.66%/yr (projected)) | delta +20.12 pp/yr
+annualized: dm_topk [K=1,L=252] w6 audited $7,441.94 vs initial $10,000.00 -> -28.48%/yr (projected)
+benchmark: dm_topk [K=1,L=252] w6 buy-and-hold $8,653.32 (-15.13%/yr (projected)) | delta -13.34 pp/yr
+annualized: dm_topk [K=3,L=126] w7 audited $12,986.16 vs initial $10,000.00 -> +34.25%/yr (projected)
+benchmark: dm_topk [K=3,L=126] w7 buy-and-hold $11,480.37 (+16.84%/yr (projected)) | delta +17.41 pp/yr
+annualized: dm_topk [K=3,L=126] w8 audited $13,351.47 vs initial $10,000.00 -> +38.11%/yr (projected)
+benchmark: dm_topk [K=3,L=126] w8 buy-and-hold $13,077.25 (+34.94%/yr (projected)) | delta +3.16 pp/yr
+annualized: dm_topk [K=2,L=63] w9 audited $13,756.28 vs initial $10,000.00 -> +42.79%/yr (projected)
+benchmark: dm_topk [K=2,L=63] w9 buy-and-hold $11,268.47 (+14.27%/yr (projected)) | delta +28.52 pp/yr
+annualized: dm_topk [K=1,L=63] w10 audited $9,869.32 vs initial $10,000.00 -> -1.47%/yr (projected)
+benchmark: dm_topk [K=1,L=63] w10 buy-and-hold $11,495.41 (+16.96%/yr (projected)) | delta -18.42 pp/yr
+annualized: best_bh [asset=eth] w2 audited $5,871.28 vs initial $10,000.00 -> -45.14%/yr (projected)
+benchmark: best_bh [asset=eth] w2 buy-and-hold $9,982.67 (-0.20%/yr (projected)) | delta -44.94 pp/yr
+annualized: best_bh [asset=btc] w3 audited $7,962.31 vs initial $10,000.00 -> -22.59%/yr (projected)
+benchmark: best_bh [asset=btc] w3 buy-and-hold $10,207.06 (+2.33%/yr (projected)) | delta -24.92 pp/yr
+annualized: best_bh [asset=gld] w4 audited $10,169.87 vs initial $10,000.00 -> +1.92%/yr (projected)
+benchmark: best_bh [asset=gld] w4 buy-and-hold $14,236.37 (+49.10%/yr (projected)) | delta -47.17 pp/yr
+annualized: best_bh [asset=eth] w5 audited $13,247.85 vs initial $10,000.00 -> +37.58%/yr (projected)
+benchmark: best_bh [asset=eth] w5 buy-and-hold $10,934.05 (+10.66%/yr (projected)) | delta +26.92 pp/yr
+annualized: best_bh [asset=eth] w6 audited $4,574.20 vs initial $10,000.00 -> -58.82%/yr (projected)
+benchmark: best_bh [asset=eth] w6 buy-and-hold $8,653.32 (-15.13%/yr (projected)) | delta -43.69 pp/yr
+annualized: best_bh [asset=gld] w7 audited $10,844.79 vs initial $10,000.00 -> +9.57%/yr (projected)
+benchmark: best_bh [asset=gld] w7 buy-and-hold $11,480.37 (+16.84%/yr (projected)) | delta -7.27 pp/yr
+annualized: best_bh [asset=btc] w8 audited $16,531.37 vs initial $10,000.00 -> +75.33%/yr (projected)
+benchmark: best_bh [asset=btc] w8 buy-and-hold $13,077.25 (+34.94%/yr (projected)) | delta +40.38 pp/yr
+annualized: best_bh [asset=btc] w9 audited $18,115.55 vs initial $10,000.00 -> +94.19%/yr (projected)
+benchmark: best_bh [asset=btc] w9 buy-and-hold $11,268.47 (+14.27%/yr (projected)) | delta +79.92 pp/yr
+annualized: best_bh [asset=eth] w10 audited $3,994.75 vs initial $10,000.00 -> -64.34%/yr (projected)
+benchmark: best_bh [asset=eth] w10 buy-and-hold $11,495.41 (+16.96%/yr (projected)) | delta -81.30 pp/yr
+
+=== RESULT: ALLOC7 FULL dm_gated: BEATS-SPX (5/9, +61.93 pp/yr); slow_bh: NO-EDGE (4/9, +40.83 pp/yr); dm_cadence: BEATS-SPX (6/9, +52.51 pp/yr); dm_topk: BEATS-SPX (6/9, +31.70 pp/yr); best_bh: NO-EDGE (3/9, -11.34 pp/yr) | FRONTIER dm_gated (forward-holdout target by v7 4)

@@ -311,6 +311,47 @@ skill — gld nearly matched ($20,547) and tlt lost a third — and its tail
 overlaps the spent v5 holdout (disclosed in the spec before the run).
 `data/holdout/alloc6.SHOT` forbids reruns.
 
+## The dispersion gate (v7)
+
+```
+python -m experiments.allocation7                      # crypto era (decisive)
+python -m experiments.allocation7 --bench etf          # equity era (regime check)
+python -m experiments.allocation7 --holdout dm_gated   # refuses until ~2027-01
+```
+
+v7 turns the v6 diagnosis into strategy. `dm_gated` measures cross-asset
+dispersion (best-minus-worst trailing return) every month and switches
+modes: momentum rotation when dispersion is high, ride-the-378-day-winner
+when it is low. `slow_bh` makes the v6 control's regime-riding explicit;
+`dm_cadence` tests weekly vs monthly vs quarterly rotation; `dm_topk` and
+`best_bh` ride along as incumbent and control (grids frozen in
+BUILD_SPEC_V7.md).
+
+Measured (full spans — every historical holdout is spent, so these windows
+are evidence, not validation):
+
+| family | crypto era, 9 windows | equity era, 11 windows |
+|---|---|---|
+| dm_gated | **5/9, +61.93 pp/yr** | 5/11, −0.51 pp/yr |
+| dm_cadence | 6/9, +52.51 | 5/11, −4.16 |
+| slow_bh | 4/9, +40.83 | 6/11, −0.08 |
+| dm_topk (incumbent) | 6/9, +31.70 | 6/11, −2.02 |
+| best_bh (control) | 3/9, −11.34 | **8/11, +5.81** |
+
+The gate beats the incumbent on both universes — doubling the crypto-era
+mean and cutting the equity-era loss — but nothing rotational beats SPY
+where dispersion is low; the control still owns that column. Cadence picks
+were unstable (5, 21, and 63 days all selected): *what gates the rotation
+matters; how often you rotate inside a week-to-quarter barely does.*
+
+Because all three historical holdouts are spent, the v7 shot is **forward**:
+`data/holdout/alloc7.FORWARD` (committed, frozen) declares dm_gated on the
+8-asset universe, firing only once ≥126 joint rows postdate 2026-07-19 —
+roughly January 2027 after a tape refetch. Parameters get re-selected once
+on pre-cutoff data, frozen, run once on rows nobody has seen — because they
+haven't happened. The runner refuses a spent shot, an unripe tape, and any
+undeclared family; all three refusals are tests.
+
 ## Money conservation, stated plainly
 
 Every movement of money is one ledger row with a debit and a credit account.

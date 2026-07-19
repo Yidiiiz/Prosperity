@@ -845,3 +845,57 @@ parentheses.
     risk/benchmark/yardstick/Record machinery; v5 code untouched
     (frozen evidence). alloc6.csv stays gitignored; alloc6.SHOT
     committed via the existing exception. Red lines untouched.
+
+99. **v7 spec ratified on operator directive ("go ahead, please make
+    improvements and changes as needed"), building the strategies the
+    v6 diagnosis implies.** Three new families, grids frozen pre-run:
+    dm_gated (monthly; if best-minus-worst trailing-Lf return across
+    the universe >= G act as top-1 momentum with positivity filter,
+    else ride the trailing-378d winner with no filter; Lf in {63,126},
+    G in {0.15,0.30}), slow_bh (the v6 control made explicit: always
+    hold the trailing-L winner, L in {252,378}, R in {63,126}),
+    dm_cadence (the weekly/monthly/quarterly arm, R in {5,21,63};
+    R=21 provably bridges to dm_topk K=1). dm_topk and best_bh ride
+    along as incumbent and control. No historical carve exists in v7:
+    all three past holdout spans are spent, so both benches walk full
+    spans and fresh validation is forward-only (#101).
+
+100. **v7 bench results: the dispersion gate is the crypto-era
+    frontier and halves the equity-era damage; no rotation beats SPY
+    on the correlated universe.** Bench A (U_FULL, 9 OOS windows):
+    dm_gated BEATS-SPX 5/9 mean +61.93 pp/yr (vs incumbent dm_topk
+    6/9 +31.70), dm_cadence 6/9 +52.51, slow_bh 4/9 +40.83, best_bh
+    3/9 -11.34. Bench B (U_ETF, 11 OOS windows 2004->2026): best_bh
+    8/11 +5.81 again the frontier; dm_gated 5/11 -0.51 improves on
+    dm_topk 6/11 -2.02 but stays NO-EDGE on mean; slow_bh 6/11
+    -0.08 did not replicate the control's edge, implying the
+    control's winning clock (~1.8y train windows) sits outside the
+    declared {252,378} grid. Cadence picks were unstable across
+    windows (5, 21, 63 all selected): rebalance period inside a
+    week-to-quarter matters far less than what gates the rotation.
+
+101. **The v7 shot is FORWARD: declared in data/holdout/alloc7.FORWARD
+    (committed, gitignore exception added), it can only run on data
+    that does not yet exist.** Rule resolved per spec v7 4 from bench
+    A: family dm_gated, universe U_FULL, cutoff 2026-07-19, minimum
+    126 joint rows postdating the cutoff (~6 months of SPY days).
+    At fire time params are re-selected once on pre-cutoff rows,
+    frozen, run once on the virgin rows with the v6 cost ladder;
+    writes alloc7.SHOT; the runner refuses a spent shot, an unripe
+    tape, and any family other than the declared one (all three
+    refusals are tests). This is the repo's first holdout that is
+    uncontaminated by construction: no one has seen the data because
+    it has not happened. Earliest fire date ~2027-01 after refetching
+    tapes.
+
+102. **v7 acceptance status at build completion.** Records carry the
+    footer and per-window spx lines; tests (9) cover future-corruption
+    leakage across all five families at a day divisible by every
+    declared cadence, the dm_cadence R=21 == dm_topk K=1 bridge,
+    slow_bh full-investment invariant, dm_gated mode switching on
+    synthetic dispersion (momentum on melt-up, regime-hold on
+    correlated drift), flat-tape conservation, the three forward
+    refusals, and FORWARD declaration integrity; full suite 239
+    green. experiments/allocation7.py reuses the v6 machinery
+    (load_joint, rebalance, judge, momentum_ranked) with v5/v6 code
+    untouched. Red lines untouched.
