@@ -1,0 +1,19 @@
+record: experiments/minute_ladder_dust_42_20260719T025344121Z_seed[42]_p45352.txt
+utc: 2026-07-19T02:53:44+00:00
+git: 1266b48-dirty
+rng_seed: [42]
+config: {"csv": "data\\btcusdt_1m_fixture.csv", "digest": "34f6b17f238b6079", "seeds": [42], "rungs": ["dust"]}
+========================================================================
+
+--- results -----------------------------------------------------
+minute-bar ladder: btcusdt_1m_fixture.csv (digest 34f6b17f238b6079), seeds [42]
+
+== rung: dust ==
+
+seed 42  [EXPECTED-FAIL]
+  4320 minute bars | pop 0 | births 0 deaths 4 | 0 fills | friction paid $0.00
+  terminal audit: treasury $10.00 cash vs $10.00 initial  (+0.00%)
+
+LADDER MACHINERY PASS — economics recorded per seed (7.4)
+
+=== RESULT: LADDER MACHINERY PASS — economics recorded per seed (7.4)

@@ -54,16 +54,17 @@ SEEDS = [42, 7, 2026]
 
 
 def base_config(seed):
-    with open(ROOT / "config.default.json", encoding="utf-8") as f:
+    # config.spy.json IS the SPY replay config: venue with spread on,
+    # fill delay 1, repro_multiple 1.08, day ticks (spec v2 7.2)
+    with open(ROOT / "config.spy.json", encoding="utf-8") as f:
         cfg = json.load(f)
     cfg["rng_seed"] = seed
+    cfg["arena"]["csv"] = str(CSV)
     return cfg
 
 
 def full_stakes_config(seed):
     cfg = base_config(seed)
-    cfg["arena"] = {"kind": "replay", "name": "spy", "csv": str(CSV),
-                    "lot_denominator": 100}
     validate(cfg)
     return cfg
 
@@ -71,18 +72,17 @@ def full_stakes_config(seed):
 def micro_stakes_config(seed):
     cfg = base_config(seed)
     cfg.update({
-        "initial_treasury_u": 10_000,  # $100.00, total
+        "initial_treasury_u": 100_000_000,  # $100.00, total
         "gen0_population": 10,
-        "gen0_seed_u": 1_000,          # $10.00 per agent, ~200 lots
+        "gen0_seed_u": 10_000_000,          # $10.00 per agent, ~200 lots
         "max_population": 40,
         "population_floor": 8,
-        "death_floor_u": 100,
-        "reserve_floor_u": 150,
-        "rent_min_u": 0,               # 1c/tick rent would be ~0.1%/day
+        "death_floor_u": 1_000_000,
+        "reserve_floor_u": 1_500_000,
+        "rent_min_u": 0,                    # a fixed rent would swamp $10 agents
         "elitism_top_k": 2,
     })
-    cfg["arena"] = {"kind": "replay", "name": "spy", "csv": str(CSV),
-                    "lot_denominator": 1000}
+    cfg["arena"]["lot_denominator"] = 1000
     validate(cfg)
     return cfg
 
@@ -90,19 +90,18 @@ def micro_stakes_config(seed):
 def tiny_stakes_config(seed):
     cfg = base_config(seed)
     cfg.update({
-        "initial_treasury_u": 1_000,   # $10.00, total
+        "initial_treasury_u": 10_000_000,   # $10.00, total
         "gen0_population": 4,
-        "gen0_seed_u": 250,            # $2.50 per agent
+        "gen0_seed_u": 2_500_000,           # $2.50 per agent
         "max_population": 20,
         "population_floor": 4,
-        "death_floor_u": 50,
-        "reserve_floor_u": 50,
-        "rent_min_u": 0,               # 1c/tick rent would be ~0.4%/day
+        "death_floor_u": 500_000,
+        "reserve_floor_u": 500_000,
+        "rent_min_u": 0,
         "elitism_top_k": 2,
         "small_stakes": True,
     })
-    cfg["arena"] = {"kind": "replay", "name": "spy", "csv": str(CSV),
-                    "lot_denominator": 1000}
+    cfg["arena"]["lot_denominator"] = 1000
     validate(cfg)
     return cfg
 
@@ -153,8 +152,8 @@ def run_seed(cfg, workdir, label):
     return result
 
 
-def money(cents):
-    return f"${cents / 100:,.2f}"
+def money(u):
+    return f"${u / 1e6:,.2f}"
 
 
 def report_rung(lines, label, cfg_fn, require_profit, seeds, workdir=None):

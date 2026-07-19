@@ -423,3 +423,32 @@ parentheses.
 57. **Line budget note.** colony/ stands at ~3,190 non-blank lines against
     the ~2,600 ceiling after stage 9; stage 11 owes a simplification pass
     (report.py and __main__.py are the least-earned lines).
+
+58. **The v1 experiments are re-based, not rewritten.** profit_matrix now
+    charges the venue's fill prices (spread ON, taker 20 + spread 2) and
+    records the new friction baseline: trend_up/momentum +4.15 bps/t,
+    mean_revert/mean_revert +5.77, the cross-cells still correctly
+    negative — MATRIX PASS. real_market builds every rung from
+    config.spy.json (spread on, fill delay 1, repro 1.08) with stakes in
+    micro-dollars. regime_flip needed no code changes and re-validates
+    FLAGSHIP PASS on all three seeds with the full v2 economy active
+    (gate genes drawn randomly, immigration budget, annualized rent).
+
+59. **The minute ladder separates machinery from economics (spec 7.4).**
+    Verdicts per seed are PASS (audited profit), EXPECTED-FAIL (machinery
+    sound, economics negative, numbers recorded), or FAIL (crash /
+    invariant / incomplete replay) — only machinery can fail the
+    experiment. The tape is digest-pinned (--digest refuses a changed
+    CSV). --parallel fans (rung, seed) pairs out as subprocesses, each
+    writing its own record (9.1). The dust rung ($10 total) demonstrated
+    the immigration budget working as designed on the CI fixture: capacity
+    $2.00 cannot afford a $2.50 seed, the colony dies out honestly, and
+    the terminal audit returns every micro-dollar to the treasury.
+
+60. **The soak is an orchestrator, not a monitor.** live_soak drives the
+    acceptance scenario end to end as subprocesses: daemon up, one
+    random-point proc.kill(), restart, resume verified by /api/health
+    passing the kill tick, clean stop, replay-twin audit last. The audit
+    verdict decides the soak verdict — invariants are already enforced
+    per tick inside the daemon, so the soak only has to prove continuity
+    and collect the evidence into one record.

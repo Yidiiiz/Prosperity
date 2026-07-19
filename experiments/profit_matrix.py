@@ -23,11 +23,14 @@ from colony.records import Record
 
 SEEDS = [42, 7, 2026, 11, 99]
 TICKS = 3000
-START_CASH = 100_000
-FEE_BPS = 20
-RENT_MIN = 10
-RENT_BPS = 2
+START_CASH = 1_000_000_000  # $1,000 in micro-dollars
+RENT_MIN = 100_000          # $0.10/tick, the Petri default
+RENT_BPS = 2                # per tick == 730 bps APR at day bars (DECISIONS #34)
 MAX_ACTION_FRACTION = 0.80
+# v2: the venue model with spread ON (spec v2 build order 3) — this record
+# is the friction baseline every later experiment is compared against
+VENUE = {"taker_bps": 20, "maker_bps": 0, "spread_bps": 2, "min_fee_u": 0,
+         "fill_delay_ticks": 0}
 
 REGIMES = {
     "trend_up": {"kind": "trend_up", "ticks": TICKS, "drift_bps": 12, "vol_bps": 60},
@@ -61,10 +64,12 @@ CRITERIA = {  # (regime, archetype) -> (comparator, threshold_bps)
 
 
 def run_single(genome, regime, seed):
-    """One agent against one pure regime, in-memory cash, real strategy/risk/fee code."""
+    """One agent against one pure regime, in-memory cash, real strategy/risk/
+    venue code — spread charged at the venue's fill prices, as in the arena."""
     rng = random.Random(seed)
-    arena = Petri({"name": "petri", "start_price_u": 200, "price_floor_u": 20,
-                   "regimes": [regime]})
+    arena = Petri({"name": "petri", "start_price_u": 2_000_000,
+                   "price_floor_u": 200_000, "regimes": [regime]})
+    cost_bps = risk.per_side_cost_bps(VENUE)
     cash, lots, hold = START_CASH, 0, 0
     for _ in range(TICKS):
         arena.step(rng)
@@ -72,23 +77,23 @@ def run_single(genome, regime, seed):
         equity = cash + lots * price
         rent = max(RENT_MIN, equity * RENT_BPS // 10_000)
         if cash < rent and lots > 0:  # force-liquidate, as in the real loop
-            proceeds = lots * price
-            cash += proceeds - risk.fee_u(proceeds, FEE_BPS)
+            proceeds = lots * risk.sell_price_u(price, VENUE)
+            cash += proceeds - risk.fee_u(proceeds, VENUE)
             lots = 0
         cash = max(0, cash - rent)
         equity = cash + lots * price
         history = arena.history(101)
-        decision = strategies.decide(genome, history, lots, hold, equity, FEE_BPS)
-        decision = risk.check(decision, cash, equity, lots, price, MAX_ACTION_FRACTION, FEE_BPS)
+        decision = strategies.decide(genome, history, lots, hold, equity, cost_bps)
+        decision = risk.check(decision, cash, equity, lots, price, MAX_ACTION_FRACTION, VENUE)
         if decision is not None:
             if decision.side == "BUY":
-                cost = decision.lots * price
-                cash -= cost + risk.fee_u(cost, FEE_BPS)
+                cost = decision.lots * risk.buy_price_u(price, VENUE)
+                cash -= cost + risk.fee_u(cost, VENUE)
                 lots += decision.lots
                 hold = 0
             else:
-                proceeds = decision.lots * price
-                cash += proceeds - risk.fee_u(proceeds, FEE_BPS)
+                proceeds = decision.lots * risk.sell_price_u(price, VENUE)
+                cash += proceeds - risk.fee_u(proceeds, VENUE)
                 lots -= decision.lots
         if lots > 0:
             hold += 1
@@ -99,9 +104,11 @@ def run_single(genome, regime, seed):
 def main():
     record = Record("records", "experiments", "profit_matrix",
                     config={"seeds": SEEDS, "ticks": TICKS, "probes": PROBES,
-                            "regimes": REGIMES},
+                            "regimes": REGIMES, "venue": VENUE},
                     seed=SEEDS)
-    lines = [f"profitability matrix: {TICKS} ticks x seeds {SEEDS}", ""]
+    lines = [f"profitability matrix: {TICKS} ticks x seeds {SEEDS}",
+             f"venue: taker {VENUE['taker_bps']} bps + spread {VENUE['spread_bps']} bps"
+             " (v2 baseline, spread ON)", ""]
     lines.append(f"{'regime':<14}{'archetype':<14}{'mean bps/t':>12}   per-seed")
     all_pass = True
     for regime_name, regime in REGIMES.items():
