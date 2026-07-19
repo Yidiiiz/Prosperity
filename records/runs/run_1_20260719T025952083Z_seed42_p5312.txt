@@ -1,0 +1,33 @@
+record: runs/run_1_20260719T025952083Z_seed42_p5312.txt
+utc: 2026-07-19T02:59:52+00:00
+git: f6824d2-dirty
+rng_seed: 42
+config: {"rng_seed": 42, "debug": false, "initial_treasury_u": 200000000000, "gen0_population": 100, "gen0_seed_u": 1000000000, "max_population": 400, "population_floor": 40, "death_floor_u": 100000000, "rent_min_u": 100000, "repro_multiple": 1.25, "repay_multiple": 0.15, "reserve_floor_u": 150000000, "max_action_fraction": 0.8, "min_ticks_for_fitness": 75, "hall_size": 100, "hall_immigrant_prob": 0.4, "mutation": {"sigma_fraction": 0.1, "gene_flip_prob": 0.05, "archetype_hop_prob": 0.01, "adaptive": {"window_generations": 5, "stagnant_multiplier": 1.5, "improving_multiplier": 0.8, "sigma_min": 0.02, "sigma_max": 0.3}}, "elitism_top_k": 3, "arena": {"name": "petri", "start_price_u": 2000000, "price_floor_u": 200000, "regimes": [{"kind": "trend_up", "ticks": 3000, "drift_bps": 12, "vol_bps": 60}, {"kind": "mean_revert", "ticks": 3000, "kappa": 0.15, "vol_bps": 200}, {"kind": "crash", "ticks": 100, "drift_bps": -80, "vol_bps": 200}, {"kind": "mean_revert", "ticks": 2000, "kappa": 0.15, "vol_bps": 200}], "tick_seconds": 86400}, "rent_apr_bps": 730, "lifecycle": {"max_age_days": 3100, "stagnation_days": 400, "breed_cooldown_days": 50, "solo_breed_patience_days": 10, "snapshot_every_days": 25, "checkpoint_every_days": 2000}, "venue": {"taker_bps": 20, "maker_bps": 0, "spread_bps": 0, "min_fee_u": 0, "fill_delay_ticks": 0}, "_tick_seconds": 86400, "max_age_ticks": 3100, "stagnation_ticks": 400, "breed_cooldown_ticks": 50, "solo_breed_patience": 10, "snapshot_every": 25, "checkpoint_every": 2000, "immigration_budget_apr_bps": 2000, "flush_every": 1}
+resume_from_tick: 0 | ticks_requested: 500
+========================================================================
+
+--- final state -------------------------------------------------
+=== colony report @ tick 500
+
+TREASURY (north star)
+  balance          $163,230.13  (-18.4% vs initial $200,000.00)
+  inflows          rent $8,478.33 | death residues $64,617.64 | debt repaid $134.15
+  outflows         gen-0 seeds $100,000.00 | immigrant seeds $10,000.00
+
+COLONY
+  population       40
+  colony wealth    $38,065.05
+  system total     $201,295.18
+  extracted from market  -$2,588.71
+  price / regime   $3.45 / trend_up
+
+FLUX (all time)
+  births           10
+  deaths           70:  stagnation 70
+
+LIVING POPULATION
+  archetypes       momentum 57%  mean_revert 32%  sitter 10%
+  diversity        3.516 (Shannon entropy, nats)
+  outstanding debt $5,865.85
+
+=== RESULT: completed @ tick 500 | population 40 | treasury $163,230.13 | invariants OK

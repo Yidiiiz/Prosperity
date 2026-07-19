@@ -37,15 +37,6 @@ def treasury_flows(con):
     return inflows, outflows
 
 
-def cause_of_death_histogram(con):
-    return dict(
-        con.execute(
-            "SELECT death_cause, COUNT(*) FROM agents WHERE died_tick IS NOT NULL"
-            " GROUP BY death_cause ORDER BY COUNT(*) DESC"
-        ).fetchall()
-    )
-
-
 def living_genomes(con):
     return [
         json.loads(row[0])
@@ -85,24 +76,6 @@ def agent_fitness(con, row, state, current_tick, cfg):
         return 0.0
     min_age = max(cfg["min_ticks_for_fitness"], 3 * cfg["snapshot_every"])
     return evolution.fitness(equity_now, first, age, state["peak_equity_u"], min_age)
-
-
-def hall_of_fame(con, k, cfg):
-    """Top-k agents, dead or alive, by lifetime fitness (with enough history)."""
-    current_tick = con.execute("SELECT MAX(last_tick) FROM runs").fetchone()[0] or 0
-    scored = []
-    for row in con.execute("SELECT * FROM agents"):
-        state = con.execute(
-            "SELECT * FROM agent_state WHERE agent_id = ?", (row["id"],)
-        ).fetchone()
-        if state is None:
-            continue
-        score = agent_fitness(con, row, state, current_tick, cfg)
-        if score != 0.0:
-            scored.append((score, row["id"], row["generation"],
-                           json.loads(row["genome_json"])["archetype"]))
-    scored.sort(key=lambda s: (-s[0], s[1]))
-    return scored[:k]
 
 
 def summary_text(con, last_n=None):

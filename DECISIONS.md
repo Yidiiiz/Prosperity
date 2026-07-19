@@ -452,3 +452,29 @@ parentheses.
     verdict decides the soak verdict — invariants are already enforced
     per tick inside the daemon, so the soak only has to prove continuity
     and collect the evidence into one record.
+
+61. **Final line budget: 3,165 non-blank lines against the ~2,600 ceiling,
+    accepted with cause.** The dead-code pass removed everything actually
+    dead (two v1 report helpers; the API layer had superseded them). The
+    overage is three spec-mandated systems that did not exist when the
+    ceiling was set against v1's 1,770: the daemon (292 — supervision, pid
+    guard, health, signals), the replay-twin audit (155), and the
+    Observatory v2 server surface (+110 for SSE, bucketing, tape,
+    lineage). No module is fighting the ceiling with accidental
+    complexity; shrinking further means deleting mandated behavior, so the
+    honest move is recording the number, not gaming it.
+
+62. **v2.0 acceptance status at build completion.** Machine-verifiable
+    criteria hold: 158 tests green on the build machine (Windows, Python
+    3.14); throughput 675 ticks/s measured (11.3: >=500 target, >=250 CI
+    floor); hard-kill resume byte-identical (test_daemon); replay-twin
+    audit PASS + CRITICAL paths tested offline; profit matrix PASS with
+    spread on; regime-flip flagship PASS on all seeds under the full v2
+    economy; real-market micro rung PASS (+10.8% audited cash, seed 42);
+    minute-ladder machinery PASS on the CI fixture (dust rung
+    EXPECTED-FAIL with honest budget exhaustion, per 7.4). Remaining
+    operator-time items, commands ready: (a) fetch >=1y of BTCUSDT 1m and
+    run `python -m experiments.minute_ladder --parallel` (11.1); (b) run
+    `python -m experiments.live_soak --hours 24` with the feed up (11.2);
+    (c) confirm the CI matrix goes green on GitHub's Windows and Linux
+    runners.

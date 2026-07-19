@@ -1,14 +1,21 @@
 # darwin-wallet
 
 An evolutionary colony of autonomous agents, each with a strictly isolated
-wallet, acting in a simulated market arena. Profitable agents reproduce by
-**mitosis** — funding their children out of their own profits — and
-unprofitable agents go bankrupt and die. Selection, crossover, mutation and
-immigration drive the colony toward profit with no human tuning. Every cent is
-integer money in a double-entry SQLite ledger, and the whole system is
-deterministic: same config + same RNG seed ⇒ byte-identical ledgers.
+wallet, acting in a market arena. Profitable agents reproduce by **mitosis**
+— funding their children out of their own profits — and unprofitable agents
+go bankrupt and die. Selection, crossover, mutation and immigration drive the
+colony toward profit with no human tuning. Every micro-dollar is integer
+money in a double-entry SQLite ledger, and the whole system is deterministic:
+same config + same RNG seed ⇒ byte-identical ledgers.
 
-## Quickstart
+v2.0 makes the colony **always-on**: a supervised daemon trades the live
+1-second BTC tape (paper only), audits its own history nightly against an
+offline replay twin, and serves a phone-usable observatory. Money is
+micro-dollars (1 $ = 1,000,000 u) so second-scale economics don't round to
+zero; config speaks wall time (`_seconds`/`_hours`/`_days`, annualized rent)
+so the same colony definition runs at day, minute, or second bars.
+
+## Quickstart (simulation)
 
 ```
 pip install -e .[dev]            # stdlib core; pytest is the only dev dep
@@ -16,133 +23,119 @@ python -m colony init                            # create colony.db, seed gen-0
 python -m colony run --ticks 10000               # run the simulation
 python -m colony serve                           # (second terminal) live dashboard
 python -m colony report                          # plain-text summary
-python -m colony tree > tree.dot                 # family tree (Graphviz DOT)
 python -m colony inspect 000001                  # one agent's genome/P&L/trades
 python -m colony verify                          # audit the ledger invariants
 python -m colony test                            # pytest, teed into records/tests/
 ```
 
 `init` refuses to touch an existing database; `run` resumes exactly where the
-last run stopped (RNG, arena and per-agent state are checkpointed every tick).
-Interrupting a run with Ctrl-C is safe.
+last run stopped (RNG, arena and per-agent state are checkpointed). A hard
+kill at any instant is safe: live configs pin `flush_every 1`, so the database
+is always at a committed tick boundary.
 
-## What you are looking at
+## Quickstart (the always-on daemon)
+
+```
+python -m colony --db live.db daemon                 # config.live.json by default
+python -m colony daemon status                       # health probe: exit 0/1/2
+python -m colony --db live.db audit                  # replay-twin audit, on demand
+python -m colony daemon clear-audit                  # operator clears a CRITICAL latch
+```
+
+One process does everything: it supervises the feed subprocess
+(`tools/live_feed.py`, Binance `@kline_1s` websocket — public market data, no
+key, no orders), consumes the journal one appended row per tick, verifies
+conservation **every tick**, writes a health sidecar served at
+`/api/health`, and after each UTC-midnight segment rotation replays the
+closed day offline through the replay arena and compares ledger hashes. A
+mismatch is a CRITICAL incident (`grep '^!!' records/INDEX.txt`) that latches
+until an operator clears it — but the daemon keeps running: an audit failure
+is an alarm about the past, not a reason to lose the present.
+
+The journal is a directory of daily segments (`data/journal/YYYY-MM-DD.csv`,
+sealed with a `.sha256` on rotation). A stale feed pauses the colony — the
+wall clock paces, the journal decides; only operators stop it. Feed gaps are
+counted and reported, never errors: the colony simply didn't tick.
+
+## The economy, briefly
 
 - **Treasury** is the north-star KPI: the house account that funded gen-0.
-  Agents pay proportional **rent** every tick, house-funded agents repay a
-  small seed quota (0.15×), and every agent's entire estate returns to the
-  treasury at death (**senescence is the quota** — there is no mid-life tax).
-  Treasury above its initial capitalization means every deployed cent has been
-  recovered *and* profit is banked.
-- **The arena** (`Petri Dish`) is a scripted price path through market regimes
-  (trend, mean-reversion, crash). Agents trade against it at the scripted
-  price plus fees; they cannot move the price.
-- **Three archetypes**: `momentum`, `mean_revert`, and `sitter` — the
-  deliberate do-nothing control that the never-trader stagnation rule must
-  drive extinct.
-- **Immigration** makes extinction impossible: whenever population falls below
-  the floor and the treasury can afford a seed, the treasury spawns an
-  immigrant (a mutated hall-of-fame genome or a fresh random one), recycling
-  money the colony already returned.
+  Agents pay **rent** (an annual rate, `rent_apr_bps`, charged per tick),
+  house-funded agents repay a seed quota (0.15×), and every estate returns to
+  the treasury at death. Treasury above initial capitalization means every
+  deployed micro-dollar was recovered *and* profit is banked.
+- **The venue is honest**: taker fees plus a bid/ask spread charged at the
+  fill (rounded against the agent), and orders decided at bar N fill at bar
+  N+1's price. Same-bar fills exist only in the scripted Petri arena.
+- **Three archetypes** (`momentum`, `mean_revert`, `sitter` — the deliberate
+  do-nothing control) share three universal **gate genes**: a volatility gate
+  (don't play flat tapes), a trades-per-day throttle (rolling 24h fill
+  window), and a 24-bit UTC active-hours mask. Gates block opens only;
+  closing is always allowed. Evolution decides when *not* to trade.
+- **Immigration is budget-capped**: the treasury reseeds the population from
+  a token bucket accruing at `immigration_budget_apr_bps` (default 20%/yr of
+  initial treasury). When the budget is exhausted the population honestly
+  sits below the floor — visible on the dashboard — instead of the treasury
+  churning itself into life support.
 
 ## The Observatory
 
-`python -m colony serve` (default port 8477) serves a single-file, read-only
-dashboard at `http://127.0.0.1:8477/`:
+`python -m colony serve` (or the daemon's `--port`) serves a single-file,
+read-only dashboard at `http://127.0.0.1:8477/`:
 
-1. **Strata chart** — stacked archetype shares over time with regime bands
-   behind them; the colony's evolutionary history reads like sediment layers,
-   and a regime flip is visible as a stratum changing color.
-2. KPI row — treasury (with an "all capital recovered" badge), system total,
-   colony wealth, money extracted from the market, population, and live
-   invariant status.
-3. Wealth, price/population charts; death-cause bars; diversity sparkline;
-   outstanding-debt gauge; a leaderboard whose rows open an agent inspector.
+- **The Money Strip**: EXTRACTED (audited cash pulled from the market —
+  today, this hour, per second; the number is allowed to be red), CASH
+  (treasury, colony cash), MARKED (position value, outlined, labeled
+  *unrealized* — never summed with cash).
+- **Liveness chips**: feed LIVE/STALE/RECONNECTING, ticks-behind, invariant
+  badge, last audit ✓/✗, immigration-budget gauge.
+- **Strata chart** — stacked archetype shares over wall-clock time with
+  regime bands and UTC day rules; the colony's history reads like sediment.
+- **Trade tape** — the last 50 fills, streamed live.
+- Wealth/price charts, death causes, diversity, a leaderboard opening an
+  agent inspector with an inline collapsible ancestry chain.
 
-The web layer opens SQLite read-only and answers GET only — control stays in
-the CLI. The single external asset is Chart.js from a CDN; with the CDN
-unreachable every number and table still renders (charts are absent).
+Data arrives by Server-Sent Events (`/api/events`: coalesced summaries ≤1/s,
+per-fill events, health changes) with automatic fallback to polling; series
+are server-bucketed (`/api/timeseries?max_points=`) so a full 86,400-tick day
+renders from under 100 KB. The web layer opens SQLite read-only and answers
+GET only — control stays in the CLI. Under 720 px the grid collapses to one
+column: an always-on colony gets checked from a phone.
 
-Plain-text **records** land in `records/` (`runs/`, `experiments/`, `tests/`),
-each with a reproducibility header (UTC time, git commit, full config, seed);
-`records/INDEX.txt` accumulates one summary line per record. Records are
-append-only and never overwritten.
-
-## v2: real market data
-
-The arena is pluggable, and v2 adds **Replay** — the colony evolves against
-real historical prices instead of the scripted Petri Dish:
+## Feeds and data
 
 ```
-python tools/fetch_market_data.py SPY -o data/spy_d.csv   # once (network)
-python -m colony init --config config.spy.json            # 33 years of SPY
-python -m colony run --ticks 999999                       # stops at data end
+python tools/fetch_binance_klines.py BTCUSDT 1m --days 365 -o data/btcusdt_1m.csv
+python tools/fetch_market_data.py SPY -o data/spy_d.csv
+python tools/live_feed.py BTCUSDT --journal data/journal            # 1s websocket
 ```
 
-The fetch script is the only network code in the project; the simulation
-replays the CSV offline, one trading day per tick, and stays fully
-deterministic (resume is guarded by a digest of the price series — a changed
-CSV refuses to resume). `lot_denominator` scales the asset so one lot is an
-affordable slice of a share. The fetched SPY history (1993–2026) is committed
-under `data/` so results reproduce without a network.
-
-Small-stakes colonies (down to $10.00 total) are supported via
-`'small_stakes': true`, which waives the lot-granularity floor. Expect
-different economics at that scale: the 1-cent integer floor makes the minimum
-fee ~100 bps on a $1 trade, and rent rounds to 0.
-
-## v3: live market data (paper)
-
-The colony can run against the **live tape** — real prices, right now, still
-virtual money, and no orders sent anywhere:
-
-```
-python tools/live_feed.py BTC-USD -o data/live_btc.csv --interval 5   # terminal 1
-python -m colony --db colony_live.db init --config config.live.json   # terminal 2
-python -m colony --db colony_live.db run --ticks 1000                 # paced by the feed
-python tools/verify_live_run.py --db colony_live.db                   # afterwards
-```
-
-The feed daemon appends quotes to an append-only journal CSV; the Live arena
-**tails the file** — one appended row is one tick, so the wall clock paces
-the colony but the core never touches the network. If the feed goes stale
-the run stops cleanly and resumes later.
-
-The journal is the session's permanent tape, which buys back determinism:
-`verify_live_run.py` replays the journal offline through the v2 replay arena
-(same config, same seed) and proves the two ledgers are byte-identical. A
-live run is exactly as auditable as a simulated one — the wall clock only
-decided *when* ticks happened, never what they did.
+The only network code in the project lives in `tools/` (Binance public data
+hosts: `data-api.binance.vision`, `data-stream.binance.vision`). The core
+replays CSVs offline and stays fully deterministic; resume is guarded by
+digests of the consumed price series — a changed tape refuses to resume.
+Committed fixtures (`data/btcusdt_1m_fixture.csv`, `data/spy_d.csv`) keep the
+entire test suite offline.
 
 ## Experiments
 
 ```
-python -m experiments.profit_matrix    # environment pre-check — run FIRST
-python -m experiments.regime_flip      # the flagship adaptation experiment
-python -m experiments.real_market      # v2: real SPY data, $200k then $10
+python -m experiments.profit_matrix     # environment pre-check — run FIRST
+python -m experiments.regime_flip       # the flagship adaptation experiment
+python -m experiments.real_market       # SPY dailies, $200k → $100 → $10
+python -m experiments.minute_ladder     # BTC 1m, $200k → $1k → $10 (--parallel)
+python -m experiments.live_soak --hours 24   # the acceptance soak (daemon + kill)
 ```
 
-The profit matrix verifies each archetype earns/loses where it should in each
-pure regime (momentum makes money in trends and bleeds in mean-reversion, and
-vice versa). If its signs are wrong, adaptation is impossible — fix the arena,
-not the GA.
-
-The regime flip runs 3,000 ticks of `trend_up` then 5,000 ticks of
-`mean_revert` on seeds {42, 7, 2026}. A passing result shows, on **every**
-seed: the living mean_revert share rising by ≥ 20 percentage points, total
-system wealth above its start, and the treasury above its initial
-capitalization. All experiments print verdict tables and write records.
-
-The real-market experiment is a **capitalization ladder** on 33 years of
-actual SPY closes, run in order: $200,000 virtual, then $100.00 total, then
-$10.00 total. Every rung ends with a **terminal audit** — when the data runs
-out, every living agent is liquidated at the last real price and its whole
-estate returns to the treasury, so the audited number is hard cash, not
-mark-to-market. The top two rungs must survive to the end of history and end
-with audited cash above initial (every seed passes: +4.5–6.3% at $200k,
-+28.5–1,853% at $100); the $10 rung must survive with invariants intact,
-and its economics are reported per seed (+26.5%, −67.3%, −4.1% — the 1-cent
-integer floor makes profit seed-dependent at that scale).
+Every experiment is per-seed, incremental (results print the moment a seed
+finishes), and resumable via `--workdir`. Replay experiments end in a
+**terminal audit**: every estate liquidated at the last real price, so
+verdicts are audited cash vs initial — no mark-to-market hand-waving. The
+minute ladder separates machinery from economics: a rung may be
+EXPECTED-FAIL (sound machinery, negative economics, numbers recorded) — only
+the machinery can truly fail. The soak starts the daemon, hard-kills it at a
+random moment, verifies exact resume, and hands the verdict to the
+replay-twin audit.
 
 ## Money conservation, stated plainly
 
@@ -150,27 +143,34 @@ Every movement of money is one ledger row with a debit and a credit account.
 There is no other way money moves. At all times,
 
 ```
-SUM(all account balances) == initial_treasury_cents
+SUM(all account balances) == initial_treasury_u
 ```
 
-and every cached balance equals the ledger-derived sum for its account. The
-invariant is verified every 100 ticks (every tick in debug mode); any
-violation raises and halts the run. `colony verify` audits it on demand.
+and every cached balance equals the ledger-derived sum for its account. A
+fast O(accounts) check runs on cadence (every tick under the daemon); the
+full O(ledger) audit runs at run boundaries and on `colony verify`. Any
+violation raises and halts the run. The nightly replay-twin extends the same
+guarantee across days: the live ledger must be byte-identical to an offline
+replay of its own journal.
 
 ## Safety by construction
 
-- **Simulation only.** Virtual money; no payment rails and no
-  order-placement code anywhere in the repository. The core makes no network
-  calls (the dashboard is a localhost read-only view); the only network code
-  is in `tools/` — `fetch_market_data.py` downloads historical CSVs and
-  `live_feed.py` appends live quotes to a journal the core merely reads.
+- **Simulation only.** Virtual money; no payment rails and **no
+  order-placement code anywhere in the repository**. The core makes no
+  network calls; the only network code is in `tools/`, and it only *reads*
+  public market data.
 - **No self-modification.** Genomes change only between generations, via the
   orchestrator's genetic operators; agents cannot rewrite themselves or the
   rules.
-- **Airtight accounting.** Double-entry ledger, integer cents, conservation
-  checked continuously, crash-on-violation.
-- v2 delivers the replay arena (real historical data, offline and
-  deterministic); v3 delivers the live arena (real-time prices, still paper,
-  reproducible from its journal). Remaining seams (an LLM cognition layer,
-  treasury withdrawal, order execution) stay documented interfaces only —
-  none of that code exists here.
+- **Airtight accounting.** Double-entry ledger, integer micro-dollars,
+  conservation checked continuously, crash-on-violation.
+- Remaining seams (an LLM cognition layer, treasury withdrawal, order
+  execution) stay documented interfaces only — none of that code exists here.
+
+## CI
+
+GitHub Actions runs the full suite on **Windows and Linux** (the daemon's
+pid-liveness, subprocess supervision, and hard-kill resume tests included),
+plus a 500-tick smoke simulation with a full ledger audit. The throughput
+benchmark enforces ≥250 ticks/s in CI (≥500 documented on the reference
+laptop in `records/`).

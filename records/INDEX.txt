@@ -20,3 +20,4 @@
 20260719T025344545Z | experiments | experiments/minute_ladder_dust_42_20260719T025344121Z_seed[42]_p45352.txt | LADDER MACHINERY PASS — economics recorded per seed (7.4)
 20260719T025359827Z | experiments | experiments/real_market_micro_42_20260719T025356422Z_seed[42]_p49096.txt | PASS
 20260719T025519612Z | experiments | experiments/regime_flip_20260719T025409901Z_seed[42, 7, 2026]_p52444.txt | PASS
+20260719T025953607Z | runs | runs/run_1_20260719T025952083Z_seed42_p5312.txt | completed @ tick 500 | population 40 | treasury $163,230.13 | invariants OK
