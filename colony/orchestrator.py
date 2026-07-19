@@ -28,6 +28,7 @@ def init_colony(con, cfg):
     db.init_schema(con)
     if con.execute("SELECT COUNT(*) FROM runs").fetchone()[0]:
         raise RuntimeError("database already initialized; init refuses to run twice")
+    ledger.attach_mirror(con)
     rng = random.Random(cfg["rng_seed"])
     arena = make_arena(cfg["arena"])
     # Lot granularity (spec 3.11): replay start prices come from the CSV, so
@@ -40,10 +41,7 @@ def init_colony(con, cfg):
         )
     with db.tx(con):
         ledger.create_account(con, TREASURY, "TREASURY")
-        con.execute(
-            "UPDATE balances SET balance_u = ? WHERE account_id = ?",
-            (cfg["initial_treasury_u"], TREASURY),
-        )
+        ledger.genesis(con, TREASURY, cfg["initial_treasury_u"])
         ledger.create_account(con, f"ARENA:{arena.name}", "ARENA")
         debt = int(cfg["repay_multiple"] * cfg["gen0_seed_u"])
         for i in range(1, cfg["gen0_population"] + 1):
@@ -75,6 +73,7 @@ def init_colony(con, cfg):
 class Orchestrator:
     def __init__(self, con, cfg=None):
         self.con = con
+        ledger.attach_mirror(con)  # zero-SELECT cash reads (spec v2 section 4)
         row = con.execute("SELECT * FROM runs ORDER BY id DESC LIMIT 1").fetchone()
         if row is None:
             raise RuntimeError("database not initialized; run `colony init` first")
@@ -126,36 +125,59 @@ class Orchestrator:
 
     def run(self, n_ticks, checkpoint_cb=None):
         """Run up to n_ticks (fewer if a finite arena runs out of data, or a
-        live feed goes stale). Returns the number of ticks actually executed."""
+        live feed goes stale). Returns the number of ticks actually executed.
+
+        flush_every N (spec v2 section 4): one transaction spans up to N
+        ticks, committed with the flushed runtime state — a crash loses at
+        most N ticks and the database is always at a flushed boundary.
+        Live configs pin 1 (the validator enforces it), so the blocking
+        wait for feed data never happens inside an open transaction.
+        """
         start = self.tick
         end = start + n_ticks
+        flush_every = self.cfg.get("flush_every", 1)
+        checkpoint_every = self.cfg["checkpoint_every"]
         wait = getattr(self.arena, "wait_for_data", None)
         while self.tick < end and not self.arena.exhausted():
             if wait is not None and not wait():
                 break  # live feed went stale; state is saved, rerun to resume
-            self.step()
-            if checkpoint_cb and self.tick % self.cfg["checkpoint_every"] == 0:
+            window_start = self.tick
+            with db.tx(self.con):
+                while (self.tick - window_start < flush_every
+                       and self.tick < end and not self.arena.exhausted()):
+                    self._step_inner()
+                self._flush(self.tick)
+            if checkpoint_cb and self.tick // checkpoint_every > window_start // checkpoint_every:
                 checkpoint_cb(self.tick)
         ledger.verify_invariants(self.con, self.cfg["initial_treasury_u"])
         return self.tick - start
 
     def step(self):
+        """One tick in its own transaction, state flushed (the flush_every 1
+        path; tests and the daemon drive this directly)."""
+        with db.tx(self.con):
+            self._step_inner()
+            self._flush(self.tick)
+
+    def _step_inner(self):
+        """Advance one tick inside an already-open transaction."""
         cfg = self.cfg
         t = self.tick + 1
-        with db.tx(self.con):
-            self._quota_sweep(t)
-            self.arena.step(self.rng)
-            price = self.arena.price()
-            utc = self.arena.utc()
-            self._live_phase(t, utc, price)
-            self._death_phase(t, utc, price)
-            self._breeding_phase(t, price)
-            if t % cfg["snapshot_every"] == 0:
-                self._snapshot(t, price)
-            self._flush(t)
+        self._quota_sweep(t)
+        self.arena.step(self.rng)
+        price = self.arena.price()
+        utc = self.arena.utc()
+        self._live_phase(t, utc, price)
+        self._death_phase(t, utc, price)
+        self._breeding_phase(t, price)
+        if t % cfg["snapshot_every"] == 0:
+            self._snapshot(t, price)
         self.tick = t
         if cfg["debug"] or t % 100 == 0:
-            ledger.verify_invariants(self.con, cfg["initial_treasury_u"])
+            # O(accounts) conservation check on cadence; the full O(ledger)
+            # audit runs at run boundaries (spec v2 section 4 keeps the hot
+            # path free of table scans)
+            ledger.verify_fast(self.con, cfg["initial_treasury_u"])
 
     def wind_down(self, cause="horizon"):
         """Terminal audit for finite arenas: liquidate every living agent at

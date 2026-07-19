@@ -131,6 +131,28 @@ class Connection(sqlite3.Connection):
     """sqlite3.Connection that allows attributes (the in-memory mirrors)."""
 
     balances = None  # account_id -> balance_u mirror, attached by ledger
+    kinds = None  # account_id -> kind, attached alongside the balance mirror
+    dirty_accounts = None  # accounts whose table row lags the mirror
+
+
+def flush_balances(con):
+    """Sync deferred balance updates from the mirror to the table (one
+    executemany per commit instead of two UPDATEs per transfer)."""
+    if con.dirty_accounts:
+        con.executemany(
+            "UPDATE balances SET balance_u = ? WHERE account_id = ?",
+            [(con.balances[a], a) for a in con.dirty_accounts],
+        )
+        con.dirty_accounts.clear()
+
+
+def rebuild_mirror(con):
+    """Resync the in-memory balance mirror after a rollback (the SQL side
+    rolled back; the dict did not)."""
+    if con.balances is not None:
+        con.balances = dict(con.execute("SELECT account_id, balance_u FROM balances"))
+        con.kinds = dict(con.execute("SELECT id, kind FROM accounts"))
+        con.dirty_accounts.clear()
 
 
 def check_version(con, path):
@@ -171,9 +193,12 @@ def tx(con):
     con.execute("BEGIN IMMEDIATE")
     try:
         yield
+        if con.dirty_accounts:
+            flush_balances(con)
         con.execute("COMMIT")
     except BaseException:
         con.execute("ROLLBACK")
+        rebuild_mirror(con)
         raise
 
 
@@ -187,4 +212,5 @@ def savepoint(con, name):
     except BaseException:
         con.execute(f"ROLLBACK TO {name}")
         con.execute(f"RELEASE {name}")
+        rebuild_mirror(con)
         raise

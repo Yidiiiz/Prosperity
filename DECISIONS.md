@@ -257,3 +257,28 @@ parentheses.
     not agent decisions. Order of a tick's agent phase: pending fill,
     rent, decide. Sell proceeds of 0 u (1 u prices under spread) post no
     ledger row per #27.
+
+39. **The measured path to 500 ticks/s** (spec v2 section 4 mandated three
+    fixes; two more were needed and are recorded here as the profile
+    demanded). Baseline at population 100: 165 ticks/s. Profile (2,000
+    ticks): (a) stdlib statistics.pstdev — exact-Fraction arithmetic in
+    Python 3.14 — cost 8s of 18s; zstats now uses exact integer sums with
+    one sqrt (n^2*var = n*sum(x^2) - sum(x)^2), deterministic and
+    platform-stable. (b) two UPDATE-balances per transfer cost ~5s; with
+    the mirror authoritative inside a transaction, the table is synced
+    once per commit (db.flush_balances, executemany over dirty accounts) —
+    crash safety unchanged because the sync happens before COMMIT.
+    (c) the full O(ledger) invariant audit at 100-tick cadence cost
+    ~250ms/call and grows with history; the cadence check is now
+    ledger.verify_fast (O(accounts): mirror sum == initial, no negative
+    non-ARENA), with the full audit at run boundaries, checkpoints,
+    wind_down and `colony verify`. Result: 675 ticks/s on the reference
+    laptop (bench in tests/test_perf.py, CI floor 250/s).
+
+40. **flush_every batches transactions, not flushes.** One BEGIN..COMMIT
+    spans up to N ticks and the runtime state flushes with it, so the
+    database is always at a flushed boundary and a crash loses at most N
+    ticks; resume from the boundary replays to a byte-identical ledger
+    (tests: flush 1 vs 100 identical; injected crash mid-window resumes
+    identical). Live arenas pin flush_every 1 in the validator, which also
+    keeps the blocking feed wait outside any open transaction.

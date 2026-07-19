@@ -163,6 +163,11 @@ def validate(cfg):
     _derive_lifecycle(cfg)
     _warn_commensurate(cfg)
     _check_venue(cfg, kind)
+    flush_every = cfg.setdefault("flush_every", 1)
+    if not isinstance(flush_every, int) or isinstance(flush_every, bool) or flush_every < 1:
+        raise ConfigError("flush_every must be a positive integer")
+    if kind == "live" and flush_every != 1:
+        raise ConfigError("live arenas pin flush_every 1 (exact resume is non-negotiable)")
 
     if not cfg["death_floor_u"] < cfg["gen0_seed_u"]:
         raise ConfigError("death_floor_u must be below gen0_seed_u")

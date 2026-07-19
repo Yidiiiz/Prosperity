@@ -5,7 +5,7 @@ LLM provider (configured by environment variable). Same inputs, same Decision
 dataclass out, plus a cost_u the orchestrator debits via SINK:METABOLISM.
 """
 
-import statistics
+import math
 from dataclasses import dataclass
 
 
@@ -19,15 +19,23 @@ def zstats(history, lookback):
     """(z, mean, stdev) of the current price vs the trailing lookback window.
 
     Returns zeros until lookback+1 prices exist or when the window is flat.
+    Prices are ints, so the sums are exact; n^2 * var = n*sum(x^2) - sum(x)^2
+    stays in integers and one sqrt at the end keeps this deterministic and
+    fast (stdlib statistics.pstdev is exact-fraction arithmetic and was the
+    measured hot spot at population 100, spec v2 section 4).
     """
     if len(history) < lookback + 1:
         return 0.0, 0.0, 0.0
     window = history[-lookback:]
-    mean = statistics.fmean(window)
-    stdev = statistics.pstdev(window)
-    if stdev == 0:
+    n = lookback
+    s1 = sum(window)
+    s2 = sum(x * x for x in window)
+    var_num = n * s2 - s1 * s1  # n^2 * variance, exact
+    mean = s1 / n
+    if var_num <= 0:
         return 0.0, mean, 0.0
-    return (history[-1] - mean) / stdev, mean, stdev
+    root = math.sqrt(var_num)
+    return (n * history[-1] - s1) / root, mean, root / n
 
 
 def _fee_blocked(genome, z, mean, stdev, fee_bps):
