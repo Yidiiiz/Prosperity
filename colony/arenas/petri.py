@@ -1,10 +1,13 @@
 """The Petri Dish: a scripted price path through the config's regime list.
 
 Exogenous by design — agents cannot move the price in v1. When the regime
-list is exhausted, it loops.
+list is exhausted, it loops. Wall time is synthetic: bars are stamped from a
+fixed epoch at tick_seconds per bar (spec v2 3.4 wants UTC axes everywhere,
+and the Petri is no exception).
 """
 
 MAX_HISTORY = 512  # far beyond the max strategy lookback (100)
+EPOCH_UTC = 1_577_836_800  # 2020-01-01T00:00:00Z, an arbitrary fixed origin
 
 
 class Petri:
@@ -12,8 +15,11 @@ class Petri:
         self.name = arena_cfg["name"]
         self.regimes = arena_cfg["regimes"]
         self.floor = arena_cfg["price_floor_u"]
+        self.ts = arena_cfg.get("tick_seconds", 86_400)
+        self.epoch = arena_cfg.get("epoch_utc", EPOCH_UTC)
         self._price = arena_cfg["start_price_u"]
         self._hist = [self._price]
+        self._steps = 0
         self._regime_idx = 0
         self._regime_tick = 0
         self._anchor = self._price
@@ -29,6 +35,7 @@ class Petri:
         self._hist.append(self._price)
         if len(self._hist) > MAX_HISTORY:
             del self._hist[0]
+        self._steps += 1
         self._regime_tick += 1
         if self._regime_tick >= regime["ticks"]:
             self._regime_idx = (self._regime_idx + 1) % len(self.regimes)
@@ -37,6 +44,9 @@ class Petri:
 
     def price(self):
         return self._price
+
+    def utc(self):
+        return self.epoch + self._steps * self.ts
 
     def history(self, n):
         return self._hist[-n:]
@@ -51,6 +61,7 @@ class Petri:
         return {
             "price": self._price,
             "hist": self._hist,
+            "steps": self._steps,
             "regime_idx": self._regime_idx,
             "regime_tick": self._regime_tick,
             "anchor": self._anchor,
@@ -59,6 +70,7 @@ class Petri:
     def set_state(self, state):
         self._price = state["price"]
         self._hist = list(state["hist"])
+        self._steps = state["steps"]
         self._regime_idx = state["regime_idx"]
         self._regime_tick = state["regime_tick"]
         self._anchor = state["anchor"]

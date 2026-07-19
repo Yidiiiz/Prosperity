@@ -12,7 +12,10 @@ class Arena(Protocol):
         """Advance one tick."""
 
     def price(self) -> int:
-        """Current price, cents per lot."""
+        """Current price, micro-dollars per lot."""
+
+    def utc(self) -> int:
+        """UTC unix seconds of the current bar (wall-clock axes, spec v2 3.4)."""
 
     def history(self, n) -> list[int]:
         """Last n prices (oldest first)."""

@@ -8,7 +8,7 @@ import statistics
 
 from . import agents, db, evolution, ledger, risk, strategies
 from .arenas import make_arena
-from .config import ConfigError
+from .config import ConfigError, rent_due
 
 TREASURY = "TREASURY"
 EPSILON = 1e-6  # matchmaker weight floor so zero-fitness agents can still pair
@@ -133,7 +133,7 @@ class Orchestrator:
             if wait is not None and not wait():
                 break  # live feed went stale; state is saved, rerun to resume
             self.step()
-            if checkpoint_cb and self.tick % 2000 == 0:
+            if checkpoint_cb and self.tick % self.cfg["checkpoint_every"] == 0:
                 checkpoint_cb(self.tick)
         ledger.verify_invariants(self.con, self.cfg["initial_treasury_u"])
         return self.tick - start
@@ -145,8 +145,9 @@ class Orchestrator:
             self._quota_sweep(t)
             self.arena.step(self.rng)
             price = self.arena.price()
-            self._live_phase(t, price)
-            self._death_phase(t, price)
+            utc = self.arena.utc()
+            self._live_phase(t, utc, price)
+            self._death_phase(t, utc, price)
             self._breeding_phase(t, price)
             if t % cfg["snapshot_every"] == 0:
                 self._snapshot(t, price)
@@ -160,9 +161,10 @@ class Orchestrator:
         the current price and return all estates to the treasury. After this,
         colony wealth is 0 and the treasury holds the system's entire cash."""
         price = self.arena.price()
+        utc = self.arena.utc()
         with db.tx(self.con):
             for aid in sorted(list(self.agents)):
-                self._die(self.tick, self.agents[aid], cause, price)
+                self._die(self.tick, utc, self.agents[aid], cause, price)
             self._flush(self.tick)
         ledger.verify_invariants(self.con, self.cfg["initial_treasury_u"])
 
@@ -182,17 +184,17 @@ class Orchestrator:
             agent.debt -= pay
             self.con.execute("UPDATE agents SET debt_u = ? WHERE id = ?", (agent.debt, aid))
 
-    def _live_phase(self, t, price):
+    def _live_phase(self, t, utc, price):
         cfg = self.cfg
         history = self.arena.history(evolution.PARAM_BOUNDS["lookback"][1] + 1)
         for aid in sorted(self.agents):
             agent = self.agents[aid]
             c = agents.cash(self.con, agent)
             equity = c + agent.lots * price
-            rent = max(cfg["rent_min_u"], equity * cfg["rent_bps_of_equity"] // 10_000)
+            rent = rent_due(equity, cfg)
             if c < rent and agent.lots > 0:
                 # force-liquidate the ENTIRE position in one sale (fees apply)
-                agents.sell_all(self.con, t, agent, price, cfg["fee_bps"], self.arena_account)
+                agents.sell_all(self.con, t, utc, agent, price, cfg["fee_bps"], self.arena_account)
                 c = agents.cash(self.con, agent)
             if c < rent:
                 self._die(t, agent, "liquidity_death", price)
@@ -209,10 +211,10 @@ class Orchestrator:
             )
             if decision is not None:
                 if decision.side == "BUY":
-                    agents.buy(self.con, t, agent, decision.lots, price, cfg["fee_bps"],
+                    agents.buy(self.con, t, utc, agent, decision.lots, price, cfg["fee_bps"],
                                self.arena_account)
                 else:
-                    agents.sell(self.con, t, agent, decision.lots, price, cfg["fee_bps"],
+                    agents.sell(self.con, t, utc, agent, decision.lots, price, cfg["fee_bps"],
                                 self.arena_account)
                 c = agents.cash(self.con, agent)
             if agent.lots > 0:
@@ -223,7 +225,7 @@ class Orchestrator:
                 agent.peak_equity = equity
                 agent.dirty = True
 
-    def _death_phase(self, t, price):
+    def _death_phase(self, t, utc, price):
         cfg = self.cfg
         for aid in sorted(list(self.agents)):
             agent = self.agents[aid]
@@ -237,14 +239,14 @@ class Orchestrator:
                 cause = "stagnation"  # never-traders only (spec 3.6)
             else:
                 continue
-            self._die(t, agent, cause, price)
+            self._die(t, utc, agent, cause, price)
 
-    def _die(self, t, agent, cause, price):
+    def _die(self, t, utc, agent, cause, price):
         if agent.peak_equity >= 2 * agent.birth_seed:
             self.hall.append(agent.genome)
             if len(self.hall) > self.cfg["hall_size"]:
                 self.hall.pop(0)
-        final = agents.die(self.con, t, agent, cause, price, self.cfg["fee_bps"],
+        final = agents.die(self.con, t, utc, agent, cause, price, self.cfg["fee_bps"],
                            self.arena_account)
         self.dead_growth.setdefault(agent.generation, []).append(
             final / max(1, agent.birth_seed)
@@ -425,9 +427,10 @@ class Orchestrator:
         )
         shares = evolution.archetype_shares(genomes)
         self.con.execute(
-            "INSERT OR REPLACE INTO colony_metrics VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            "INSERT OR REPLACE INTO colony_metrics VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (
                 t,
+                self.arena.utc(),
                 ledger.balance(self.con, TREASURY),
                 wealth,
                 ledger.balance(self.con, self.arena_account),

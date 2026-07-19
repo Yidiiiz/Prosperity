@@ -209,3 +209,28 @@ parentheses.
     rows stay valid; the venue model replaces it and skips 0-amount fees
     per #27. `report.money` renders dollars with 2 decimals at or above
     $1 and 6 below; raw µ$ appears only in ledger/debug output.
+
+34. **rent_apr_bps ships at 730, not the spec's 7,300.** Spec v2 §3.3 states
+    "v1 2 bps/tick ≡ 7,300 bps APR at day-ticks" — arithmetically 2 bps ×
+    365 days = 730 bps. The same clause's controlling requirement is "so
+    Petri economics are unchanged", and §10.2 requires the v1 flagship to
+    re-validate unchanged, so the correct number wins: at tick_seconds
+    86,400, `equity × 730 × 86,400 // (10⁴ × 31,536,000)` equals
+    `equity × 2 // 10⁴` exactly (proven by test), byte-identical to v1
+    rent. The validator cap moves from 2 bps/tick to 730 bps APR, same
+    ceiling in wall-time terms.
+
+35. **Wall-time plumbing.** The lifecycle loader stores derived tick counts
+    back onto the config dict under the v1 names (`max_age_ticks`,
+    `snapshot_every`, ...), so downstream code never converts and stored
+    `config_json` resumes consistently. `min_ticks_for_fitness` stays a
+    tick count: it guards a statistical minimum of observations, not a
+    wall-time lifecycle. The Petri stamps bars from a fixed epoch
+    (2020-01-01T00:00:00Z, `arena.epoch_utc` to override) at tick_seconds
+    per bar so UTC axes exist in every arena; replay/live parse the Date
+    column (bare dates = UTC midnight). `colony_metrics` and `trades` gain
+    a `utc` column. The shipped Petri `max_age_days` 3,100 is commensurate
+    with the 100-tick crash regime (31 × 100) and the validator warning
+    fires by design — the #23 measurement problem was equality with a LONG
+    regime; a warning, not an error, is the spec'd behavior and the crash
+    regime length is part of the validated v1 economics we must not touch.

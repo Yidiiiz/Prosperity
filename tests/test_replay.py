@@ -13,11 +13,13 @@ from tests.test_determinism import ledger_hash
 
 
 def write_csv(path, closes):
+    import datetime
+    start = datetime.date(2020, 1, 1)
     with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(["Date", "Close"])
         for i, close in enumerate(closes):
-            writer.writerow([f"2020-01-{i + 1:02d}", close])
+            writer.writerow([(start + datetime.timedelta(days=i)).isoformat(), close])
     return str(path)
 
 
@@ -27,7 +29,8 @@ def trend_closes(n=300):
 
 
 def replay_cfg(csv_path, **overrides):
-    return make_cfg(arena={"kind": "replay", "name": "test_replay", "csv": csv_path},
+    return make_cfg(arena={"kind": "replay", "name": "test_replay", "csv": csv_path,
+                           "tick_seconds": 86_400},
                     **overrides)
 
 

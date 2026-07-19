@@ -1,15 +1,35 @@
-"""Config loading and validation. Refuses to run on nonsense (spec section 5)."""
+"""Config loading and validation. Refuses to run on nonsense (spec section 5).
+
+v2: wall time is the config language (spec v2 section 3). Lifecycle constants
+are written with a _seconds/_hours/_days suffix and converted to ticks at
+load via the arena's tick_seconds; rates are annualized (rent_apr_bps). The
+derived tick values are stored back onto the config dict under the v1 names
+(max_age_ticks, snapshot_every, ...) so the rest of the code never converts.
+"""
 
 import json
+import warnings
 
 from .evolution import PARAM_BOUNDS
+
+SECONDS_PER_YEAR = 31_536_000
+SUFFIXES = {"_seconds": 1, "_hours": 3_600, "_days": 86_400}
+
+# lifecycle base key -> the derived config name the rest of the code reads
+LIFECYCLE_KEYS = {
+    "max_age": "max_age_ticks",
+    "stagnation": "stagnation_ticks",
+    "breed_cooldown": "breed_cooldown_ticks",
+    "solo_breed_patience": "solo_breed_patience",
+    "snapshot_every": "snapshot_every",
+    "checkpoint_every": "checkpoint_every",
+}
 
 REQUIRED_KEYS = [
     "rng_seed", "debug", "initial_treasury_u", "gen0_population", "gen0_seed_u",
     "max_population", "population_floor", "death_floor_u", "rent_min_u",
-    "rent_bps_of_equity", "fee_bps", "repro_multiple", "repay_multiple",
-    "reserve_floor_u", "breed_cooldown_ticks", "solo_breed_patience", "max_age_ticks",
-    "stagnation_ticks", "max_action_fraction", "min_ticks_for_fitness", "snapshot_every",
+    "rent_apr_bps", "fee_bps", "repro_multiple", "repay_multiple",
+    "reserve_floor_u", "lifecycle", "max_action_fraction", "min_ticks_for_fitness",
     "hall_size", "hall_immigrant_prob", "mutation", "elitism_top_k", "arena",
 ]
 
@@ -27,13 +47,75 @@ def load_config(path):
     return cfg
 
 
+def tick_seconds(arena_cfg):
+    """Seconds of wall time per tick: Petri defaults to one day per bar; replay
+    and live must state the cadence of their data (spec v2 3.1)."""
+    default = 86_400 if arena_cfg.get("kind", "petri") == "petri" else None
+    ts = arena_cfg.get("tick_seconds", default)
+    if not isinstance(ts, int) or isinstance(ts, bool) or ts < 1:
+        raise ConfigError("arena.tick_seconds must be a positive integer"
+                          " (seconds per bar; required for replay/live arenas)")
+    return ts
+
+
+def rent_due(equity_u, cfg):
+    """Per-tick rent from the annualized rate (spec v2 3.3): floor division,
+    may round to 0 at small stakes (a 0 rent is skipped per DECISIONS #27)."""
+    rent = equity_u * cfg["rent_apr_bps"] * cfg["_tick_seconds"] // (10_000 * SECONDS_PER_YEAR)
+    return max(cfg["rent_min_u"], rent)
+
+
+def _derive_lifecycle(cfg):
+    """Convert the wall-time lifecycle block to ticks (rounded, minimum 1),
+    rejecting unknown keys, missing keys, and a base key given twice."""
+    ts = tick_seconds(cfg["arena"])
+    cfg["_tick_seconds"] = ts
+    derived = {}
+    for key, value in cfg["lifecycle"].items():
+        for suffix, secs in SUFFIXES.items():
+            if key.endswith(suffix):
+                base = key[: -len(suffix)]
+                break
+        else:
+            raise ConfigError(f"lifecycle key {key!r} needs a _seconds/_hours/_days suffix")
+        if base not in LIFECYCLE_KEYS:
+            raise ConfigError(f"unknown lifecycle key {key!r}")
+        if base in derived:
+            raise ConfigError(f"lifecycle key {base!r} given twice with different units")
+        if not isinstance(value, (int, float)) or value <= 0:
+            raise ConfigError(f"lifecycle {key} must be a positive number")
+        derived[base] = max(1, round(value * secs / ts))
+    for base, name in LIFECYCLE_KEYS.items():
+        if base not in derived:
+            raise ConfigError(f"missing lifecycle key {base!r} (any _seconds/_hours/_days form)")
+        cfg[name] = derived[base]
+
+
+def _warn_commensurate(cfg):
+    """Lifecycle constants must not be commensurate with regime lengths
+    (spec v2 1.4, fixes LEARNINGS #23): a senescence wave landing exactly on
+    a regime boundary muddies selection measurements."""
+    if cfg["arena"].get("kind", "petri") != "petri":
+        return
+    max_age = cfg["max_age_ticks"]
+    for regime in cfg["arena"]["regimes"]:
+        length = regime["ticks"]
+        if max_age == length or max_age % length == 0 or length % max_age == 0:
+            warnings.warn(
+                f"max_age ({max_age} ticks) is commensurate with a {regime['kind']}"
+                f" regime length ({length} ticks): lifecycle waves will align with"
+                " regime boundaries and muddy selection measurements",
+                stacklevel=2,
+            )
+
+
 def validate(cfg):
     for key in REQUIRED_KEYS:
         if key not in cfg:
             raise ConfigError(f"missing config key {key!r}")
     for key, value in cfg.items():
         if key.endswith("_u") and not isinstance(value, int):
-            raise ConfigError(f"{key} must be an integer number of cents, got {value!r}")
+            raise ConfigError(f"{key} must be an integer number of micro-dollars, got {value!r}")
 
     arena = cfg["arena"]
     kind = arena.get("kind", "petri")
@@ -61,6 +143,9 @@ def validate(cfg):
     else:
         raise ConfigError(f"unknown arena kind {kind!r}")
 
+    _derive_lifecycle(cfg)
+    _warn_commensurate(cfg)
+
     if not cfg["death_floor_u"] < cfg["gen0_seed_u"]:
         raise ConfigError("death_floor_u must be below gen0_seed_u")
     if not cfg["reserve_floor_u"] >= cfg["death_floor_u"]:
@@ -74,9 +159,10 @@ def validate(cfg):
     max_lookback = PARAM_BOUNDS["lookback"][1]
     if not cfg["stagnation_ticks"] > max_lookback:
         raise ConfigError(f"stagnation_ticks must exceed the max lookback bound ({max_lookback})")
-    # Rent must stay far below achievable earn rates (spec 3.6).
-    if cfg["rent_bps_of_equity"] > 2:
-        raise ConfigError("rent_bps_of_equity must be <= 2")
+    # Rent must stay far below achievable earn rates (spec 3.6). 730 bps APR
+    # is the v1 2 bps/tick ceiling expressed annually at day-ticks.
+    if cfg["rent_apr_bps"] > 730:
+        raise ConfigError("rent_apr_bps must be <= 730")
     if cfg["gen0_population"] * cfg["gen0_seed_u"] > cfg["initial_treasury_u"]:
         raise ConfigError("treasury cannot fund gen0_population x gen0_seed_u")
     if cfg["population_floor"] > cfg["max_population"]:

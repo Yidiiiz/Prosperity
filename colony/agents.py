@@ -135,46 +135,46 @@ def _set_lots(con, agent, lots):
     )
 
 
-def buy(con, tick, agent, lots, price, fee_bps, arena_account):
+def buy(con, tick, utc, agent, lots, price, fee_bps, arena_account):
     cost = lots * price
     fee = fee_u(cost, fee_bps)
     ledger.transfer(con, tick, account_id(agent.id), arena_account, cost, "buy")
     ledger.transfer(con, tick, account_id(agent.id), arena_account, fee, "fee")
     _set_lots(con, agent, agent.lots + lots)
     con.execute(
-        "INSERT INTO trades (tick, agent_id, side, lots, price_u, fee_u)"
-        " VALUES (?, ?, 'BUY', ?, ?, ?)",
-        (tick, agent.id, lots, price, fee),
+        "INSERT INTO trades (tick, utc, agent_id, side, lots, price_u, fee_u)"
+        " VALUES (?, ?, ?, 'BUY', ?, ?, ?)",
+        (tick, utc, agent.id, lots, price, fee),
     )
     agent.hold = 0
     agent.ever_traded = True
     agent.dirty = True
 
 
-def sell(con, tick, agent, lots, price, fee_bps, arena_account):
+def sell(con, tick, utc, agent, lots, price, fee_bps, arena_account):
     proceeds = lots * price
     fee = fee_u(proceeds, fee_bps)
     ledger.transfer(con, tick, arena_account, account_id(agent.id), proceeds, "sell")
     ledger.transfer(con, tick, account_id(agent.id), arena_account, fee, "fee")
     _set_lots(con, agent, agent.lots - lots)
     con.execute(
-        "INSERT INTO trades (tick, agent_id, side, lots, price_u, fee_u)"
-        " VALUES (?, ?, 'SELL', ?, ?, ?)",
-        (tick, agent.id, lots, price, fee),
+        "INSERT INTO trades (tick, utc, agent_id, side, lots, price_u, fee_u)"
+        " VALUES (?, ?, ?, 'SELL', ?, ?, ?)",
+        (tick, utc, agent.id, lots, price, fee),
     )
     agent.ever_traded = True
     agent.dirty = True
 
 
-def sell_all(con, tick, agent, price, fee_bps, arena_account):
+def sell_all(con, tick, utc, agent, price, fee_bps, arena_account):
     if agent.lots > 0:
-        sell(con, tick, agent, agent.lots, price, fee_bps, arena_account)
+        sell(con, tick, utc, agent, agent.lots, price, fee_bps, arena_account)
 
 
-def die(con, tick, agent, cause, price, fee_bps, arena_account):
+def die(con, tick, utc, agent, cause, price, fee_bps, arena_account):
     """Death is a full liquidation (spec 3.9): sell everything, sweep the
     residue to the treasury, archive the fossil. Returns the final equity."""
-    sell_all(con, tick, agent, price, fee_bps, arena_account)
+    sell_all(con, tick, utc, agent, price, fee_bps, arena_account)
     residue = cash(con, agent)
     if residue > 0:
         ledger.transfer(

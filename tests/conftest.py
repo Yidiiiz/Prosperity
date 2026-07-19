@@ -16,18 +16,21 @@ BASE_CFG = {
     "population_floor": 4,
     "death_floor_u": 100_000_000,
     "rent_min_u": 100_000,
-    "rent_bps_of_equity": 2,
+    "rent_apr_bps": 730,
     "fee_bps": 20,
     "repro_multiple": 1.25,
     "repay_multiple": 0.15,
     "reserve_floor_u": 150_000_000,
-    "breed_cooldown_ticks": 50,
-    "solo_breed_patience": 10,
-    "max_age_ticks": 3000,
-    "stagnation_ticks": 120,
+    "lifecycle": {
+        "max_age_days": 3100,
+        "stagnation_days": 120,
+        "breed_cooldown_days": 50,
+        "solo_breed_patience_days": 10,
+        "snapshot_every_days": 25,
+        "checkpoint_every_days": 2000,
+    },
     "max_action_fraction": 0.80,
     "min_ticks_for_fitness": 75,
-    "snapshot_every": 25,
     "hall_size": 100,
     "hall_immigrant_prob": 0.4,
     "mutation": {
@@ -57,6 +60,14 @@ def make_cfg(**overrides):
     arena = overrides.pop("arena", None)
     if arena:
         cfg["arena"].update(arena)
+    lifecycle = overrides.pop("lifecycle", None)
+    if lifecycle:
+        # an override replaces the base key whatever unit suffix it used
+        for key in lifecycle:
+            base = key.rsplit("_", 1)[0]
+            for existing in [k for k in cfg["lifecycle"] if k.rsplit("_", 1)[0] == base]:
+                del cfg["lifecycle"][existing]
+        cfg["lifecycle"].update(lifecycle)
     cfg.update(overrides)
     validate(cfg)
     return cfg

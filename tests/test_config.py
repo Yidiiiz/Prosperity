@@ -40,12 +40,12 @@ def test_lot_granularity_constraint():
 
 def test_stagnation_must_exceed_max_lookback():
     with pytest.raises(ConfigError):
-        make_cfg(stagnation_ticks=100)
+        make_cfg(lifecycle={"stagnation_days": 100})
 
 
-def test_rent_bps_capped():
+def test_rent_apr_capped():
     with pytest.raises(ConfigError):
-        make_cfg(rent_bps_of_equity=3)
+        make_cfg(rent_apr_bps=731)
 
 
 def test_treasury_must_fund_gen0():

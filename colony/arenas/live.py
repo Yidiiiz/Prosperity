@@ -15,22 +15,32 @@ import hashlib
 import io
 import time
 
+from .replay import parse_utc, to_price_u
 
-def _journal_closes(path):
+
+def _journal_rows(path):
     """Read Date,Close rows, tolerating a partial final line (the feed may
-    be mid-append). Returns [] if the file does not exist yet."""
+    be mid-append). Returns ([], []) if the file does not exist yet."""
     try:
         with open(path, newline="", encoding="utf-8") as f:
             text = f.read()
     except FileNotFoundError:
-        return []
+        return [], []
     if text and not text.endswith("\n"):
         text = text[: text.rfind("\n") + 1]  # drop the torn tail line
     reader = csv.DictReader(io.StringIO(text))
-    field = next((c for c in reader.fieldnames or [] if c.strip().lower() == "close"), None)
-    if field is None:
-        return []
-    return [float(row[field]) for row in reader if row.get(field)]
+    fields = reader.fieldnames or []
+    close = next((c for c in fields if c.strip().lower() == "close"), None)
+    date = next((c for c in fields if c.strip().lower() == "date"), None)
+    if close is None:
+        return [], []
+    times, closes = [], []
+    for row in reader:
+        if not row.get(close):
+            continue
+        times.append(parse_utc(row[date]) if date and row.get(date) else 0)
+        closes.append(float(row[close]))
+    return times, closes
 
 
 def _digest(prices):
@@ -44,6 +54,7 @@ class Live:
         self.denominator = arena_cfg.get("lot_denominator", 1)
         self.timeout = arena_cfg.get("poll_timeout_seconds", 120)
         self._prices = []
+        self._times = []
         self._idx = 0
         self._load()
         if not self._prices:
@@ -53,9 +64,10 @@ class Live:
             )
 
     def _load(self):
-        closes = _journal_closes(self.csv_path)
+        times, closes = _journal_rows(self.csv_path)
         if len(closes) > len(self._prices):
-            self._prices = [max(1, round(c * 1_000_000 / self.denominator)) for c in closes]
+            self._prices = [to_price_u(c, self.denominator) for c in closes]
+            self._times = times
 
     def wait_for_data(self):
         """Block until an unconsumed row exists. False = the feed went stale
@@ -76,6 +88,9 @@ class Live:
 
     def price(self):
         return self._prices[self._idx]
+
+    def utc(self):
+        return self._times[self._idx]
 
     def history(self, n):
         return self._prices[max(0, self._idx - n + 1): self._idx + 1]

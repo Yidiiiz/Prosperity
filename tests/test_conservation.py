@@ -45,17 +45,17 @@ def test_property_1000_random_valid_operations(tmp_path):
             if op < 0.35:  # buy
                 lots = min(cash // (2 * price), rng.randint(1, 50))
                 if lots > 0:
-                    agents.buy(con, tick, agent, lots, price, cfg["fee_bps"], "ARENA:petri")
+                    agents.buy(con, tick, 0, agent, lots, price, cfg["fee_bps"], "ARENA:petri")
             elif op < 0.70:  # sell
                 if agent.lots > 0:
-                    agents.sell(con, tick, agent, rng.randint(1, agent.lots), price,
+                    agents.sell(con, tick, 0, agent, rng.randint(1, agent.lots), price,
                                 cfg["fee_bps"], "ARENA:petri")
             elif op < 0.90:  # rent
                 rent = max(cfg["rent_min_u"], cash * 2 // 10_000)
                 if cash >= rent:
                     ledger.transfer(con, tick, f"AGENT:{aid}", "TREASURY", rent, "rent")
             elif op < 0.97:  # death
-                orch._die(tick, agent, "bankrupt", price)
+                orch._die(tick, 0, agent, "bankrupt", price)
             else:  # house birth (immigrant-style spawn)
                 if ledger.balance(con, "TREASURY") >= cfg["gen0_seed_u"]:
                     orch._birth(

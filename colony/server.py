@@ -66,7 +66,7 @@ def api_timeseries(con, query):
     rows = con.execute(
         "SELECT * FROM colony_metrics WHERE tick > ? ORDER BY tick", (after,)
     ).fetchall()
-    columns = ["tick", "treasury_u", "colony_wealth_u", "population", "price_u",
+    columns = ["tick", "utc", "treasury_u", "colony_wealth_u", "population", "price_u",
                "regime_kind", "share_momentum", "share_mean_revert", "share_sitter",
                "diversity", "births_cum", "deaths_cum"]
     return {c: [row[c] for row in rows] for c in columns}

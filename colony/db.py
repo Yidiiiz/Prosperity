@@ -71,6 +71,7 @@ CREATE TABLE IF NOT EXISTS positions (
 CREATE TABLE IF NOT EXISTS trades (
   seq         INTEGER PRIMARY KEY AUTOINCREMENT,
   tick        INTEGER NOT NULL,
+  utc         INTEGER NOT NULL,
   agent_id    TEXT NOT NULL,
   side        TEXT NOT NULL CHECK (side IN ('BUY','SELL')),
   lots        INTEGER NOT NULL,
@@ -90,6 +91,7 @@ CREATE TABLE IF NOT EXISTS snapshots (
 -- Aggregate time series written every snapshot_every ticks.
 CREATE TABLE IF NOT EXISTS colony_metrics (
   tick              INTEGER PRIMARY KEY,
+  utc               INTEGER NOT NULL,
   treasury_u    INTEGER NOT NULL,
   colony_wealth_u INTEGER NOT NULL,
   arena_u       INTEGER NOT NULL,

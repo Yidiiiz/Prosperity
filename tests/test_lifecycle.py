@@ -40,8 +40,8 @@ def test_bankruptcy_is_full_liquidation_with_residue(tmp_path):
     with db.tx(con):
         # commit nearly everything at $2.00, then mark to market at $0.18:
         # equity = 8_020_000 + 495*180_000 = 97_120_000 u <= death_floor -> bankrupt
-        agents.buy(con, 1, agent, 495, 2_000_000, cfg["fee_bps"], "ARENA:petri")
-        orch._death_phase(1, 180_000)
+        agents.buy(con, 1, 0, agent, 495, 2_000_000, cfg["fee_bps"], "ARENA:petri")
+        orch._death_phase(1, 0, 180_000)
     row = con.execute("SELECT died_tick, death_cause FROM agents WHERE id = ?", (aid,)).fetchone()
     assert row["death_cause"] == "bankrupt" and row["died_tick"] == 1
     # full liquidation: no lots left, estate swept to treasury, fee charged on the sale
@@ -62,12 +62,12 @@ def test_rent_shortfall_forces_full_liquidation(tmp_path):
     aid = sorted(orch.agents)[0]
     agent = orch.agents[aid]
     with db.tx(con):
-        agents.buy(con, 1, agent, 495, 2_000_000, cfg["fee_bps"], "ARENA:petri")
+        agents.buy(con, 1, 0, agent, 495, 2_000_000, cfg["fee_bps"], "ARENA:petri")
         # drain remaining cash below rent (in-simulation: pay it to the arena)
         ledger.transfer(con, 1, f"AGENT:{aid}", "ARENA:petri", 8_000_000, "fee")
     assert agents.cash(con, agent) == 20_000
     with db.tx(con):
-        orch._live_phase(2, 2_000_000)
+        orch._live_phase(2, 0, 2_000_000)
     # position force-sold in one sale, rent paid, agent survived
     assert agent.lots == 0
     assert agents.cash(con, agent) > 0
@@ -79,7 +79,7 @@ def test_rent_shortfall_forces_full_liquidation(tmp_path):
 
 
 def test_old_age_death(tmp_path):
-    cfg = make_cfg(max_age_ticks=130, breed_cooldown_ticks=10)
+    cfg = make_cfg(lifecycle={"max_age_days": 130, "breed_cooldown_days": 10})
     con, orch = make_colony(tmp_path, cfg)
     orch.run(140)
     rows = con.execute("SELECT born_tick, died_tick, death_cause FROM agents").fetchall()
