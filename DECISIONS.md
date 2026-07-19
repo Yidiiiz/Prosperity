@@ -234,3 +234,26 @@ parentheses.
     fires by design — the #23 measurement problem was equality with a LONG
     regime; a warning, not an error, is the spec'd behavior and the crash
     regime length is part of the validated v1 economics we must not touch.
+
+36. **Venue defaults per arena class.** The shipped Petri venue is
+    `{taker_bps: 20, spread_bps: 0, min_fee_u: 0, fill_delay_ticks: 0}` —
+    exactly the v1 execution model, so the validated Petri economics and
+    the v1 acceptance runs re-base unchanged. Real-data configs (replay,
+    live) ship the spec's honest block `{taker_bps: 10, spread_bps: 2,
+    min_fee_u: 0, fill_delay_ticks: 1}`. The validator rejects
+    fill_delay_ticks 0 outside the Petri (spec v2 2.3).
+
+37. **fee_aware sees taker + half-spread.** The #7 formula is ratified
+    verbatim (`edge_bps < 2 x fee_bps`); with the venue model, the
+    per-side cost passed to `decide` is `taker_bps + spread_bps / 2` —
+    the actual cost of one side of a round trip.
+
+38. **Pending orders live one bar, exactly.** A risk-checked decision at
+    row N is stored in agent_state (pending_side/pending_lots, flushed in
+    the tick transaction, so it survives restarts); at row N+1 it is
+    re-checked against current equity at the new price (shrunk to caps,
+    cancelled if unaffordable) and consumed either way. Engine actions —
+    rent force-liquidation, death liquidation — remain immediate: they are
+    not agent decisions. Order of a tick's agent phase: pending fill,
+    rent, decide. Sell proceeds of 0 u (1 u prices under spread) post no
+    ledger row per #27.

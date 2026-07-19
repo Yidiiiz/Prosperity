@@ -40,7 +40,7 @@ def test_bankruptcy_is_full_liquidation_with_residue(tmp_path):
     with db.tx(con):
         # commit nearly everything at $2.00, then mark to market at $0.18:
         # equity = 8_020_000 + 495*180_000 = 97_120_000 u <= death_floor -> bankrupt
-        agents.buy(con, 1, 0, agent, 495, 2_000_000, cfg["fee_bps"], "ARENA:petri")
+        agents.buy(con, 1, 0, agent, 495, 2_000_000, cfg["venue"], "ARENA:petri")
         orch._death_phase(1, 0, 180_000)
     row = con.execute("SELECT died_tick, death_cause FROM agents WHERE id = ?", (aid,)).fetchone()
     assert row["death_cause"] == "bankrupt" and row["died_tick"] == 1
@@ -62,7 +62,7 @@ def test_rent_shortfall_forces_full_liquidation(tmp_path):
     aid = sorted(orch.agents)[0]
     agent = orch.agents[aid]
     with db.tx(con):
-        agents.buy(con, 1, 0, agent, 495, 2_000_000, cfg["fee_bps"], "ARENA:petri")
+        agents.buy(con, 1, 0, agent, 495, 2_000_000, cfg["venue"], "ARENA:petri")
         # drain remaining cash below rent (in-simulation: pay it to the arena)
         ledger.transfer(con, 1, f"AGENT:{aid}", "ARENA:petri", 8_000_000, "fee")
     assert agents.cash(con, agent) == 20_000

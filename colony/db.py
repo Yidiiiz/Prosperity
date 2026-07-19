@@ -58,7 +58,9 @@ CREATE TABLE IF NOT EXISTS agent_state (
   ever_traded             INTEGER NOT NULL,
   last_birth_tick         INTEGER,
   queue_since             INTEGER,
-  final_equity_u      INTEGER
+  pending_side            TEXT,
+  pending_lots            INTEGER NOT NULL DEFAULT 0,
+  final_equity_u          INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS positions (
@@ -75,8 +77,9 @@ CREATE TABLE IF NOT EXISTS trades (
   agent_id    TEXT NOT NULL,
   side        TEXT NOT NULL CHECK (side IN ('BUY','SELL')),
   lots        INTEGER NOT NULL,
-  price_u INTEGER NOT NULL,
-  fee_u   INTEGER NOT NULL
+  price_u  INTEGER NOT NULL,
+  fee_u    INTEGER NOT NULL,
+  spread_u INTEGER NOT NULL DEFAULT 0
 );
 
 -- Periodic equity snapshots (every snapshot_every ticks and at death).

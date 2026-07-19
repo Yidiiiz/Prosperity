@@ -8,7 +8,6 @@
   "population_floor": 40,
   "death_floor_u": 100000000,
   "rent_min_u": 100000,
-  "fee_bps": 20,
   "repro_multiple": 1.25,
   "repay_multiple": 0.15,
   "reserve_floor_u": 150000000,
@@ -69,5 +68,12 @@
     "solo_breed_patience_days": 10,
     "snapshot_every_days": 25,
     "checkpoint_every_days": 2000
+  },
+  "venue": {
+    "taker_bps": 20,
+    "maker_bps": 0,
+    "spread_bps": 0,
+    "min_fee_u": 0,
+    "fill_delay_ticks": 0
   }
 }

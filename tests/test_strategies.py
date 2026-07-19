@@ -1,6 +1,8 @@
 from colony.risk import check, fee_u
 from colony.strategies import Decision, decide, zstats
 
+VENUE = {"taker_bps": 20, "maker_bps": 0, "spread_bps": 0, "min_fee_u": 0}
+
 MOMENTUM = {
     "archetype": "momentum",
     "params": {"lookback": 10, "entry_z": 1.5, "exit_z": -0.5, "risk_fraction": 0.40,
@@ -87,30 +89,30 @@ def test_fee_aware_blocks_thin_edges():
 
 def test_risk_caps_buy_at_max_action_fraction():
     d = check(Decision("BUY", 1_000), cash=1_000_000, equity=1_000_000, lots_held=0,
-              price=200, max_action_fraction=0.10, fee_bps=20)
+              price=200, max_action_fraction=0.10, venue=VENUE)
     assert d.lots == int(0.10 * 1_000_000) // 200
 
 
 def test_risk_caps_buy_at_cash_including_fee():
     # cash covers 5 lots at 200 but not 5 lots + fee
     d = check(Decision("BUY", 5), cash=1_000, equity=1_000_000, lots_held=0,
-              price=200, max_action_fraction=0.80, fee_bps=20)
+              price=200, max_action_fraction=0.80, venue=VENUE)
     assert d.lots == 4
-    assert 4 * 200 + fee_u(4 * 200, 20) <= 1_000
+    assert 4 * 200 + fee_u(4 * 200, VENUE) <= 1_000
 
 
 def test_risk_rejects_unaffordable_buy():
     assert check(Decision("BUY", 10), cash=100, equity=100, lots_held=0,
-                 price=200, max_action_fraction=0.80, fee_bps=20) is None
+                 price=200, max_action_fraction=0.80, venue=VENUE) is None
 
 
 def test_risk_caps_sell_at_position():
     d = check(Decision("SELL", 10), cash=0, equity=1_000, lots_held=3,
-              price=200, max_action_fraction=0.80, fee_bps=20)
+              price=200, max_action_fraction=0.80, venue=VENUE)
     assert d.lots == 3
     assert check(Decision("SELL", 5), cash=0, equity=0, lots_held=0,
-                 price=200, max_action_fraction=0.80, fee_bps=20) is None
+                 price=200, max_action_fraction=0.80, venue=VENUE) is None
 
 
 def test_risk_passes_none_through():
-    assert check(None, 0, 0, 0, 200, 0.8, 20) is None
+    assert check(None, 0, 0, 0, 200, 0.8, VENUE) is None

@@ -28,7 +28,7 @@ LIFECYCLE_KEYS = {
 REQUIRED_KEYS = [
     "rng_seed", "debug", "initial_treasury_u", "gen0_population", "gen0_seed_u",
     "max_population", "population_floor", "death_floor_u", "rent_min_u",
-    "rent_apr_bps", "fee_bps", "repro_multiple", "repay_multiple",
+    "rent_apr_bps", "venue", "repro_multiple", "repay_multiple",
     "reserve_floor_u", "lifecycle", "max_action_fraction", "min_ticks_for_fitness",
     "hall_size", "hall_immigrant_prob", "mutation", "elitism_top_k", "arena",
 ]
@@ -109,6 +109,23 @@ def _warn_commensurate(cfg):
             )
 
 
+def _check_venue(cfg, arena_kind):
+    """Per-venue execution costs (spec v2 2.2) and fill delay (2.3). All v2
+    orders are market orders: maker_bps is schema for future limit-order
+    work and is validated but unused."""
+    venue = cfg["venue"]
+    for key in ("taker_bps", "maker_bps", "spread_bps", "min_fee_u"):
+        value = venue.get(key)
+        if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+            raise ConfigError(f"venue.{key} must be a non-negative integer")
+    delay = venue.get("fill_delay_ticks", 1)
+    if delay not in (0, 1):
+        raise ConfigError("venue.fill_delay_ticks must be 0 or 1")
+    if delay == 0 and arena_kind != "petri":
+        raise ConfigError("venue.fill_delay_ticks 0 is allowed only for the Petri arena"
+                          " (same-bar fills on real data are fake intraday alpha)")
+
+
 def validate(cfg):
     for key in REQUIRED_KEYS:
         if key not in cfg:
@@ -145,6 +162,7 @@ def validate(cfg):
 
     _derive_lifecycle(cfg)
     _warn_commensurate(cfg)
+    _check_venue(cfg, kind)
 
     if not cfg["death_floor_u"] < cfg["gen0_seed_u"]:
         raise ConfigError("death_floor_u must be below gen0_seed_u")

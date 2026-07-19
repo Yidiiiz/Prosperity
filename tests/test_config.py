@@ -10,7 +10,7 @@ def test_default_config_is_valid():
 
 def test_missing_key_rejected():
     cfg = make_cfg()
-    del cfg["fee_bps"]
+    del cfg["venue"]
     with pytest.raises(ConfigError):
         validate(cfg)
 

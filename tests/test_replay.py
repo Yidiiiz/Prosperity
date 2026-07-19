@@ -29,6 +29,7 @@ def trend_closes(n=300):
 
 
 def replay_cfg(csv_path, **overrides):
+    overrides.setdefault("venue", {"fill_delay_ticks": 1})
     return make_cfg(arena={"kind": "replay", "name": "test_replay", "csv": csv_path,
                            "tick_seconds": 86_400},
                     **overrides)

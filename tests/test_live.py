@@ -20,6 +20,7 @@ def append_row(path, close, torn=False):
 
 
 def live_cfg(csv_path, **overrides):
+    overrides.setdefault("venue", {"fill_delay_ticks": 1})
     return make_cfg(
         arena={"kind": "live", "name": "live_test", "csv": csv_path,
                "poll_timeout_seconds": 0.5, "tick_seconds": 86_400},
@@ -97,7 +98,8 @@ def test_live_run_equals_replay_twin(tmp_path):
     con_twin, orch_twin = make_colony(
         tmp_path,
         make_cfg(arena={"kind": "replay", "name": "live_test", "csv": journal,
-                        "tick_seconds": 86_400}),
+                        "tick_seconds": 86_400},
+                 venue={"fill_delay_ticks": 1}),
         "twin.db",
     )
     assert orch_twin.run(120) == 120

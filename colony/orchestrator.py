@@ -89,6 +89,7 @@ class Orchestrator:
         self.arena = make_arena(self.cfg["arena"])
         self.arena.set_state(state["arena"])
         self.arena_account = f"ARENA:{self.arena.name}"
+        self.venue = self.cfg["venue"]
         self.agents = agents.load_living(con)
         self.queue = sorted(
             (a.id for a in self.agents.values() if a.queue_since is not None),
@@ -184,39 +185,67 @@ class Orchestrator:
             agent.debt -= pay
             self.con.execute("UPDATE agents SET debt_u = ? WHERE id = ?", (agent.debt, aid))
 
+    def _execute(self, t, utc, agent, decision, price):
+        if decision.side == "BUY":
+            agents.buy(self.con, t, utc, agent, decision.lots, price, self.venue,
+                       self.arena_account)
+        else:
+            agents.sell(self.con, t, utc, agent, decision.lots, price, self.venue,
+                        self.arena_account)
+
     def _live_phase(self, t, utc, price):
         cfg = self.cfg
+        venue = self.venue
+        delay = venue.get("fill_delay_ticks", 1)
+        cost_bps = risk.per_side_cost_bps(venue)
         history = self.arena.history(evolution.PARAM_BOUNDS["lookback"][1] + 1)
         for aid in sorted(self.agents):
             agent = self.agents[aid]
+            # Pending order from the last bar fills FIRST at THIS bar's price
+            # (spec v2 2.3): risk re-checked against current equity — shrunk
+            # if it now violates caps, cancelled if unaffordable.
+            if agent.pending_side is not None:
+                c = agents.cash(self.con, agent)
+                fill = risk.check(
+                    strategies.Decision(agent.pending_side, agent.pending_lots),
+                    c, c + agent.lots * price, agent.lots, price,
+                    cfg["max_action_fraction"], venue,
+                )
+                agent.pending_side = None
+                agent.pending_lots = 0
+                agent.dirty = True
+                if fill is not None:
+                    self._execute(t, utc, agent, fill, price)
             c = agents.cash(self.con, agent)
             equity = c + agent.lots * price
             rent = rent_due(equity, cfg)
             if c < rent and agent.lots > 0:
                 # force-liquidate the ENTIRE position in one sale (fees apply)
-                agents.sell_all(self.con, t, utc, agent, price, cfg["fee_bps"], self.arena_account)
+                agents.sell_all(self.con, t, utc, agent, price, venue, self.arena_account)
                 c = agents.cash(self.con, agent)
             if c < rent:
-                self._die(t, agent, "liquidity_death", price)
+                self._die(t, utc, agent, "liquidity_death", price)
                 continue
-            if rent > 0:  # can round to 0 at small stakes; a 0-cent row is no row
+            if rent > 0:  # can round to 0 at small stakes; a 0-amount row is no row
                 ledger.transfer(self.con, t, agents.account_id(aid), TREASURY, rent, "rent")
                 c -= rent
             equity = c + agent.lots * price
             decision = strategies.decide(
-                agent.genome, history, agent.lots, agent.hold, equity, cfg["fee_bps"]
+                agent.genome, history, agent.lots, agent.hold, equity, cost_bps
             )
             decision = risk.check(
-                decision, c, equity, agent.lots, price, cfg["max_action_fraction"], cfg["fee_bps"]
+                decision, c, equity, agent.lots, price, cfg["max_action_fraction"], venue
             )
             if decision is not None:
-                if decision.side == "BUY":
-                    agents.buy(self.con, t, utc, agent, decision.lots, price, cfg["fee_bps"],
-                               self.arena_account)
+                if delay == 0:
+                    self._execute(t, utc, agent, decision, price)
+                    c = agents.cash(self.con, agent)
                 else:
-                    agents.sell(self.con, t, utc, agent, decision.lots, price, cfg["fee_bps"],
-                                self.arena_account)
-                c = agents.cash(self.con, agent)
+                    # decided at row N, executes at row N+1 (one pending order
+                    # per agent; a new decision replaces an unfilled one)
+                    agent.pending_side = decision.side
+                    agent.pending_lots = decision.lots
+                    agent.dirty = True
             if agent.lots > 0:
                 agent.hold += 1
                 agent.dirty = True
@@ -246,7 +275,7 @@ class Orchestrator:
             self.hall.append(agent.genome)
             if len(self.hall) > self.cfg["hall_size"]:
                 self.hall.pop(0)
-        final = agents.die(self.con, t, utc, agent, cause, price, self.cfg["fee_bps"],
+        final = agents.die(self.con, t, utc, agent, cause, price, self.venue,
                            self.arena_account)
         self.dead_growth.setdefault(agent.generation, []).append(
             final / max(1, agent.birth_seed)

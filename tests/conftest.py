@@ -17,7 +17,8 @@ BASE_CFG = {
     "death_floor_u": 100_000_000,
     "rent_min_u": 100_000,
     "rent_apr_bps": 730,
-    "fee_bps": 20,
+    "venue": {"taker_bps": 20, "maker_bps": 0, "spread_bps": 0, "min_fee_u": 0,
+              "fill_delay_ticks": 0},
     "repro_multiple": 1.25,
     "repay_multiple": 0.15,
     "reserve_floor_u": 150_000_000,
@@ -60,6 +61,9 @@ def make_cfg(**overrides):
     arena = overrides.pop("arena", None)
     if arena:
         cfg["arena"].update(arena)
+    venue = overrides.pop("venue", None)
+    if venue:
+        cfg["venue"].update(venue)
     lifecycle = overrides.pop("lifecycle", None)
     if lifecycle:
         # an override replaces the base key whatever unit suffix it used
