@@ -8,6 +8,7 @@ the CLI. Binds to 127.0.0.1 by default.
 import hashlib
 import json
 import sqlite3
+import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -16,6 +17,7 @@ from . import evolution
 
 DASHBOARD = Path(__file__).resolve().parent / "web" / "dashboard.html"
 RECORDS_ROOT = Path("records")
+SSE_INTERVAL = 1.0  # spec v2 8.1: at most one summary event per second
 
 
 def open_readonly(db_path):
@@ -34,8 +36,20 @@ def _latest_metrics(con):
     return con.execute("SELECT * FROM colony_metrics ORDER BY tick DESC LIMIT 1").fetchone()
 
 
+def _extracted_since(con, arena_now, boundary_utc):
+    """-(delta ARENA) since the last metric at or before boundary_utc. The
+    arena account starts at 0, so a missing base row means 'since genesis'."""
+    row = con.execute(
+        "SELECT arena_u FROM colony_metrics WHERE utc <= ? ORDER BY tick DESC LIMIT 1",
+        (boundary_utc,),
+    ).fetchone()
+    return -(arena_now - (row["arena_u"] if row else 0))
+
+
 def api_summary(con, _query):
-    run = con.execute("SELECT id, config_json FROM runs ORDER BY id DESC LIMIT 1").fetchone()
+    run = con.execute(
+        "SELECT id, config_json, state_json FROM runs ORDER BY id DESC LIMIT 1"
+    ).fetchone()
     cfg = json.loads(run["config_json"])
     m = _latest_metrics(con)
     if m is None:
@@ -44,32 +58,104 @@ def api_summary(con, _query):
     debt = con.execute(
         "SELECT COALESCE(SUM(debt_u), 0) FROM agents WHERE died_tick IS NULL"
     ).fetchone()[0]
+    # the Money Strip (spec v2 8.2): realized cash vs marked-to-market value
+    # are NEVER summed into one on-screen figure
+    colony_cash = con.execute(
+        "SELECT COALESCE(SUM(b.balance_u), 0) FROM balances b"
+        " JOIN accounts a ON a.id = b.account_id JOIN agents ag ON a.id = 'AGENT:' || ag.id"
+        " WHERE a.kind = 'AGENT' AND ag.died_tick IS NULL"
+    ).fetchone()[0]
+    open_lots = con.execute(
+        "SELECT COALESCE(SUM(p.lots), 0) FROM positions p"
+        " JOIN agents a ON a.id = p.agent_id WHERE a.died_tick IS NULL"
+    ).fetchone()[0]
+    utc = m["utc"]
+    prev = con.execute(
+        "SELECT utc, arena_u FROM colony_metrics WHERE utc <= ? ORDER BY tick DESC LIMIT 1",
+        (utc - 60,),
+    ).fetchone()
+    per_second = 0.0
+    if prev and utc > prev["utc"]:
+        per_second = -(m["arena_u"] - prev["arena_u"]) / (utc - prev["utc"])
+    state = json.loads(run["state_json"])
+    imm_capacity = cfg["initial_treasury_u"] * cfg.get("immigration_budget_apr_bps", 2_000) // 10_000
     return {
         "run_id": run["id"],
         "tick": m["tick"],
+        "utc": utc,
         "regime_kind": m["regime_kind"],
         "treasury_u": m["treasury_u"],
         "colony_wealth_u": m["colony_wealth_u"],
+        "colony_cash_u": colony_cash,
+        "marked_u": open_lots * m["price_u"],
         "system_total_u": m["treasury_u"] + m["colony_wealth_u"],
         "arena_extracted_u": -m["arena_u"],
+        "extracted_today_u": _extracted_since(con, m["arena_u"], utc - (utc % 86_400)),
+        "extracted_hour_u": _extracted_since(con, m["arena_u"], utc - (utc % 3_600)),
+        "extracted_per_second_u": per_second,
         "population": m["population"],
         "births_cum": m["births_cum"],
         "deaths_cum": m["deaths_cum"],
         "outstanding_debt_u": debt,
         "invariant_ok": total == cfg["initial_treasury_u"],
+        "immigration_tokens_u": state.get("immigration_tokens_u"),
+        "immigration_capacity_u": imm_capacity,
+        "population_floor": cfg["population_floor"],
         "config": cfg,
     }
 
 
+TIMESERIES_COLUMNS = ["tick", "utc", "treasury_u", "colony_wealth_u", "population",
+                      "price_u", "regime_kind", "share_momentum", "share_mean_revert",
+                      "share_sitter", "diversity", "births_cum", "deaths_cum"]
+BUCKET_MINMAX = ("price_u", "treasury_u", "colony_wealth_u", "population")
+
+
 def api_timeseries(con, query):
+    """Incremental series; with more rows than max_points (default 2,000,
+    spec v2 8.4) they are bucketed server-side: last-of-bucket for every
+    column plus min/max envelopes for the charted money/price series. A full
+    86,400-tick day renders from under 100 KB."""
     after = int(query.get("after_tick", ["0"])[0])
+    max_points = max(1, int(query.get("max_points", ["2000"])[0]))
     rows = con.execute(
         "SELECT * FROM colony_metrics WHERE tick > ? ORDER BY tick", (after,)
     ).fetchall()
-    columns = ["tick", "utc", "treasury_u", "colony_wealth_u", "population", "price_u",
-               "regime_kind", "share_momentum", "share_mean_revert", "share_sitter",
-               "diversity", "births_cum", "deaths_cum"]
-    return {c: [row[c] for row in rows] for c in columns}
+    if len(rows) <= max_points:
+        out = {c: [row[c] for row in rows] for c in TIMESERIES_COLUMNS}
+        out["bucketed"] = False
+        return out
+    lo, hi = rows[0]["tick"], rows[-1]["tick"]
+    span = hi - lo + 1
+    buckets = []
+    current = []
+    for row in rows:
+        idx = (row["tick"] - lo) * max_points // span
+        if current and idx != current[0]:
+            buckets.append(current[1])
+            current = []
+        if not current:
+            current = [idx, []]
+        current[1].append(row)
+    buckets.append(current[1])
+    out = {c: [b[-1][c] for b in buckets] for c in TIMESERIES_COLUMNS}
+    for col in BUCKET_MINMAX:
+        out[col + "_min"] = [min(r[col] for r in b) for b in buckets]
+        out[col + "_max"] = [max(r[col] for r in b) for b in buckets]
+    out["bucketed"] = True
+    return out
+
+
+def api_tape(con, query):
+    """The trade tape (spec v2 8.5): the last N fills, newest first."""
+    limit = min(int(query.get("limit", ["50"])[0]), 200)
+    after_seq = int(query.get("after_seq", ["0"])[0])
+    rows = con.execute(
+        "SELECT seq, tick, utc, agent_id, side, lots, price_u, fee_u, spread_u"
+        " FROM trades WHERE seq > ? ORDER BY seq DESC LIMIT ?",
+        (after_seq, limit),
+    ).fetchall()
+    return [dict(r) for r in rows]
 
 
 def api_deaths(con, _query):
@@ -130,6 +216,31 @@ def api_leaderboard(con, query):
     return board
 
 
+def _lineage_chain(con, agent_id, limit=64):
+    """Ancestor chain following parent_a (spec v2 8.7): id, generation,
+    archetype, peak equity, fate — rendered inline, no graph library."""
+    chain = []
+    current = agent_id
+    while current is not None and len(chain) < limit:
+        row = con.execute(
+            "SELECT a.id, a.generation, a.genome_json, a.parent_a, a.died_tick,"
+            " a.death_cause, s.peak_equity_u FROM agents a"
+            " LEFT JOIN agent_state s ON s.agent_id = a.id WHERE a.id = ?",
+            (current,),
+        ).fetchone()
+        if row is None:
+            break
+        chain.append({
+            "id": row["id"],
+            "generation": row["generation"],
+            "archetype": json.loads(row["genome_json"])["archetype"],
+            "peak_equity_u": row["peak_equity_u"],
+            "fate": row["death_cause"] if row["died_tick"] is not None else "alive",
+        })
+        current = row["parent_a"]
+    return chain
+
+
 def api_agent(con, agent_id):
     row = con.execute("SELECT * FROM agents WHERE id = ?", (agent_id,)).fetchone()
     if row is None:
@@ -161,6 +272,7 @@ def api_agent(con, agent_id):
         "peak_equity_u": state["peak_equity_u"] if state else None,
         "last_snapshot": dict(last_snap) if last_snap else None,
         "trades": trades,
+        "lineage": _lineage_chain(con, agent_id),
     }
 
 
@@ -188,9 +300,10 @@ def api_runs(con, _query):
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "Observatory/1.0"
+    server_version = "Observatory/2.0"
     db_path = "colony.db"
     records_root = RECORDS_ROOT
+    sse_interval = SSE_INTERVAL
 
     def log_message(self, fmt, *args):  # quiet by default; this is a monitor
         pass
@@ -234,6 +347,10 @@ class Handler(BaseHTTPRequestHandler):
                     self._send_json(result)
             elif path == "/api/health":
                 self._send_json(api_health(self.db_path))
+            elif path == "/api/tape":
+                self._with_db(api_tape, query)
+            elif path == "/api/events":
+                self._serve_events()
             elif path == "/api/runs":
                 self._with_db(api_runs, query)
             elif path.startswith("/records"):
@@ -249,6 +366,49 @@ class Handler(BaseHTTPRequestHandler):
             self._send_json(fn(con, query))
         finally:
             con.close()
+
+    def _serve_events(self):
+        """Server-Sent Events (spec v2 8.1): push, not poll — a one-way
+        stream, which is the read-only guarantee expressed as a protocol.
+        Emits `summary` on tick advance (coalesced, at most one per
+        sse_interval), `fill` per new trade, `health` on state change."""
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream; charset=utf-8")
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+
+        def emit(event, obj):
+            self.wfile.write(
+                f"event: {event}\ndata: {json.dumps(obj)}\n\n".encode("utf-8"))
+            self.wfile.flush()
+
+        last_tick = -1
+        last_seq = None
+        last_health = None
+        try:
+            while True:
+                con = open_readonly(self.db_path)
+                try:
+                    summary = api_summary(con, {})
+                    if last_seq is None:  # first pass: only stream NEW fills
+                        row = con.execute("SELECT COALESCE(MAX(seq), 0) FROM trades").fetchone()
+                        last_seq = row[0]
+                    if summary.get("tick", 0) != last_tick:
+                        last_tick = summary.get("tick", 0)
+                        emit("summary", summary)  # coalesced: latest wins
+                    for fill in reversed(api_tape(con, {"after_seq": [str(last_seq)]})):
+                        last_seq = max(last_seq, fill["seq"])
+                        emit("fill", fill)
+                finally:
+                    con.close()
+                health = api_health(self.db_path)
+                if health != last_health:
+                    last_health = health
+                    emit("health", health)
+                emit("ping", {"t": time.time()})  # liveness for the client
+                time.sleep(self.sse_interval)
+        except OSError:
+            return  # client went away; the stream simply ends
 
     def _serve_record(self, rel):
         """Read-only static serving of the records folder, traversal-proof."""

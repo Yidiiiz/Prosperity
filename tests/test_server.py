@@ -82,6 +82,78 @@ def test_records_listing_and_traversal_guard(live):
     get(live + "/records/../secret.txt", expect=404)
 
 
+def test_summary_money_strip_fields(live):
+    s = json.loads(get(live + "/api/summary"))
+    for key in ("utc", "colony_cash_u", "marked_u", "extracted_today_u",
+                "extracted_hour_u", "extracted_per_second_u",
+                "immigration_tokens_u", "immigration_capacity_u", "population_floor"):
+        assert key in s, key
+    assert s["marked_u"] >= 0
+    assert s["immigration_capacity_u"] > 0
+    assert 0 <= s["immigration_tokens_u"] <= s["immigration_capacity_u"]
+
+
+def test_timeseries_bucketing(live):
+    full = json.loads(get(live + "/api/timeseries?after_tick=0"))
+    assert full["bucketed"] is False
+    n = len(full["tick"])
+    assert n >= 2
+    ts = json.loads(get(live + "/api/timeseries?after_tick=0&max_points=1"))
+    assert ts["bucketed"] is True
+    assert len(ts["tick"]) == 1
+    assert ts["tick"][-1] == full["tick"][-1]  # last-of-bucket wins
+    assert ts["price_u_min"][0] <= ts["price_u"][0] <= ts["price_u_max"][0]
+    assert ts["price_u_min"][0] == min(full["price_u"])
+    assert ts["price_u_max"][0] == max(full["price_u"])
+
+
+def test_tape_endpoint(live):
+    tape = json.loads(get(live + "/api/tape?limit=10"))
+    assert isinstance(tape, list)
+    for fill in tape:
+        assert {"seq", "tick", "utc", "agent_id", "side", "lots",
+                "price_u", "fee_u", "spread_u"} <= set(fill)
+
+
+def test_agent_lineage_inline(live):
+    board = json.loads(get(live + "/api/leaderboard?limit=1"))
+    agent = json.loads(get(live + f"/api/agent/{board[0]['id']}"))
+    chain = agent["lineage"]
+    assert chain and chain[0]["id"] == board[0]["id"]
+    for link in chain:
+        assert {"id", "generation", "archetype", "peak_equity_u", "fate"} <= set(link)
+    assert chain[0]["fate"] == "alive"
+
+
+def test_sse_stream_emits_summary_fill_and_ping(live):
+    import http.client
+    host, port = live.removeprefix("http://").split(":")
+    conn = http.client.HTTPConnection(host, int(port), timeout=10)
+    try:
+        conn.request("GET", "/api/events")
+        resp = conn.getresponse()
+        assert resp.getheader("Content-Type").startswith("text/event-stream")
+        seen = set()
+        body = b""
+        while not {"summary", "ping"} <= seen:
+            line = resp.fp.readline()
+            assert line, "stream ended before summary+ping arrived"
+            body += line
+            if line.startswith(b"event: "):
+                seen.add(line.split(b": ")[1].strip().decode())
+        payload = [l for l in body.split(b"\n") if l.startswith(b"data: ")][0]
+        assert b"treasury_u" in payload  # the summary event carries the summary
+    finally:
+        conn.close()
+
+
+def test_dashboard_is_v2(live):
+    body = get(live + "/")
+    for marker in (b'id="money"', b'id="tape"', b"EventSource", b"/api/events",
+                   b'id="chips"', b"max-width: 720px"):
+        assert marker in body, marker
+
+
 def test_non_get_rejected(live):
     req = urllib.request.Request(live + "/api/summary", data=b"{}", method="POST")
     with pytest.raises(urllib.error.HTTPError) as exc:

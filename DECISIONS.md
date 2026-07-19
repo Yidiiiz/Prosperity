@@ -393,3 +393,33 @@ parentheses.
     repro_multiple 1.25 (validated); config.spy.json and config.live.json
     ship 1.08 — the mitosis mechanics are untouched, only the bar moves
     to match real-data drift rates.
+
+54. **SSE is a per-connection read loop, not a push pipe.** /api/events
+    holds one thread per client: each second it re-opens the db read-only,
+    emits `summary` only when the tick advanced (coalesce: latest wins),
+    emits one `fill` per new trades.seq past the connection's watermark
+    (the watermark starts at MAX(seq), so a fresh stream shows only new
+    fills), emits `health` when the sidecar changed, and always emits a
+    `ping`. One-directional SSE is the read-only guarantee expressed as a
+    protocol (spec v2 8.1); the dashboard falls back to 2s polling after
+    two stream errors.
+
+55. **Bucketing is last-of-bucket plus envelopes.** /api/timeseries
+    max_points (default 2,000) buckets by equal tick spans: every column
+    returns last-of-bucket; price/treasury/colony-wealth/population also
+    return _min/_max envelopes. LTTB explicitly skipped per spec. A
+    "bucketed" flag tells the client which shape it got; a full 86,400-row
+    day is ~60 KB.
+
+56. **The Money Strip is ledger-live, not snapshot-lagged.** colony_cash_u
+    (SUM of living agents' balances) and marked_u (open lots x last price)
+    come from the balances/positions tables at request time and are never
+    summed on screen — realized and mark-to-market stay separate figures
+    (spec v2 8.2). Extraction windows (today / hour / per-second) diff the
+    arena account against the last colony_metrics row at or before each
+    UTC boundary; a missing base row means "since genesis" because ARENA
+    starts at 0.
+
+57. **Line budget note.** colony/ stands at ~3,190 non-blank lines against
+    the ~2,600 ceiling after stage 9; stage 11 owes a simplification pass
+    (report.py and __main__.py are the least-earned lines).

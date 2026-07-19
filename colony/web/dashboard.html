@@ -11,6 +11,7 @@
     --bg: #0B0E14; --panel: #11151F; --border: #1D2433;
     --momentum: #E8A33D; --mean-revert: #3DBFB0; --sitter: #6B7280;
     --bone: #EFE7D3; --alert: #E5484D; --text: #B8C0CF; --dim: #6B7280;
+    --amber: #E8A33D; --green: #3DBFB0;
     --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
     --grot: "Space Grotesk", system-ui, sans-serif;
   }
@@ -29,27 +30,53 @@
     font-variant: small-caps; color: var(--dim); margin-bottom: 8px;
   }
   .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-  /* hero */
-  #hero { grid-column: span 12; }
-  #hero .chartbox { position: relative; height: 260px; }
-  /* KPI row */
-  .kpi { grid-column: span 2; }
-  .kpi .value { font-family: var(--mono); font-variant-numeric: tabular-nums;
-                font-size: 20px; color: var(--text); }
-  .kpi .sub { font-family: var(--mono); font-size: 11px; color: var(--dim); margin-top: 2px; }
-  #kpi-treasury .value { font-size: 26px; color: var(--bone); }
-  .badge {
-    display: none; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--bg); background: var(--bone); padding: 1px 6px; margin-top: 4px;
-  }
-  .badge.on { display: inline-block; }
-  #kpi-invariant .value.ok { color: var(--mean-revert); }
-  #kpi-invariant .value.halt { color: var(--alert); }
+
+  /* liveness header (spec v2 8.6) */
+  #chips { grid-column: span 12; display: flex; flex-wrap: wrap; gap: 8px;
+           align-items: center; padding: 8px 12px; }
+  .chip { font-family: var(--mono); font-size: 11px; padding: 5px 10px; min-height: 26px;
+          border: 1px solid var(--border); color: var(--dim); white-space: nowrap; }
+  .chip b { font-weight: 500; }
+  .chip.live { color: var(--green); border-color: var(--green); }
+  .chip.stale { color: var(--amber); border-color: var(--amber); }
+  .chip.reconnecting, .chip.bad { color: var(--alert); border-color: var(--alert); }
+  #chip-immigration { display: flex; align-items: center; gap: 6px; }
+  #imm-track { width: 70px; height: 8px; background: var(--bg);
+               border: 1px solid var(--border); display: inline-block; }
+  #imm-fill { height: 100%; width: 0%; background: var(--green); }
+
+  /* the Money Strip hero (spec v2 8.2) */
+  #money { grid-column: span 12; display: grid;
+           grid-template-columns: repeat(3, 1fr); gap: 0; padding: 0; }
+  #money .group { padding: 12px 16px; border-right: 1px solid var(--border); }
+  #money .group:last-child { border-right: none; }
+  #money .group h2 { margin-bottom: 10px; }
+  #money .figures { display: flex; gap: 22px; flex-wrap: wrap; }
+  #money .fig .cap { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+                     color: var(--dim); }
+  #money .fig .val { font-family: var(--mono); font-variant-numeric: tabular-nums;
+                     font-size: 22px; color: var(--bone); margin-top: 2px; }
+  #money .fig .val.pos { color: var(--amber); }
+  #money .fig .val.neg { color: var(--alert); }
+  #money .fig.marked .val { color: transparent; -webkit-text-stroke: 1px var(--bone);
+                            text-stroke: 1px var(--bone); }
+  #money .fig .sub { font-family: var(--mono); font-size: 10px; color: var(--dim); }
+
   /* charts */
-  .half { grid-column: span 6; } .third { grid-column: span 4; } .quarter { grid-column: span 3; }
+  #hero { grid-column: span 12; }
+  #hero .chartbox { position: relative; height: 240px; }
+  .half { grid-column: span 6; } .third { grid-column: span 4; }
   .chartbox { position: relative; height: 200px; }
   .nochart { color: var(--dim); font-family: var(--mono); font-size: 11px; padding: 20px 0; }
-  /* death bars, gauge — pure CSS, render without the CDN */
+  .legend { display: flex; gap: 14px; font-size: 11px; color: var(--dim); margin-bottom: 6px;
+            font-family: var(--mono); }
+
+  /* trade tape (spec v2 8.5) */
+  #tape { grid-column: span 6; }
+  #tape .scroll { max-height: 260px; overflow-y: auto; }
+  #tape td.buy { color: var(--green); } #tape td.sell { color: var(--amber); }
+  #tape a { color: inherit; text-decoration: underline dotted; cursor: pointer; }
+
   .bar-row { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
   .bar-row .label { width: 110px; font-family: var(--mono); font-size: 11px; }
   .bar-row .bar { height: 10px; background: var(--sitter); min-width: 1px; }
@@ -57,7 +84,7 @@
   #gauge-track { height: 12px; background: var(--bg); border: 1px solid var(--border); }
   #gauge-fill { height: 100%; width: 0%; background: var(--momentum); }
   canvas.spark { width: 100%; height: 60px; }
-  /* leaderboard */
+
   #leaders { grid-column: span 12; }
   table { border-collapse: collapse; width: 100%; }
   th, td { text-align: right; padding: 3px 10px; font-family: var(--mono);
@@ -69,7 +96,8 @@
   tbody tr:hover { background: #171c29; }
   tbody tr:focus-visible { outline: 1px solid var(--bone); outline-offset: -1px; }
   .dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; }
-  /* agent drawer */
+
+  /* agent drawer + inline lineage (spec v2 8.7) */
   #drawer {
     position: fixed; top: 0; right: 0; bottom: 0; width: 420px; max-width: 90vw;
     background: var(--panel); border-left: 1px solid var(--border); padding: 16px;
@@ -82,23 +110,71 @@
   #drawer h3 { font-family: var(--mono); color: var(--bone); margin-bottom: 8px; }
   #drawer button {
     background: none; border: 1px solid var(--border); color: var(--dim); float: right;
-    cursor: pointer; font-family: var(--mono); padding: 2px 8px;
+    cursor: pointer; font-family: var(--mono); padding: 8px 12px; min-height: 44px;
   }
   #drawer button:focus-visible { outline: 1px solid var(--bone); }
   #drawer table { margin-top: 8px; }
-  .legend { display: flex; gap: 14px; font-size: 11px; color: var(--dim); margin-bottom: 6px;
-            font-family: var(--mono); }
-  @media (prefers-reduced-motion: reduce) {
-    #drawer { transition: none; }
-  }
-  @media (max-width: 900px) {
-    .kpi { grid-column: span 4; }
-    .half, .third, .quarter { grid-column: span 12; }
+  #drawer details { margin: 4px 0 4px 12px; font-family: var(--mono); font-size: 11px; }
+  #drawer details summary { cursor: pointer; padding: 4px 0; color: var(--text); }
+  #drawer details .fate { color: var(--dim); }
+
+  @media (prefers-reduced-motion: reduce) { #drawer { transition: none; } }
+  /* mobile (spec v2 8.8): single column, hero-first, >=44px targets */
+  @media (max-width: 720px) {
+    .grid > * { grid-column: span 12 !important; }
+    #money { grid-template-columns: 1fr; }
+    #money .group { border-right: none; border-bottom: 1px solid var(--border); }
+    #money { order: 1; } #chips { order: 2; } #hero { order: 3; } #tape { order: 4; }
+    #wealth-panel { order: 5; } #price-panel { order: 6; }
+    #deaths-panel { order: 7; } #div-panel { order: 8; } #debt-panel { order: 9; }
+    #leaders { order: 10; }
+    .chip { min-height: 44px; display: inline-flex; align-items: center; }
+    th, td { padding: 10px 8px; }
   }
 </style>
 </head>
 <body>
 <div class="grid">
+
+  <section id="chips" class="panel" aria-label="liveness">
+    <span class="chip" id="chip-feed">FEED —</span>
+    <span class="chip" id="chip-behind">behind —</span>
+    <span class="chip" id="chip-invariant">INVARIANT —</span>
+    <span class="chip" id="chip-audit">AUDIT —</span>
+    <span class="chip" id="chip-immigration">
+      <span>IMMIGRATION</span>
+      <span id="imm-track"><span id="imm-fill" style="display:block"></span></span>
+      <span id="imm-label">—</span>
+    </span>
+    <span class="chip" id="chip-stream">stream: connecting</span>
+  </section>
+
+  <section id="money" class="panel" aria-label="money strip">
+    <div class="group">
+      <h2>Extracted — audited cash pulled from the market</h2>
+      <div class="figures">
+        <div class="fig"><div class="cap">today</div><div class="val num" id="x-today">—</div></div>
+        <div class="fig"><div class="cap">this hour</div><div class="val num" id="x-hour">—</div></div>
+        <div class="fig"><div class="cap">per second</div><div class="val num" id="x-rate">—</div></div>
+      </div>
+    </div>
+    <div class="group">
+      <h2>Cash — realized, ledger-exact</h2>
+      <div class="figures">
+        <div class="fig"><div class="cap">treasury</div><div class="val num" id="c-treasury">—</div></div>
+        <div class="fig"><div class="cap">colony cash</div><div class="val num" id="c-colony">—</div></div>
+      </div>
+    </div>
+    <div class="group">
+      <h2>Marked — position value at last price</h2>
+      <div class="figures">
+        <div class="fig marked"><div class="cap">unrealized</div><div class="val num" id="m-marked">—</div>
+          <div class="sub">never summed with cash on screen</div></div>
+        <div class="fig"><div class="cap">tick · regime</div><div class="val num" style="font-size:14px" id="m-tick">—</div>
+          <div class="sub" id="m-utc">—</div></div>
+      </div>
+    </div>
+  </section>
 
   <section id="hero" class="panel">
     <h2>Strata — archetype shares over time</h2>
@@ -107,50 +183,43 @@
       <span style="color:var(--mean-revert)">■ mean_revert</span>
       <span style="color:var(--sitter)">■ sitter</span>
       <span>▨ regime bands</span>
-      <span>· birth+death rate</span>
+      <span>│ UTC day rules</span>
     </div>
     <div class="chartbox"><canvas id="strata"></canvas></div>
-    <div class="nochart" id="strata-fallback" hidden>charts unavailable (CDN unreachable) — all figures below remain live</div>
+    <div class="nochart" id="strata-fallback" hidden>charts unavailable (CDN unreachable) — all figures remain live</div>
   </section>
 
-  <section class="panel kpi" id="kpi-treasury">
-    <h2>Treasury ★</h2>
-    <div class="value num" id="v-treasury">—</div>
-    <div class="sub" id="v-treasury-delta">Δ since start —</div>
-    <span class="badge" id="badge-recovered">all capital recovered</span>
-  </section>
-  <section class="panel kpi"><h2>System total</h2>
-    <div class="value" id="v-system">—</div><div class="sub">treasury + colony</div></section>
-  <section class="panel kpi"><h2>Colony wealth</h2>
-    <div class="value" id="v-colony">—</div><div class="sub">living agents’ equity</div></section>
-  <section class="panel kpi"><h2>Extracted from market</h2>
-    <div class="value" id="v-extracted">—</div><div class="sub">− arena account</div></section>
-  <section class="panel kpi"><h2>Population</h2>
-    <div class="value" id="v-population">—</div>
-    <div class="sub" id="v-flux">births — · deaths —</div></section>
-  <section class="panel kpi" id="kpi-invariant"><h2>Invariant</h2>
-    <div class="value" id="v-invariant">—</div>
-    <div class="sub" id="v-tick">tick — · —</div></section>
-
-  <section class="panel half">
+  <section class="panel half" id="wealth-panel">
     <h2>Wealth — treasury vs colony vs system</h2>
     <div class="chartbox"><canvas id="wealth"></canvas></div>
   </section>
-  <section class="panel half">
+  <section class="panel half" id="price-panel">
     <h2>Price &amp; population</h2>
     <div class="chartbox"><canvas id="price"></canvas></div>
   </section>
 
-  <section class="panel third">
+  <section class="panel" id="tape">
+    <h2>Trade tape — last 50 fills</h2>
+    <div class="scroll">
+      <table>
+        <thead><tr><th class="left">utc</th><th class="left">agent</th><th class="left">side</th>
+          <th>lots</th><th>fill</th><th>fee+spread</th></tr></thead>
+        <tbody id="tape-rows"></tbody>
+      </table>
+    </div>
+    <div class="nochart" id="tape-empty">no fills yet</div>
+  </section>
+
+  <section class="panel third" id="deaths-panel">
     <h2>Deaths by cause</h2>
     <div id="deaths"></div>
   </section>
-  <section class="panel third">
+  <section class="panel third" id="div-panel">
     <h2>Diversity (Shannon entropy)</h2>
     <canvas id="spark" class="spark" width="360" height="60"></canvas>
     <div class="sub num" id="v-diversity">—</div>
   </section>
-  <section class="panel third">
+  <section class="panel third" id="debt-panel">
     <h2>Outstanding seed debt</h2>
     <div id="gauge-track"><div id="gauge-fill"></div></div>
     <div class="sub num" id="v-debt">—</div>
@@ -183,40 +252,57 @@ const COLORS = {
 const REGIME_TINT = {
   trend_up: "rgba(232,163,61,0.05)", mean_revert: "rgba(61,191,176,0.05)",
   crash: "rgba(229,72,77,0.08)", replay: "rgba(239,231,211,0.04)",
+  live: "rgba(61,191,176,0.03)",
 };
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const THIN = " ";
 
-const S = {  // accumulated timeseries (incremental fetches)
-  tick: [], treasury: [], colony: [], population: [], price: [], regime: [],
+const S = {  // accumulated timeseries (bucketed initial load + incremental tail)
+  tick: [], utc: [], treasury: [], colony: [], population: [], price: [], regime: [],
   mom: [], mr: [], sit: [], div: [], births: [], deaths: [],
-  system: [], fluxRate: [],
-  lastTick: 0, initialTreasury: null, charts: {}, timer: null,
+  system: [], lastTick: 0, initialTreasury: null, charts: {}, timer: null,
+  tape: [], sseErrors: 0, sse: null, polling: false,
 };
 
-function money(cents) {
-  const sign = cents < 0 ? "-" : "";
-  const s = Math.abs(cents / 100).toFixed(2);
+function money(u) {  // micro-dollars -> dollars
+  const sign = u < 0 ? "-" : "";
+  const s = Math.abs(u / 1e6).toFixed(2);
   const parts = s.split(".");
   return sign + "$" + parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, THIN) + "." + parts[1];
 }
+function moneyFine(u) {  // micro-dollar precision for micro rates
+  return (u < 0 ? "-" : "") + "$" + Math.abs(u / 1e6).toFixed(6);
+}
+function utcLabel(sec) {
+  if (!sec) return "";
+  const d = new Date(sec * 1000);
+  return d.toISOString().slice(5, 16).replace("T", " ");  // MM-DD HH:MM
+}
+function utcTime(sec) {
+  return sec ? new Date(sec * 1000).toISOString().slice(11, 19) : "—";
+}
 
-// eased number ticks (300ms); instant under prefers-reduced-motion
 const tweens = new Map();
-function setNum(id, cents, fmt) {
+function setNum(id, u, fmt) {
   fmt = fmt || money;
   const el = document.getElementById(id);
-  const from = tweens.has(id) ? tweens.get(id) : cents;
-  tweens.set(id, cents);
-  if (REDUCED || from === cents) { el.textContent = fmt(cents); return; }
+  const from = tweens.has(id) ? tweens.get(id) : u;
+  tweens.set(id, u);
+  if (REDUCED || from === u) { el.textContent = fmt(u); return; }
   const t0 = performance.now();
   function frame(t) {
     const k = Math.min(1, (t - t0) / 300);
     const eased = 1 - (1 - k) * (1 - k);
-    el.textContent = fmt(Math.round(from + (cents - from) * eased));
-    if (k < 1 && tweens.get(id) === cents) requestAnimationFrame(frame);
+    el.textContent = fmt(Math.round(from + (u - from) * eased));
+    if (k < 1 && tweens.get(id) === u) requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
+}
+function signedMoney(id, u, fmt) {  // amber positive, red negative (spec 8.2)
+  const el = document.getElementById(id);
+  el.classList.toggle("pos", u > 0);
+  el.classList.toggle("neg", u < 0);
+  el.textContent = (u > 0 ? "+" : "") + (fmt || money)(u);
 }
 
 async function getJSON(url) {
@@ -225,7 +311,7 @@ async function getJSON(url) {
   return r.json();
 }
 
-// ---- regime band painter (shared Chart.js plugin) ----
+// ---- regime bands + UTC day rules (spec v2 8.3), one shared plugin ----
 const regimeBands = {
   id: "regimeBands",
   beforeDraw(chart) {
@@ -241,11 +327,27 @@ const regimeBands = {
         start = i;
       }
     }
+    ctx.strokeStyle = "rgba(239,231,211,0.08)";
+    ctx.lineWidth = 1;
+    for (let i = 1; i < S.utc.length; i++) {
+      if (Math.floor(S.utc[i] / 86400) !== Math.floor(S.utc[i - 1] / 86400)) {
+        const x = scales.x.getPixelForValue(i);
+        if (x >= chartArea.left && x <= chartArea.right) {
+          ctx.beginPath();
+          ctx.moveTo(x, chartArea.top); ctx.lineTo(x, chartArea.bottom);
+          ctx.stroke();
+        }
+      }
+    }
   },
 };
 
 const AXIS = { ticks: { color: COLORS.dim, font: { family: "IBM Plex Mono, monospace", size: 10 } },
                grid: { color: COLORS.border } };
+
+function labels() {  // wall-clock x-axis whenever the arena stamps utc
+  return S.utc.some(u => u) ? S.utc.map(utcLabel) : S.tick;
+}
 
 function makeCharts() {
   if (!window.Chart) {
@@ -259,23 +361,20 @@ function makeCharts() {
 
   S.charts.strata = new Chart(document.getElementById("strata"), {
     type: "line",
-    data: { labels: S.tick, datasets: [
-      { label: "momentum", data: S.mom, backgroundColor: COLORS.momentum + "CC",
+    data: { labels: [], datasets: [
+      { label: "momentum", data: [], backgroundColor: COLORS.momentum + "CC",
         borderColor: COLORS.momentum, fill: true, stack: "s" },
-      { label: "mean_revert", data: S.mr, backgroundColor: COLORS.mean_revert + "CC",
+      { label: "mean_revert", data: [], backgroundColor: COLORS.mean_revert + "CC",
         borderColor: COLORS.mean_revert, fill: true, stack: "s" },
-      { label: "sitter", data: S.sit, backgroundColor: COLORS.sitter + "CC",
+      { label: "sitter", data: [], backgroundColor: COLORS.sitter + "CC",
         borderColor: COLORS.sitter, fill: true, stack: "s" },
-      { label: "flux", data: S.fluxRate, yAxisID: "y2",
-        borderColor: "rgba(239,231,211,0.35)", fill: false },
     ]},
     options: {
       maintainAspectRatio: false, animation: false,
       scales: {
-        x: AXIS,
+        x: { ...AXIS, ticks: { ...AXIS.ticks, maxTicksLimit: 10 } },
         y: { ...AXIS, stacked: true, min: 0, max: 1,
              ticks: { ...AXIS.ticks, callback: v => (v * 100) + "%" } },
-        y2: { display: false, min: 0 },
       },
       plugins: { tooltip: { mode: "index", intersect: false } },
     },
@@ -284,24 +383,26 @@ function makeCharts() {
 
   S.charts.wealth = new Chart(document.getElementById("wealth"), {
     type: "line",
-    data: { labels: S.tick, datasets: [
-      { label: "treasury", data: S.treasury, borderColor: COLORS.bone },
-      { label: "colony", data: S.colony, borderColor: COLORS.mean_revert },
-      { label: "system", data: S.system, borderColor: COLORS.momentum },
+    data: { labels: [], datasets: [
+      { label: "treasury", data: [], borderColor: COLORS.bone },
+      { label: "colony", data: [], borderColor: COLORS.mean_revert },
+      { label: "system", data: [], borderColor: COLORS.momentum },
     ]},
     options: { maintainAspectRatio: false, animation: false,
-      scales: { x: AXIS, y: { ...AXIS, ticks: { ...AXIS.ticks, callback: v => money(v) } } },
+      scales: { x: { ...AXIS, ticks: { ...AXIS.ticks, maxTicksLimit: 8 } },
+                y: { ...AXIS, ticks: { ...AXIS.ticks, callback: v => money(v) } } },
       plugins: { legend: { display: true, labels: { color: COLORS.dim, boxWidth: 8 } } } },
+    plugins: [regimeBands],
   });
 
   S.charts.price = new Chart(document.getElementById("price"), {
     type: "line",
-    data: { labels: S.tick, datasets: [
-      { label: "price", data: S.price, borderColor: COLORS.bone },
-      { label: "population", data: S.population, yAxisID: "y2", borderColor: COLORS.sitter },
+    data: { labels: [], datasets: [
+      { label: "price", data: [], borderColor: COLORS.bone },
+      { label: "population", data: [], yAxisID: "y2", borderColor: COLORS.sitter },
     ]},
     options: { maintainAspectRatio: false, animation: false,
-      scales: { x: AXIS,
+      scales: { x: { ...AXIS, ticks: { ...AXIS.ticks, maxTicksLimit: 8 } },
         y: { ...AXIS, ticks: { ...AXIS.ticks, callback: v => money(v) } },
         y2: { ...AXIS, position: "right", grid: { display: false } } },
       plugins: { legend: { display: true, labels: { color: COLORS.dim, boxWidth: 8 } } } },
@@ -311,17 +412,11 @@ function makeCharts() {
 
 function refreshCharts() {
   S.system = S.treasury.map((t, i) => t + S.colony[i]);
-  S.fluxRate = S.tick.map((_, i) => {
-    if (i === 0) return 0;
-    const dt = S.tick[i] - S.tick[i - 1] || 1;
-    return ((S.births[i] - S.births[i - 1]) + (S.deaths[i] - S.deaths[i - 1])) / dt;
-  });
-  for (const chart of Object.values(S.charts)) {
-    chart.data.labels = S.tick;
-  }
+  const lab = labels();
+  for (const chart of Object.values(S.charts)) chart.data.labels = lab;
   if (S.charts.strata) {
     const ds = S.charts.strata.data.datasets;
-    ds[0].data = S.mom; ds[1].data = S.mr; ds[2].data = S.sit; ds[3].data = S.fluxRate;
+    ds[0].data = S.mom; ds[1].data = S.mr; ds[2].data = S.sit;
     S.charts.strata.update("none");
   }
   if (S.charts.wealth) {
@@ -375,6 +470,97 @@ function renderLeaderboard(rows) {
     `<td>${r.age}</td><td>${r.lineage_depth}</td></tr>`).join("");
 }
 
+// ---- trade tape (spec v2 8.5) ----
+function renderTape() {
+  const body = document.getElementById("tape-rows");
+  document.getElementById("tape-empty").hidden = S.tape.length > 0;
+  body.innerHTML = S.tape.slice(0, 50).map(f =>
+    `<tr><td class="left num">${utcTime(f.utc)}</td>` +
+    `<td class="left"><a data-id="${f.agent_id}">${f.agent_id}</a></td>` +
+    `<td class="left ${f.side === "BUY" ? "buy" : "sell"}">${f.side}</td>` +
+    `<td>${f.lots}</td><td>${money(f.price_u)}</td>` +
+    `<td>${money((f.fee_u || 0) + (f.spread_u || 0))}</td></tr>`).join("");
+}
+function pushFill(fill) {
+  S.tape.unshift(fill);
+  if (S.tape.length > 50) S.tape.length = 50;
+  renderTape();
+}
+
+// ---- liveness chips (spec v2 8.6) ----
+function renderHealth(h) {
+  const feed = document.getElementById("chip-feed");
+  const behind = document.getElementById("chip-behind");
+  const audit = document.getElementById("chip-audit");
+  if (!h || h.state === "no-daemon") {
+    feed.textContent = "FEED sim/replay"; feed.className = "chip";
+    behind.textContent = "behind —";
+    audit.textContent = "AUDIT n/a"; audit.className = "chip";
+  } else {
+    const lastRow = (h.feed && h.feed.last_row_utc) || 0;
+    const ageS = lastRow ? Math.max(0, Math.round(Date.now() / 1000 - lastRow)) : null;
+    if (h.state === "stale") {
+      feed.textContent = `FEED STALE ${ageS === null ? "" : "+" + ageS + "s"}`;
+      feed.className = "chip stale";
+    } else if (h.feed && !h.feed.connected) {
+      feed.textContent = "FEED RECONNECTING"; feed.className = "chip reconnecting";
+    } else {
+      feed.textContent = "FEED LIVE"; feed.className = "chip live";
+    }
+    behind.textContent = `behind ${h.ticks_behind_feed ?? "—"} · gaps ${(h.feed || {}).gap_count ?? 0}`;
+    if (h.audit_critical) {
+      audit.textContent = "AUDIT ✗ CRITICAL"; audit.className = "chip bad";
+    } else if (h.last_audit) {
+      audit.textContent = `AUDIT ${h.last_audit.ok ? "✓" : "✗"} ${h.last_audit.segment}`;
+      audit.className = "chip " + (h.last_audit.ok ? "live" : "bad");
+    } else {
+      audit.textContent = "AUDIT pending"; audit.className = "chip";
+    }
+  }
+}
+
+function renderSummary(s) {
+  if (S.initialTreasury === null) S.initialTreasury = s.config.initial_treasury_u;
+  signedMoney("x-today", s.extracted_today_u || 0);
+  signedMoney("x-hour", s.extracted_hour_u || 0);
+  signedMoney("x-rate", Math.round(s.extracted_per_second_u || 0), moneyFine);
+  setNum("c-treasury", s.treasury_u || 0);
+  setNum("c-colony", s.colony_cash_u || 0);
+  setNum("m-marked", s.marked_u || 0);
+  document.getElementById("m-tick").textContent =
+    `t=${s.tick} · ${s.regime_kind || "—"} · pop ${s.population}`;
+  document.getElementById("m-utc").textContent =
+    s.utc ? new Date(s.utc * 1000).toISOString().replace("T", " ").slice(0, 19) + " UTC" : "—";
+  const inv = document.getElementById("chip-invariant");
+  inv.textContent = `INVARIANT ${s.invariant_ok ? "OK" : "HALT"} · t=${s.tick}`;
+  inv.className = "chip " + (s.invariant_ok ? "live" : "bad");
+  const debt = s.outstanding_debt_u || 0;
+  document.getElementById("v-debt").textContent = money(debt) + " outstanding";
+  const debtScale = Math.max(debt, S.initialTreasury * 0.05);
+  document.getElementById("gauge-fill").style.width =
+    Math.min(100, (debt / debtScale) * 100) + "%";
+  if (s.immigration_capacity_u) {
+    const pct = Math.min(100, 100 * (s.immigration_tokens_u || 0) / s.immigration_capacity_u);
+    document.getElementById("imm-fill").style.width = pct + "%";
+    const below = s.population < s.population_floor;
+    document.getElementById("imm-label").textContent =
+      pct.toFixed(0) + "%" + (below ? " · below floor (budget)" : "");
+    document.getElementById("imm-fill").style.background =
+      below ? "var(--alert)" : "var(--green)";
+  }
+}
+
+// ---- lineage inline (spec v2 8.7): nested <details>, no graph library ----
+function lineageHTML(chain) {
+  let html = "", closers = "";
+  for (const a of chain) {
+    html += `<details open><summary>${a.id} · gen ${a.generation} · ${a.archetype}` +
+      ` · peak ${money(a.peak_equity_u || 0)} · <span class="fate">${a.fate}</span></summary>`;
+    closers += "</details>";
+  }
+  return html + closers;
+}
+
 async function openDrawer(id) {
   const a = await getJSON("/api/agent/" + id);
   document.getElementById("drawer-title").textContent =
@@ -389,13 +575,14 @@ async function openDrawer(id) {
     `debt ${money(a.debt_u)}` +
     (a.last_snapshot ? `\nlast snapshot t=${a.last_snapshot.tick}: equity ${money(a.last_snapshot.equity_u)}` : "") +
     `</pre>` +
+    `<h3>ancestry</h3>` + lineageHTML(a.lineage || []) +
     `<table><thead><tr><th>tick</th><th class="left">side</th><th>lots</th>` +
     `<th>price</th><th>fee</th></tr></thead><tbody>${trades}</tbody></table>`;
   document.getElementById("drawer").classList.add("open");
 }
-document.getElementById("leader-rows").addEventListener("click", e => {
-  const tr = e.target.closest("tr[data-id]");
-  if (tr) openDrawer(tr.dataset.id);
+document.addEventListener("click", e => {
+  const el = e.target.closest("tr[data-id], a[data-id]");
+  if (el) openDrawer(el.dataset.id);
 });
 document.getElementById("leader-rows").addEventListener("keydown", e => {
   const tr = e.target.closest("tr[data-id]");
@@ -404,66 +591,89 @@ document.getElementById("leader-rows").addEventListener("keydown", e => {
 document.getElementById("drawer-close").addEventListener("click", () =>
   document.getElementById("drawer").classList.remove("open"));
 
-async function poll() {
-  if (document.hidden) return;  // pause when the tab is hidden
+// ---- data flow: SSE first (spec v2 8.1), polling fallback after 2 errors ----
+function appendSeries(ts) {
+  for (let i = 0; i < (ts.tick || []).length; i++) {
+    S.tick.push(ts.tick[i]); S.utc.push(ts.utc ? ts.utc[i] : 0);
+    S.treasury.push(ts.treasury_u[i]);
+    S.colony.push(ts.colony_wealth_u[i]); S.population.push(ts.population[i]);
+    S.price.push(ts.price_u[i]); S.regime.push(ts.regime_kind[i]);
+    S.mom.push(ts.share_momentum[i]); S.mr.push(ts.share_mean_revert[i]);
+    S.sit.push(ts.share_sitter[i]); S.div.push(ts.diversity[i]);
+    S.births.push(ts.births_cum[i]); S.deaths.push(ts.deaths_cum[i]);
+  }
+  if (S.tick.length) S.lastTick = S.tick[S.tick.length - 1];
+}
+
+async function pollSeries() {
+  if (document.hidden) return;
   try {
     const results = await Promise.all([
-      getJSON("/api/summary"),
-      getJSON("/api/timeseries?after_tick=" + S.lastTick),
+      getJSON("/api/timeseries?max_points=2000&after_tick=" + S.lastTick),
       getJSON("/api/deaths"),
       getJSON("/api/leaderboard?limit=20"),
     ]);
-    const summary = results[0], ts = results[1], deaths = results[2], leaders = results[3];
-    if (S.initialTreasury === null) S.initialTreasury = summary.config.initial_treasury_u;
-    for (let i = 0; i < (ts.tick || []).length; i++) {
-      S.tick.push(ts.tick[i]); S.treasury.push(ts.treasury_u[i]);
-      S.colony.push(ts.colony_wealth_u[i]); S.population.push(ts.population[i]);
-      S.price.push(ts.price_u[i]); S.regime.push(ts.regime_kind[i]);
-      S.mom.push(ts.share_momentum[i]); S.mr.push(ts.share_mean_revert[i]);
-      S.sit.push(ts.share_sitter[i]); S.div.push(ts.diversity[i]);
-      S.births.push(ts.births_cum[i]); S.deaths.push(ts.deaths_cum[i]);
-    }
-    if (S.tick.length) S.lastTick = S.tick[S.tick.length - 1];
-
-    setNum("v-treasury", summary.treasury_u || 0);
-    const delta = (summary.treasury_u || 0) - S.initialTreasury;
-    document.getElementById("v-treasury-delta").textContent =
-      "Δ since start " + (delta >= 0 ? "+" : "") + money(delta);
-    document.getElementById("badge-recovered").classList.toggle("on", delta > 0);
-    setNum("v-system", summary.system_total_u || 0);
-    setNum("v-colony", summary.colony_wealth_u || 0);
-    setNum("v-extracted", summary.arena_extracted_u || 0);
-    setNum("v-population", summary.population || 0, v => String(v));
-    document.getElementById("v-flux").textContent =
-      `births ${summary.births_cum || 0} · deaths ${summary.deaths_cum || 0}`;
-    const inv = document.getElementById("v-invariant");
-    inv.textContent = summary.invariant_ok ? "OK" : "HALT";
-    inv.className = "value " + (summary.invariant_ok ? "ok" : "halt");
-    document.getElementById("v-tick").textContent =
-      `tick ${summary.tick} · ${summary.regime_kind || "—"}`;
-    document.getElementById("v-diversity").textContent =
-      (S.div.length ? S.div[S.div.length - 1] : 0).toFixed(3) + " nats";
-    const debt = summary.outstanding_debt_u || 0;
-    document.getElementById("v-debt").textContent = money(debt) + " outstanding";
-    const debtScale = Math.max(debt, S.initialTreasury * 0.05);
-    document.getElementById("gauge-fill").style.width =
-      Math.min(100, (debt / debtScale) * 100) + "%";
-
-    renderDeaths(deaths);
-    renderLeaderboard(leaders);
+    appendSeries(results[0]);
+    renderDeaths(results[1]);
+    renderLeaderboard(results[2]);
     refreshCharts();
     drawSpark();
+    document.getElementById("v-diversity").textContent =
+      (S.div.length ? S.div[S.div.length - 1] : 0).toFixed(3) + " nats";
+  } catch (err) { /* transient; the stream chip already reflects health */ }
+}
+
+async function pollSummary() {  // fallback path only
+  try {
+    renderSummary(await getJSON("/api/summary"));
+    renderHealth(await getJSON("/api/health"));
   } catch (err) {
-    const inv = document.getElementById("v-invariant");
-    inv.textContent = "OFFLINE";
-    inv.className = "value halt";
+    const inv = document.getElementById("chip-invariant");
+    inv.textContent = "OFFLINE"; inv.className = "chip bad";
   }
 }
 
-makeCharts();
-poll();
-S.timer = setInterval(poll, 2000);
-document.addEventListener("visibilitychange", () => { if (!document.hidden) poll(); });
+function startPollingFallback() {
+  if (S.polling) return;
+  S.polling = true;
+  document.getElementById("chip-stream").textContent = "stream: polling (2s)";
+  pollSummary();
+  setInterval(pollSummary, 2000);
+}
+
+function startSSE() {
+  if (!window.EventSource) { startPollingFallback(); return; }
+  const es = new EventSource("/api/events");
+  S.sse = es;
+  es.addEventListener("summary", e => renderSummary(JSON.parse(e.data)));
+  es.addEventListener("fill", e => pushFill(JSON.parse(e.data)));
+  es.addEventListener("health", e => renderHealth(JSON.parse(e.data)));
+  es.addEventListener("ping", () => {
+    S.sseErrors = 0;
+    document.getElementById("chip-stream").textContent = "stream: live (SSE)";
+  });
+  es.onerror = () => {
+    S.sseErrors += 1;
+    document.getElementById("chip-stream").textContent =
+      `stream: reconnecting (${S.sseErrors})`;
+    if (S.sseErrors >= 2) { es.close(); startPollingFallback(); }
+  };
+}
+
+async function boot() {
+  makeCharts();
+  try {
+    const tape = await getJSON("/api/tape?limit=50");
+    S.tape = tape;
+    renderTape();
+  } catch (err) { /* tape fills in from SSE */ }
+  await pollSummary();  // first paint, then the stream takes over
+  await pollSeries();
+  startSSE();
+  S.timer = setInterval(pollSeries, 5000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) pollSeries(); });
+}
+boot();
 </script>
 </body>
 </html>
