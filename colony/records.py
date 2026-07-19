@@ -14,9 +14,10 @@ import datetime
 import json
 import os
 import subprocess
+import time
 from pathlib import Path
 
-KINDS = ("runs", "experiments", "tests", "feed", "audits")
+KINDS = ("runs", "experiments", "tests", "feed", "audits", "bank")
 
 
 def _utc_stamp():
@@ -58,6 +59,8 @@ class Record:
             header.append(extra_header)
         header.append("=" * 72)
         self.path.write_text("\n".join(header) + "\n", encoding="utf-8")
+        self._start = time.monotonic()
+        self._replay_terms = None
 
     def append(self, text):
         with open(self.path, "a", encoding="utf-8") as f:
@@ -67,9 +70,22 @@ class Record:
         self.append(f"\n--- {title} " + "-" * max(1, 60 - len(title)))
         self.append(body)
 
+    def set_replay_terms(self, first_utc, last_utc, entries):
+        """Arm the mandatory v3 replay footer (spec v3 2.2): tape span plus
+        [(label, initial_u, audited_u, bench_u)] result entries. finish()
+        appends it with the wall-clock runtime measured there."""
+        self._replay_terms = (first_utc, last_utc, entries)
+
     def finish(self, headline, level="INFO"):
         """Append the closing line and index this record in INDEX.txt.
         level="CRITICAL" marks the INDEX line with the `!! ` incident prefix."""
+        if self._replay_terms is not None:
+            from . import benchmark  # local: records must not need risk math
+
+            first_utc, last_utc, entries = self._replay_terms
+            self.append("\n" + benchmark.footer(
+                first_utc, last_utc, entries, time.monotonic() - self._start
+            ))
         self.append(f"\n=== RESULT: {headline}")
         index = self.root / "INDEX.txt"
         rel = self.path.relative_to(self.root).as_posix()

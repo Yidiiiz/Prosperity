@@ -1,0 +1,76 @@
+record: experiments/minute_ladder_20260719T040950114Z_seed[42, 7, 2026]_p52860.txt
+utc: 2026-07-19T04:09:50+00:00
+git: 6049f65-dirty
+rng_seed: [42, 7, 2026]
+config: {"csv": "data\\btcusdt_1m_fixture.csv", "digest": "34f6b17f238b6079", "seeds": [42, 7, 2026], "rungs": ["full", "small", "dust"]}
+========================================================================
+
+--- results -----------------------------------------------------
+minute-bar ladder: btcusdt_1m_fixture.csv (digest 34f6b17f238b6079), seeds [42, 7, 2026]
+
+== rung: full ==
+
+seed 42  [EXPECTED-FAIL]
+  4320 minute bars | pop 40 | births 21 deaths 81 | 220 fills | friction paid $99.47
+  terminal audit: treasury $199,915.20 cash vs $200,000.00 initial  (-0.04%) | buy-and-hold same tape $204,359.89
+
+seed 7  [EXPECTED-FAIL]
+  4320 minute bars | pop 40 | births 11 deaths 71 | 522 fills | friction paid $210.61
+  terminal audit: treasury $199,818.35 cash vs $200,000.00 initial  (-0.09%) | buy-and-hold same tape $204,359.89
+
+seed 2026  [EXPECTED-FAIL]
+  4320 minute bars | pop 40 | births 14 deaths 74 | 724 fills | friction paid $228.59
+  terminal audit: treasury $199,778.79 cash vs $200,000.00 initial  (-0.11%) | buy-and-hold same tape $204,359.89
+
+== rung: small ==
+
+seed 42  [EXPECTED-FAIL]
+  4320 minute bars | pop 6 | births 4 deaths 8 | 12 fills | friction paid $0.35
+  terminal audit: treasury $999.70 cash vs $1,000.00 initial  (-0.03%) | buy-and-hold same tape $1,021.79
+
+seed 7  [EXPECTED-FAIL]
+  4320 minute bars | pop 6 | births 4 deaths 8 | 18 fills | friction paid $0.36
+  terminal audit: treasury $999.52 cash vs $1,000.00 initial  (-0.05%) | buy-and-hold same tape $1,021.79
+
+seed 2026  [EXPECTED-FAIL]
+  4320 minute bars | pop 7 | births 4 deaths 7 | 28 fills | friction paid $0.86
+  terminal audit: treasury $999.05 cash vs $1,000.00 initial  (-0.10%) | buy-and-hold same tape $1,021.79
+
+== rung: dust ==
+
+seed 42  [EXPECTED-FAIL]
+  4320 minute bars | pop 0 | births 0 deaths 4 | 0 fills | friction paid $0.00
+  terminal audit: treasury $10.00 cash vs $10.00 initial  (+0.00%) | buy-and-hold same tape $10.22
+
+seed 7  [EXPECTED-FAIL]
+  4320 minute bars | pop 1 | births 0 deaths 3 | 2 fills | friction paid $0.00
+  terminal audit: treasury $10.00 cash vs $10.00 initial  (-0.01%) | buy-and-hold same tape $10.22
+
+seed 2026  [EXPECTED-FAIL]
+  4320 minute bars | pop 3 | births 0 deaths 1 | 28 fills | friction paid $0.04
+  terminal audit: treasury $9.95 cash vs $10.00 initial  (-0.50%) | buy-and-hold same tape $10.22
+
+LADDER MACHINERY OK — v3 tiers recorded per seed (v2 7.4, v3 2.4)
+
+span: 2026-07-14T00:00:00+00:00 -> 2026-07-17T00:00:00+00:00 (0.01 years)
+wall: 92.2 s
+annualized: full seed 42 audited $199,915.20 vs initial $200,000.00 -> -5.03%/yr (projected)
+benchmark: full seed 42 buy-and-hold $204,359.89 (+1281.24%/yr (projected)) | delta -1286.28 pp/yr
+annualized: full seed 7 audited $199,818.35 vs initial $200,000.00 -> -10.47%/yr (projected)
+benchmark: full seed 7 buy-and-hold $204,359.89 (+1281.24%/yr (projected)) | delta -1291.72 pp/yr
+annualized: full seed 2026 audited $199,778.79 vs initial $200,000.00 -> -12.61%/yr (projected)
+benchmark: full seed 2026 buy-and-hold $204,359.89 (+1281.24%/yr (projected)) | delta -1293.85 pp/yr
+annualized: small seed 42 audited $999.70 vs initial $1,000.00 -> -3.57%/yr (projected)
+benchmark: small seed 42 buy-and-hold $1,021.79 (+1278.95%/yr (projected)) | delta -1282.52 pp/yr
+annualized: small seed 7 audited $999.52 vs initial $1,000.00 -> -5.69%/yr (projected)
+benchmark: small seed 7 buy-and-hold $1,021.79 (+1278.95%/yr (projected)) | delta -1284.64 pp/yr
+annualized: small seed 2026 audited $999.05 vs initial $1,000.00 -> -10.93%/yr (projected)
+benchmark: small seed 2026 buy-and-hold $1,021.79 (+1278.95%/yr (projected)) | delta -1289.88 pp/yr
+annualized: dust seed 42 audited $10.00 vs initial $10.00 -> +0.00%/yr (projected)
+benchmark: dust seed 42 buy-and-hold $10.22 (+1260.80%/yr (projected)) | delta -1260.80 pp/yr
+annualized: dust seed 7 audited $10.00 vs initial $10.00 -> -1.06%/yr (projected)
+benchmark: dust seed 7 buy-and-hold $10.22 (+1260.80%/yr (projected)) | delta -1261.86 pp/yr
+annualized: dust seed 2026 audited $9.95 vs initial $10.00 -> -45.66%/yr (projected)
+benchmark: dust seed 2026 buy-and-hold $10.22 (+1260.80%/yr (projected)) | delta -1306.46 pp/yr
+
+=== RESULT: LADDER MACHINERY OK — v3 tiers recorded per seed (v2 7.4, v3 2.4)

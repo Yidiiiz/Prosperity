@@ -53,6 +53,15 @@ PROBES = {
         "econ": {"child_seed_fraction": 0.40},
         "genes": [],
     },
+    # v3 section 6: the breakout row — rides new highs with a trailing stop
+    "breakout": {
+        "archetype": "breakout",
+        "params": {"lookback": 30, "confirm_bps": 5, "trail_bps": 400,
+                   "entry_z": 1.0, "exit_z": 0.0, "risk_fraction": 0.6,
+                   "hold_max": 1500},
+        "econ": {"child_seed_fraction": 0.40},
+        "genes": [],
+    },
 }
 
 CRITERIA = {  # (regime, archetype) -> (comparator, threshold_bps)
@@ -60,6 +69,8 @@ CRITERIA = {  # (regime, archetype) -> (comparator, threshold_bps)
     ("mean_revert", "momentum"): ("<=", -2.0),
     ("mean_revert", "mean_revert"): (">=", 2.0),
     ("trend_up", "mean_revert"): ("<=", 0.0),
+    ("trend_up", "breakout"): (">=", 2.0),
+    ("mean_revert", "breakout"): ("<=", 0.0),
 }
 
 

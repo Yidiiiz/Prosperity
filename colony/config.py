@@ -191,6 +191,28 @@ def validate(cfg):
     budget = cfg.setdefault("immigration_budget_apr_bps", 2_000)
     if not isinstance(budget, int) or isinstance(budget, bool) or budget < 0:
         raise ConfigError("immigration_budget_apr_bps must be a non-negative integer")
+    # the genome bank (spec v3 section 4). bank_path None disables admission
+    # at terminal audit — experiments and the CLI opt in explicitly, so test
+    # colonies and casual runs never write the shared bank (single-writer
+    # by convention; the daemon never writes it).
+    bank_path = cfg.setdefault("bank_path", None)
+    if bank_path is not None and not isinstance(bank_path, str):
+        raise ConfigError("bank_path must be a string path or null")
+    if not isinstance(cfg.setdefault("records_root", "records"), str):
+        raise ConfigError("records_root must be a string path")
+    for key, default in (("bank_min_fills", 20), ("bank_admit_top_k", 8)):
+        value = cfg.setdefault(key, default)
+        if not isinstance(value, int) or isinstance(value, bool) or value < 1:
+            raise ConfigError(f"{key} must be a positive integer")
+    share = cfg.setdefault("bank_immigrant_share_bps", 5_000)
+    if not isinstance(share, int) or isinstance(share, bool) or not 0 <= share <= 10_000:
+        raise ConfigError("bank_immigrant_share_bps must be an integer in 0..10000")
+    multiple = cfg.setdefault("champion_seed_multiple", 2)
+    if not isinstance(multiple, int) or isinstance(multiple, bool) or not 1 <= multiple <= 10:
+        raise ConfigError("champion_seed_multiple must be an integer in 1..10 (spec v3 5.3)")
+    reinvest = cfg.setdefault("reinvest_fraction_bps", 5_000)
+    if not isinstance(reinvest, int) or isinstance(reinvest, bool) or not 0 <= reinvest <= 10_000:
+        raise ConfigError("reinvest_fraction_bps must be an integer in 0..10000 (spec v3 5.4)")
     flush_every = cfg.setdefault("flush_every", 1)
     if not isinstance(flush_every, int) or isinstance(flush_every, bool) or flush_every < 1:
         raise ConfigError("flush_every must be a positive integer")

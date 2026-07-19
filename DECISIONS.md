@@ -478,3 +478,133 @@ parentheses.
     `python -m experiments.live_soak --hours 24` with the feed up (11.2);
     (c) confirm the CI matrix goes green on GitHub's Windows and Linux
     runners.
+
+63. **Realized P&L is the agent's net ledger flow against ARENA accounts**
+    (spec v3 3.1: "sells minus buys minus fees, from the ledger"). One CASE
+    aggregation over `ledger` joined on ARENA-kind counterparties gives
+    sells − buys − fees exactly; identity checked in tests:
+    realized == delivered-to-system + liquidation-holdings − funding.
+    `active_days` floors at 1 day when the agent has any fill (a
+    same-day scalper's rate should not divide by epsilon); zero fills means
+    zero rate, keeping never-traded sitters off the profitmaker board.
+
+64. **`bank_path` defaults to None — the bank is opt-in.** A colony with no
+    configured bank runs exactly as v2 did (no admission at wind-down, no
+    snapshot at init, no immigration draws), which is what keeps every v2
+    archive resumable and replayable. `records_root` (default "records")
+    was added alongside it so tests and experiments can redirect the §4.3
+    admission record away from the repo's records/ tree.
+
+65. **Extinction on a fully-consumed tape is economics, not machinery**
+    (re-affirming #59 under v3 tiers). The real-market tiny rung wipes out;
+    the machinery FAIL stamp is reserved for exceptions and invariant
+    breaks. The rung reports EXPECTED-FAIL and the ladder headline stays
+    honest about which bar each rung met.
+
+66. **The solo probe is deliberately spartan: $1,000, no rent, no breeding,
+    no immigration** (spec v3 4.4 "frozen"). Certification asks one
+    question — does this genome alone extract cash from a postdating
+    window — so the probe replays the pending-order/fill-window/gate
+    semantics of the live arena (fill delay 1, 24h window, gates, terminal
+    liquidation) and nothing else. Rent would measure treasury policy, not
+    the genome.
+
+67. **Schema evolution is additive; `user_version` stays 2.** v3 adds
+    `bank_snapshot` and `agents.origin` via CREATE-IF-MISSING / ALTER at
+    Orchestrator start. A version bump would have forced a migration
+    story for v2 archives that a guard clause covers in four lines; the
+    replay-twin byte-identity tests are the proof the guards are inert.
+
+68. **Champion seeds that outrun the token bucket fall back to the base
+    seed.** `champion_seed_multiple × gen0_seed` is drawn from the same
+    immigration bucket as everyone else (spec v3 5.3 "no new money"); if
+    the bucket cannot afford the multiple it funds a plain gen-0 seed
+    instead of waiting, so a lean bucket degrades the *privilege*, never
+    the *flow*, of immigration.
+
+69. **Accrual tops up to base capacity; the ratchet alone exceeds it.**
+    The APR accrual stops adding tokens at base capacity (as in v2), while
+    a compounding redeploy may push the bucket to 4× base (spec v3 5.4).
+    Without the clamp ordering, accrual after a redeploy would double-count
+    headroom. The high-water mark is one-way and persisted in run state,
+    so resume cannot re-trigger a redeploy already taken.
+
+70. **Footer entries carry optional per-entry spans.** Walk-forward
+    annualizes each out-of-sample window over *its own* dates, not the
+    whole tape (a +30% window over 8 years is not +30%/8yr). `footer()`
+    accepts 4-tuples (whole-span) and 6-tuples (own-span); every other
+    caller keeps the 4-tuple form.
+
+71. **The A/B experiment disables admission arithmetically, not with a
+    flag.** Both arms run `bank_min_fills = 10^9` (and top-k 1), so
+    neither arm can write to the bank mid-experiment — arm B *reads* a
+    snapshot, nothing writes. One mechanism, zero new config surface,
+    and the reuse measurement can't contaminate its own input.
+
+72. **Held-out enforcement is by date interval, not file identity.**
+    `bank_reuse` refuses (SystemExit) if the held-out window overlaps any
+    banked genome's admission *or* certification window — comparing dates
+    catches a re-sliced CSV of the same bars, which a filename or digest
+    check would wave through.
+
+73. **Breakout trails from an approximated post-entry high.** The strategy
+    keeps no per-agent state between decisions (archetypes are pure
+    functions of history + position), so the trail reference is
+    `max(history[-(hold+1):])` — the high since the entry could last have
+    happened. It can only be ≥ the true post-entry high, so the trail
+    triggers no later than a stateful version; entries pay gates and
+    fee_aware, exits are always allowed (#50).
+
+74. **Profit-matrix bars for breakout: ≥ +2.0 bps/t on trend_up, ≤ 0.0 on
+    mean_revert.** Same shape as momentum's criteria: the archetype must
+    make real money in its home regime and must not thrive where its
+    premise is false (measured: +5.30 and −38.24).
+
+75. **Walk-forward EDGE is a strict majority of test windows** (wins × 2 >
+    tests), pooled certified-champion cash vs pooled B&H per window. A
+    windowless tie (0/0) is NO-EDGE. Measured on SPY 1993–2026, 4 windows
+    × 3 seeds: NO-EDGE across the board — champions beat B&H only in the
+    2001–2009 test window (the one containing two crashes). The
+    measurement is the deliverable; the spec forbids demanding EDGE.
+
+76. **`colony run`'s footer marks, it does not audit.** The run command
+    prints "system total (marked)" against the benchmark because open
+    positions exist mid-run; only wind_down/experiment records use
+    audited-cash language. No bare "PASS" appears in any replay output
+    (spec v3 2.4).
+
+77. **One v2 test re-based, none deleted.** The 4-way archetype rotation
+    changed which gen-0 agents are sitters; the lifecycle stagnation test
+    now filters to sitters born early enough to exhaust their grace
+    window instead of assuming rotation order. Every other v1/v2 test
+    passes unchanged.
+
+78. **v3 line budget: 3,826 non-blank lines against the ~3,600 ceiling,
+    accepted with cause** (continuing #57/#61). The +657 over v2's 3,169
+    is the spec's own new machinery: benchmark.py (72), bank.py (193),
+    and the reuse/compounding/Champions surface spread across
+    orchestrator, server, report and the CLI (~390). As at v2 close,
+    nothing is dead weight — shrinking further means deleting mandated
+    behavior, so the honest move is recording the number.
+
+79. **v3.0 acceptance status at build completion.** Machine-verifiable
+    criteria hold: 198 tests green (Windows, Python 3.14); every replay
+    verdict is tiered against buy-and-hold with the mandatory
+    span/wall/annualized/benchmark footer, no bare "PASS" in replay
+    output; realized-P&L profitmaker boards in report/inspect; bank
+    admission + out-of-sample certification with the postdating refusal
+    tested; replay-twin audit byte-identical with bank immigrants
+    present; compounding ratchet tested including resume. Evidence runs
+    (records/): SPY real-market ladder full/micro/tiny all CASH; profit
+    matrix PASS with breakout (+5.30 bps/t trend_up, −38.24
+    mean_revert); regime-flip flagship PASS all seeds; SPY walk-forward
+    1993–2026, 4 windows × 3 seeds: **NO-EDGE** (champions beat B&H
+    only in the 2001–2009 crash window), zero machinery failures;
+    held-out reuse A/B (train ≤2018-02, test from 2018-03): **B ≥ A on
+    all three seeds** (+$1,203.59, +$512.13, ±$0 — the third drew no
+    bank immigrants), direction reported, not demanded. Remaining
+    operator-time items (10.7), commands ready: (a) year-long minute
+    ladder re-run under v3 tiers (`python -m experiments.minute_ladder
+    --parallel` with ≥1y of BTCUSDT 1m), (b) 24h live soak
+    (`python -m experiments.live_soak --hours 24`), (c) green CI matrix
+    on GitHub's Windows and Linux runners.

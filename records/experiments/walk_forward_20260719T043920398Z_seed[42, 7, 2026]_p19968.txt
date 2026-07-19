@@ -1,0 +1,52 @@
+record: experiments/walk_forward_20260719T043920398Z_seed[42, 7, 2026]_p19968.txt
+utc: 2026-07-19T04:39:20+00:00
+git: 6049f65-dirty
+rng_seed: [42, 7, 2026]
+config: {"csv": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\spy_d.csv", "digest": "7f758062b681ee8e", "windows": 4, "seeds": [42, 7, 2026], "profile": "daily"}
+========================================================================
+
+--- results -----------------------------------------------------
+walk-forward: spy_d.csv (digest 7f758062b681ee8e), 4 windows, seeds [42, 7, 2026]
+
+seed 42:
+  window 1 -> test 2: admitted 8, certified 3/8 | evolve treasury 207961714823 u | oos pooled 7612765098 u vs B&H 6885469088 u (beat)
+  window 2 -> test 3: admitted 5, certified 5/5 | evolve treasury 202669302981 u | oos pooled 5651624353 u vs B&H 12633244110 u (did not beat)
+  window 3 -> test 4: admitted 8, certified 8/8 | evolve treasury 207935026410 u | oos pooled 8931065842 u vs B&H 21583181992 u (did not beat)
+  seed 42: NO-EDGE (1/3 test windows beaten)
+
+seed 7:
+  window 1 -> test 2: admitted 8, certified 2/8 | evolve treasury 205381222110 u | oos pooled 7657014099 u vs B&H 6885469088 u (beat)
+  window 2 -> test 3: admitted 8, certified 8/8 | evolve treasury 203539743973 u | oos pooled 8688557307 u vs B&H 20213190576 u (did not beat)
+  window 3 -> test 4: admitted 8, certified 7/8 | evolve treasury 205488067153 u | oos pooled 8590855984 u vs B&H 21583181992 u (did not beat)
+  seed 7: NO-EDGE (1/3 test windows beaten)
+
+seed 2026:
+  window 1 -> test 2: admitted 8, certified 2/8 | evolve treasury 207014567874 u | oos pooled 7386804183 u vs B&H 6885469088 u (beat)
+  window 2 -> test 3: admitted 8, certified 8/8 | evolve treasury 201304394026 u | oos pooled 9122471301 u vs B&H 20213190576 u (did not beat)
+  window 3 -> test 4: admitted 8, certified 7/8 | evolve treasury 205810356227 u | oos pooled 8881193611 u vs B&H 21583181992 u (did not beat)
+  seed 2026: NO-EDGE (1/3 test windows beaten)
+
+WALK-FORWARD seed 42: NO-EDGE, seed 7: NO-EDGE, seed 2026: NO-EDGE
+
+span: 1993-01-29T00:00:00+00:00 -> 2026-07-17T00:00:00+00:00 (33.46 years)
+wall: 118.4 s
+annualized: seed 42 oos window 2 audited $7,612.77 vs initial $8,000.00 -> -0.15%/yr
+benchmark: seed 42 oos window 2 buy-and-hold $6,885.47 (-0.45%/yr) | delta +0.30 pp/yr
+annualized: seed 42 oos window 3 audited $5,651.62 vs initial $5,000.00 -> +0.37%/yr
+benchmark: seed 42 oos window 3 buy-and-hold $12,633.24 (+2.81%/yr) | delta -2.44 pp/yr
+annualized: seed 42 oos window 4 audited $8,931.07 vs initial $8,000.00 -> +0.33%/yr
+benchmark: seed 42 oos window 4 buy-and-hold $21,583.18 (+3.01%/yr) | delta -2.68 pp/yr
+annualized: seed 7 oos window 2 audited $7,657.01 vs initial $8,000.00 -> -0.13%/yr
+benchmark: seed 7 oos window 2 buy-and-hold $6,885.47 (-0.45%/yr) | delta +0.32 pp/yr
+annualized: seed 7 oos window 3 audited $8,688.56 vs initial $8,000.00 -> +0.25%/yr
+benchmark: seed 7 oos window 3 buy-and-hold $20,213.19 (+2.81%/yr) | delta -2.56 pp/yr
+annualized: seed 7 oos window 4 audited $8,590.86 vs initial $8,000.00 -> +0.21%/yr
+benchmark: seed 7 oos window 4 buy-and-hold $21,583.18 (+3.01%/yr) | delta -2.80 pp/yr
+annualized: seed 2026 oos window 2 audited $7,386.80 vs initial $8,000.00 -> -0.24%/yr
+benchmark: seed 2026 oos window 2 buy-and-hold $6,885.47 (-0.45%/yr) | delta +0.21 pp/yr
+annualized: seed 2026 oos window 3 audited $9,122.47 vs initial $8,000.00 -> +0.39%/yr
+benchmark: seed 2026 oos window 3 buy-and-hold $20,213.19 (+2.81%/yr) | delta -2.42 pp/yr
+annualized: seed 2026 oos window 4 audited $8,881.19 vs initial $8,000.00 -> +0.31%/yr
+benchmark: seed 2026 oos window 4 buy-and-hold $21,583.18 (+3.01%/yr) | delta -2.70 pp/yr
+
+=== RESULT: WALK-FORWARD seed 42: NO-EDGE, seed 7: NO-EDGE, seed 2026: NO-EDGE

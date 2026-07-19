@@ -1,0 +1,6 @@
+record: experiments/real_market_20260719T041606955Z_seed[42, 7, 2026]_p43700.txt
+utc: 2026-07-19T04:16:06+00:00
+git: 6049f65-dirty
+rng_seed: [42, 7, 2026]
+config: {"csv": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\spy_d.csv", "seeds": [42, 7, 2026], "rung": "all"}
+========================================================================

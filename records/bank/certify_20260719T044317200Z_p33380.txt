@@ -1,0 +1,13 @@
+record: bank/certify_20260719T044317200Z_p33380.txt
+utc: 2026-07-19T04:43:17+00:00
+git: 6049f65-dirty
+rng_seed: n/a
+config: n/a
+========================================================================
+
+--- events ------------------------------------------------------
+certify 0a65e3f3ab3f pnl 28136937 u
+certify 48fb9a1c3aaa pnl 59617532 u
+certify 6bedaa24a738 pnl 150567681 u
+
+=== RESULT: 3/3 probe(s) certified on window_4.csv

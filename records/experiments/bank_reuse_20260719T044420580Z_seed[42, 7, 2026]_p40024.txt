@@ -1,0 +1,32 @@
+record: experiments/bank_reuse_20260719T044420580Z_seed[42, 7, 2026]_p40024.txt
+utc: 2026-07-19T04:44:20+00:00
+git: 6049f65-dirty
+rng_seed: [42, 7, 2026]
+config: {"csv": "data\\spy_d.csv", "digest": "7f758062b681ee8e", "bank": "work_ab/bank_42.jsonl", "certified": 8, "from": "2018-03-01", "seeds": [42, 7, 2026]}
+========================================================================
+
+--- results -----------------------------------------------------
+bank reuse A/B: spy_d.csv, held-out 2018-03-01..2026-07-17, bank work_ab/bank_42.jsonl (8 certified), seeds [42, 7, 2026]
+
+seed 42: A 206315806100 u vs B 207519397701 u (B-A +1203591601 u, B >= A) | bank agents in B: 7 | first surplus tick A None B None
+seed 7: A 205317368303 u vs B 205829495620 u (B-A +512127317 u, B >= A) | bank agents in B: 11 | first surplus tick A None B None
+seed 2026: A 205295273813 u vs B 205295273813 u (B-A +0 u, B >= A) | bank agents in B: 0 | first surplus tick A None B None
+
+REUSE A/B measured — direction reported, not demanded
+
+span: 2018-03-01T00:00:00+00:00 -> 2026-07-17T00:00:00+00:00 (8.38 years)
+wall: 61.0 s
+annualized: seed 42 A random audited $206,315.81 vs initial $200,000.00 -> +0.37%/yr
+benchmark: seed 42 A random buy-and-hold $554,093.34 (+12.93%/yr) | delta -12.56 pp/yr
+annualized: seed 42 B bank audited $207,519.40 vs initial $200,000.00 -> +0.44%/yr
+benchmark: seed 42 B bank buy-and-hold $554,093.34 (+12.93%/yr) | delta -12.49 pp/yr
+annualized: seed 7 A random audited $205,317.37 vs initial $200,000.00 -> +0.31%/yr
+benchmark: seed 7 A random buy-and-hold $554,093.34 (+12.93%/yr) | delta -12.62 pp/yr
+annualized: seed 7 B bank audited $205,829.50 vs initial $200,000.00 -> +0.34%/yr
+benchmark: seed 7 B bank buy-and-hold $554,093.34 (+12.93%/yr) | delta -12.59 pp/yr
+annualized: seed 2026 A random audited $205,295.27 vs initial $200,000.00 -> +0.31%/yr
+benchmark: seed 2026 A random buy-and-hold $554,093.34 (+12.93%/yr) | delta -12.62 pp/yr
+annualized: seed 2026 B bank audited $205,295.27 vs initial $200,000.00 -> +0.31%/yr
+benchmark: seed 2026 B bank buy-and-hold $554,093.34 (+12.93%/yr) | delta -12.62 pp/yr
+
+=== RESULT: REUSE A/B measured — direction reported, not demanded

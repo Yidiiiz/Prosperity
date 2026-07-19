@@ -10,12 +10,13 @@ ladder with the venue's spread ON and fill delay 1. Rungs:
   dust  -- $10 TOTAL (4 agents seeded $2.50, small_stakes waiver)
 
 Every rung ends with a TERMINAL AUDIT (#29): every estate liquidated at the
-last real price, so the verdict is audited CASH vs initial. Per spec v2 7.4
-the first minute-scale ladders are EXPECTED to fail economically — the
-verdict per seed is PASS (audited profit), EXPECTED-FAIL (machinery sound,
-economics negative, per-seed numbers recorded), or FAIL (the machinery
-itself broke: crash, invariant, incomplete replay). Machinery failures are
-the only failures.
+last real price, so the verdict is audited CASH vs initial AND vs
+buy-and-hold on the same tape at the same venue costs (spec v3 section 2).
+Verdict per seed is a v3 2.4 tier: ALPHA (beat buy-and-hold), CASH (real
+profit, no edge over holding), EXPECTED-FAIL (machinery sound, economics
+negative, per-seed numbers recorded), or FAIL (the machinery itself broke:
+crash, invariant, incomplete replay). Machinery failures are the only
+failures.
 
 Usage: python -m experiments.minute_ladder [--rung full|small|dust|all]
        [--seeds 42,7,2026] [--workdir DIR] [--csv PATH] [--digest HEX]
@@ -32,7 +33,8 @@ import sys
 import tempfile
 from pathlib import Path
 
-from colony import db, ledger, orchestrator
+from colony import benchmark, db, ledger, orchestrator, report
+from colony.arenas.replay import read_rows
 from colony.config import validate
 from colony.records import Record
 
@@ -143,22 +145,23 @@ def run_seed(cfg, workdir, label):
     fees = con.execute(
         "SELECT COALESCE(SUM(fee_u), 0) + COALESCE(SUM(spread_u), 0) FROM trades"
     ).fetchone()[0]
+    top = report.profitmakers_text(con, top_k=5)  # spec v3 3.1
     con.close()
     return {
         "ticks": ticks, "pop": pop, "births": births, "deaths": deaths,
         "treasury_liq": treasury, "initial": cfg["initial_treasury_u"],
-        "trades": trades, "friction": fees,
+        "trades": trades, "friction": fees, "profitmakers": top,
     }
 
 
-def verdict_of(result):
-    return "PASS" if result["treasury_liq"] > result["initial"] else "EXPECTED-FAIL"
-
-
-def run_rung(lines, label, seeds, csv_path, workdir):
+def run_rung(lines, label, seeds, csv_path, closes, entries, workdir):
     machinery_ok = True
     for seed in seeds:
         cfg = RUNGS[label](seed, csv_path)
+        bench = benchmark.buy_and_hold(
+            closes, cfg["initial_treasury_u"], cfg["venue"],
+            cfg["arena"]["lot_denominator"],
+        )
         try:
             if workdir:
                 r = run_seed(cfg, workdir, label)
@@ -171,7 +174,8 @@ def run_rung(lines, label, seeds, csv_path, workdir):
             print(line, flush=True)
             lines.append(line)
             continue
-        v = verdict_of(r)
+        v = benchmark.tier(r["initial"], r["treasury_liq"], bench)  # spec v3 2.4
+        entries.append((f"{label} seed {seed}", r["initial"], r["treasury_liq"], bench))
         gain = (r["treasury_liq"] / r["initial"] - 1) * 100
         block = [
             f"seed {seed}  [{v}]",
@@ -179,7 +183,9 @@ def run_rung(lines, label, seeds, csv_path, workdir):
             f" deaths {r['deaths']} | {r['trades']} fills"
             f" | friction paid {money(r['friction'])}",
             f"  terminal audit: treasury {money(r['treasury_liq'])} cash"
-            f" vs {money(r['initial'])} initial  ({gain:+.2f}%)",
+            f" vs {money(r['initial'])} initial  ({gain:+.2f}%)"
+            f" | buy-and-hold same tape {money(bench)}",
+            "  " + r["profitmakers"].replace("\n", "\n  "),
             "",
         ]
         print("\n".join(block), flush=True)  # per-seed, the moment it finishes
@@ -242,18 +248,22 @@ def main(argv=None):
     record = Record("records", "experiments", name,
                     config={"csv": str(csv_path), "digest": digest,
                             "seeds": seeds, "rungs": rungs}, seed=seeds)
+    times, closes = read_rows(csv_path)
     lines = [f"minute-bar ladder: {csv_path.name} (digest {digest}), seeds {seeds}", ""]
     machinery_ok = True
+    entries = []
     for label in rungs:
         header = f"== rung: {label} =="
         print(header, flush=True)
         lines += [header, ""]
-        machinery_ok &= run_rung(lines, label, seeds, csv_path, args.workdir)
-    headline = ("LADDER MACHINERY PASS — economics recorded per seed (7.4)"
+        machinery_ok &= run_rung(lines, label, seeds, csv_path, closes, entries,
+                                 args.workdir)
+    headline = ("LADDER MACHINERY OK — v3 tiers recorded per seed (v2 7.4, v3 2.4)"
                 if machinery_ok else "LADDER MACHINERY FAIL")
     lines.append(headline)
     print(headline)
     record.section("results", "\n".join(lines))
+    record.set_replay_terms(times[0], times[-1], entries)
     record.finish(headline, level="INFO" if machinery_ok else "CRITICAL")
     return 0 if machinery_ok else 1
 

@@ -7,7 +7,7 @@ the ledger; fitness is analysis-only and floats are fine.
 import math
 from collections import Counter
 
-ARCHETYPES = ["momentum", "mean_revert", "sitter"]
+ARCHETYPES = ["momentum", "mean_revert", "sitter", "breakout"]  # v3 section 6
 
 MASK24 = "mask24"  # 24-bit UTC-hour bitmask gene: bit-flip mutation, not gauss
 
@@ -23,6 +23,10 @@ PARAM_BOUNDS = {
     "vol_gate_bps": (0, 100, int),
     "max_trades_per_day": (1, 500, int),
     "active_hours_mask": (1, (1 << 24) - 1, MASK24),
+    # v3 section 6, breakout only: enter on a new lookback-bar high by
+    # >= confirm_bps; exit trail_bps below the post-entry high
+    "confirm_bps": (0, 100, int),
+    "trail_bps": (50, 2000, int),
 }
 ECON_BOUNDS = {
     "child_seed_fraction": (0.30, 0.55, float),

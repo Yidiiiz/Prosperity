@@ -1,0 +1,22 @@
+record: experiments/walk_forward_42_20260719T043814241Z_seed[42]_p36884.txt
+utc: 2026-07-19T04:38:14+00:00
+git: 6049f65-dirty
+rng_seed: [42]
+config: {"csv": "data\\btcusdt_1m_fixture.csv", "digest": "34f6b17f238b6079", "windows": 4, "seeds": [42], "profile": "minute"}
+========================================================================
+
+--- results -----------------------------------------------------
+walk-forward: btcusdt_1m_fixture.csv (digest 34f6b17f238b6079), 4 windows, seeds [42]
+
+seed 42:
+  window 1 -> test 2: admitted 0, certified 0/0 | evolve treasury 199987971598 u | oos pooled 0 u vs B&H 0 u (did not beat)
+  window 2 -> test 3: admitted 0, certified 0/0 | evolve treasury 199982273445 u | oos pooled 0 u vs B&H 0 u (did not beat)
+  window 3 -> test 4: admitted 0, certified 0/0 | evolve treasury 199986246224 u | oos pooled 0 u vs B&H 0 u (did not beat)
+  seed 42: NO-EDGE (0/3 test windows beaten)
+
+WALK-FORWARD seed 42: NO-EDGE
+
+span: 2026-07-14T00:00:00+00:00 -> 2026-07-17T00:00:00+00:00 (0.01 years)
+wall: 31.6 s
+
+=== RESULT: WALK-FORWARD seed 42: NO-EDGE

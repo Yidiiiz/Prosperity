@@ -30,6 +30,12 @@ colony's retained wealth); after the audit the claim is exact.
     survival to the end of history with invariants intact; the post-audit
     treasury is reported per seed and expected to be seed-dependent.
 
+v3 (spec v3 2.4): verdicts are tiers — ALPHA (beat buy-and-hold at the same
+venue costs), CASH (audited profit, no edge over holding), EXPECTED-FAIL,
+FAIL (machinery). The v2 profit bars for full/micro map to CASH; tiny stays
+machinery-only. The record footer states span, wall clock, CAGR, and the
+buy-and-hold benchmark (spec v3 2.2).
+
 Usage: python -m experiments.real_market [--rung full|micro|tiny|all]
        [--seeds 42,7] [--workdir DIR]
 (the default runs the whole ladder; per-rung/per-seed invocations exist so
@@ -43,10 +49,13 @@ import sys
 import tempfile
 from pathlib import Path
 
-from colony import db, ledger, orchestrator
+from colony import benchmark, db, ledger, orchestrator, report
+from colony.arenas.replay import read_rows
 from colony.config import validate
 from colony.evolution import archetype_shares
 from colony.records import Record
+
+TIER_RANK = {"FAIL": 0, "EXPECTED-FAIL": 1, "CASH": 2, "ALPHA": 3}
 
 ROOT = Path(__file__).resolve().parent.parent
 CSV = ROOT / "data" / "spy_d.csv"
@@ -147,6 +156,7 @@ def run_seed(cfg, workdir, label):
         "treasury_liq": ledger.balance(con, "TREASURY"),
         "initial": cfg["initial_treasury_u"],
         "shares": shares, "price": price,
+        "profitmakers": report.profitmakers_text(con, top_k=5),  # spec v3 3.1
     }
     con.close()
     return result
@@ -156,22 +166,39 @@ def money(u):
     return f"${u / 1e6:,.2f}"
 
 
-def report_rung(lines, label, cfg_fn, require_profit, seeds, workdir=None):
-    rung_pass = True
+def report_rung(lines, label, cfg_fn, require_cash, seeds, closes, entries, workdir=None):
+    """One rung across seeds. Verdicts are spec v3 2.4 tiers: the v2 profit
+    bar for full/micro maps to CASH (require_cash); tiny is machinery-only.
+    Returns the rung's worst tier."""
+    worst = "ALPHA"
     for seed in seeds:
         cfg = cfg_fn(seed)
-        if workdir:
-            r = run_seed(cfg, workdir, label)
-        else:
-            with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
-                r = run_seed(cfg, tmp, label)
-        profit_ok = r["treasury_liq"] > r["initial"]
-        ok = r["survived"] and (profit_ok or not require_profit)
-        rung_pass = rung_pass and ok
+        bench = benchmark.buy_and_hold(
+            closes, cfg["initial_treasury_u"], cfg["venue"],
+            cfg["arena"]["lot_denominator"],
+        )
+        try:
+            if workdir:
+                r = run_seed(cfg, workdir, label)
+            else:
+                with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+                    r = run_seed(cfg, tmp, label)
+        except Exception as exc:  # machinery failure: the only real failure
+            worst = "FAIL"
+            lines.append(f"seed {seed}  [FAIL — machinery: {exc}]")
+            lines.append("")
+            continue
+        # extinction before the end of history is economics, not machinery
+        # (#59: the honest signal the venue cannot support the stakes) — the
+        # replay itself completed, so the tier comes strictly from spec v3 2.4
+        v = benchmark.tier(r["initial"], r["treasury_liq"], bench)
+        if TIER_RANK[v] < TIER_RANK[worst]:
+            worst = v
+        entries.append((f"{label} seed {seed}", r["initial"], r["treasury_liq"], bench))
         s = r["shares"]
         gain = (r["treasury_liq"] / r["initial"] - 1) * 100
-        profit_note = "ok" if profit_ok else ("FAIL" if require_profit else "reported only")
-        lines.append(f"seed {seed}  [{'PASS' if ok else 'FAIL'}]")
+        lines.append(f"seed {seed}  [{v}]" + ("" if v != "CASH" or not require_cash
+                                              else "  (meets the v2 bar)"))
         lines.append(f"  {r['ticks']} ticks (trading days) | pop {r['pop']}"
                      f" | births {r['births']} deaths {r['deaths']}"
                      f" | survived: {'ok' if r['survived'] else 'FAIL'}")
@@ -181,9 +208,11 @@ def report_rung(lines, label, cfg_fn, require_profit, seeds, workdir=None):
                      f" sit {s['sitter']:.0%}")
         lines.append(f"  terminal audit: all estates liquidated at the last real price ->")
         lines.append(f"    treasury {money(r['treasury_liq'])} cash"
-                     f" vs {money(r['initial'])} initial  ({gain:+.1f}%: {profit_note})")
+                     f" vs {money(r['initial'])} initial  ({gain:+.1f}%)"
+                     f" | buy-and-hold same tape {money(bench)}")
+        lines.append("  " + r["profitmakers"].replace("\n", "\n  "))
         lines.append("")
-    return rung_pass
+    return worst
 
 
 def main(argv=None):
@@ -204,33 +233,40 @@ def main(argv=None):
         name += "_" + args.seeds.replace(",", "_")
     record = Record("records", "experiments", name,
                     config={"csv": str(CSV), "seeds": seeds, "rung": args.rung}, seed=seeds)
+    times, closes = read_rows(CSV)
     lines = ["real market replay: SPY daily closes, capitalization ladder", ""]
     verdicts = []
+    entries = []
 
     if args.rung in ("full", "all"):
         lines.append("== rung 1: full stakes ($200,000, lot = 1/100 share) ==")
         lines.append("")
-        ok = report_rung(lines, "full", full_stakes_config, True, seeds, args.workdir)
-        verdicts.append(("full stakes", ok))
+        v = report_rung(lines, "full", full_stakes_config, True, seeds, closes,
+                        entries, args.workdir)
+        verdicts.append(("full stakes", v, "CASH"))
     if args.rung in ("micro", "all"):
         lines.append("== rung 2: micro stakes ($100.00 TOTAL, lot = 1/1000 share) ==")
         lines.append("")
-        ok = report_rung(lines, "micro", micro_stakes_config, True, seeds, args.workdir)
-        verdicts.append(("micro stakes", ok))
+        v = report_rung(lines, "micro", micro_stakes_config, True, seeds, closes,
+                        entries, args.workdir)
+        verdicts.append(("micro stakes", v, "CASH"))
     if args.rung in ("tiny", "all"):
         lines.append("== rung 3: tiny stakes ($10.00 TOTAL, lot = 1/1000 share) ==")
         lines.append("")
-        ok = report_rung(lines, "tiny", tiny_stakes_config, False, seeds, args.workdir)
-        verdicts.append(("tiny stakes", ok))
+        v = report_rung(lines, "tiny", tiny_stakes_config, False, seeds, closes,
+                        entries, args.workdir)
+        verdicts.append(("tiny stakes", v, "EXPECTED-FAIL"))
 
-    all_pass = all(ok for _, ok in verdicts)
-    detail = ", ".join(f"{label}: {'pass' if ok else 'FAIL'}" for label, ok in verdicts)
-    lines.append(f"REAL MARKET {'PASS' if all_pass else 'FAIL'}  ({detail})")
+    # a rung holds when its worst tier meets its bar (v2 bars re-based, v3 2.4)
+    all_ok = all(TIER_RANK[v] >= TIER_RANK[bar] for _, v, bar in verdicts)
+    detail = ", ".join(f"{label}: {v}" for label, v, _ in verdicts)
+    lines.append(f"REAL MARKET {'bars met' if all_ok else 'BELOW v2 BAR'}  ({detail})")
     output = "\n".join(lines)
     print(output)
     record.section("results", output)
-    record.finish("PASS" if all_pass else "FAIL")
-    return 0 if all_pass else 1
+    record.set_replay_terms(times[0], times[-1], entries)
+    record.finish(detail if all_ok else f"BELOW v2 BAR — {detail}")
+    return 0 if all_ok else 1
 
 
 if __name__ == "__main__":

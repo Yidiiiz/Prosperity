@@ -55,6 +55,23 @@ def cmd_run(args):
     record.section("final state", summary)
     metrics = report.latest_metrics(con)
     treasury = metrics["treasury_u"] if metrics else 0
+    if orch.cfg["arena"].get("kind") == "replay" and orch.tick > 0:
+        # spec v3 2.2: every replay record states span, wall, CAGR, benchmark.
+        # Mid-run the colony figure is marked-to-market, not audited — labelled.
+        from . import benchmark
+        from .arenas.replay import read_rows
+
+        times, closes = read_rows(orch.cfg["arena"]["csv"])
+        initial = orch.cfg["initial_treasury_u"]
+        marked = treasury + (metrics["colony_wealth_u"] if metrics else 0)
+        bench = benchmark.buy_and_hold(
+            closes[: orch.tick + 1], initial, orch.cfg["venue"],
+            orch.cfg["arena"].get("lot_denominator", 1),
+        )
+        record.set_replay_terms(
+            times[0], times[orch.tick],
+            [("system total (marked)", initial, marked, bench)],
+        )
     if interrupted:
         status = "INTERRUPTED"
     elif executed < args.ticks:
@@ -142,6 +159,55 @@ def cmd_audit(args):
     return 0 if ok else 1
 
 
+def cmd_bank(args):
+    from . import bank as bank_mod
+
+    if args.action == "admit":
+        con = _open(args)
+        admitted = bank_mod.admit_from_db(con, args.bank)
+        for aid, h, bps in admitted:
+            print(f"admitted {h[:12]} (agent {aid}, {bps:+.2f} bps/day in-sample)")
+        print(f"{len(admitted)} candidate(s) admitted -> {args.bank}")
+        return 0
+    if args.action == "certify":
+        if not args.tape:
+            print("certify needs --tape CSV", file=sys.stderr)
+            return 2
+        cfg = load_config(args.config)
+        results = bank_mod.certify(
+            args.bank, args.tape, cfg["venue"],
+            cfg["arena"].get("lot_denominator", 1),
+            from_date=args.from_date, recertify=args.recertify,
+        )
+        for h, verdict, pnl in results:
+            print(f"{verdict:<8} {h[:12]} probe pnl {report.money(pnl)}")
+        print(f"{len(results)} probe(s) run against {args.tape}")
+        return 0
+    state = bank_mod.fold(args.bank)
+    if args.action == "show":
+        matches = [h for h in state if h.startswith(args.arg or "")]
+        if not args.arg or len(matches) != 1:
+            print(f"need a unique hash prefix ({len(matches)} match(es))", file=sys.stderr)
+            return 1
+        print(json.dumps(state[matches[0]], indent=2, sort_keys=True))
+        return 0
+    if not state:  # list
+        print(f"bank {args.bank} is empty")
+        return 0
+    for h, entry in sorted(state.items(), key=lambda kv: kv[1]["status"] + kv[0]):
+        admit = entry.get("admit", {})
+        probe = entry.get("certify") or entry.get("lapse")
+        ins = admit.get("audited", {}).get("realized_bps_per_day", 0.0)
+        outs = (f"{probe['audited']['realized_bps_per_day']:+8.2f}" if probe
+                else "       -")
+        src = admit.get("source", {})
+        window = "..".join(w[:10] for w in src.get("window", ["?", "?"]))
+        print(f"{h[:12]}  {entry['status']:<9} in {ins:+8.2f} out {outs} bps/day"
+              f"  {src.get('arena', '?')} {window} seed {src.get('config_seed', '?')}"
+              f" agent {src.get('agent_id', '?')}")
+    return 0
+
+
 def cmd_test(args):
     record = records.Record(RECORDS_ROOT, "tests", "pytest")
     proc = subprocess.run(
@@ -200,6 +266,19 @@ def main(argv=None):
     p.add_argument("--max-ticks", type=int, default=None,
                    help="stop after N ticks (soaks/tests; default: run forever)")
     p.set_defaults(fn=cmd_daemon)
+
+    p = sub.add_parser("bank", help="genome bank: list, show, admit, certify")
+    p.add_argument("action", choices=("list", "show", "admit", "certify"))
+    p.add_argument("arg", nargs="?", help="hash prefix for `show`")
+    p.add_argument("--bank", default="bank/bank.jsonl", help="bank event log path")
+    p.add_argument("--tape", default=None, help="certify: out-of-sample Date,Close CSV")
+    p.add_argument("--from", dest="from_date", default=None,
+                   help="certify: probe only bars at or after this UTC date")
+    p.add_argument("--config", default="config.spy.json",
+                   help="certify: config supplying the venue + lot size")
+    p.add_argument("--recertify", action="store_true",
+                   help="certify: re-probe certified genomes too (failures lapse)")
+    p.set_defaults(fn=cmd_bank)
 
     p = sub.add_parser("audit", help="replay-twin audit of closed journal segments")
     p.add_argument("--records", default=RECORDS_ROOT)

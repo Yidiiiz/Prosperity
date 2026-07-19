@@ -18,6 +18,7 @@ State lives in records/audits/state.json:
 import copy
 import hashlib
 import json
+import sqlite3
 import tempfile
 from pathlib import Path
 
@@ -141,9 +142,23 @@ def audit(db_path, records_root="records", utcnow=None):
                 "tick_seconds": arena_cfg.get("tick_seconds", 1),
             }
             twin_cfg["flush_every"] = 100  # flush cadence proven ledger-neutral
+            # the twin gets the ORIGINAL run's bank snapshot (spec v3 5.1) —
+            # the live bank file may have moved on since init
+            twin_cfg["bank_path"] = None
             validate(twin_cfg)
             twin = db.connect(Path(workdir) / "twin.db")
             orch = orchestrator.init_colony(twin, twin_cfg)
+            try:
+                snap = live.execute(
+                    "SELECT genome_hash, genome_json, provenance FROM bank_snapshot"
+                ).fetchall()
+            except sqlite3.OperationalError:
+                snap = []  # pre-v3 database: no snapshot table
+            if snap:
+                with db.tx(twin):
+                    twin.executemany("INSERT INTO bank_snapshot VALUES (?, ?, ?)",
+                                     [tuple(r) for r in snap])
+                orch = orchestrator.Orchestrator(twin)  # reload with the snapshot
             executed = orch.run(ticks)
             live_hash, live_rows = ledger_hash(live, up_to_tick=ticks)
             twin_hash, twin_rows = ledger_hash(twin)

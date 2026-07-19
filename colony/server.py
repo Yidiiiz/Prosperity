@@ -36,6 +36,45 @@ def _latest_metrics(con):
     return con.execute("SELECT * FROM colony_metrics ORDER BY tick DESC LIMIT 1").fetchone()
 
 
+_bh_cache = {}  # (db_path, tick) -> vs-B&H block; one entry, recomputed on tick
+
+
+def _vs_buy_and_hold(cfg, tick):
+    """The benchmark block for the Money Strip (spec v3 8.1): buy-and-hold
+    of the initial capitalization over the span consumed so far — replay
+    reads its tape, live concatenates its journal. Petri has no real tape,
+    so the block is None there."""
+    kind = cfg["arena"].get("kind", "petri")
+    if kind == "petri" or tick < 1:
+        return None
+    key = (cfg["arena"].get("csv") or cfg["arena"].get("journal"), tick)
+    if key in _bh_cache:
+        return _bh_cache[key]
+    from . import benchmark
+    if kind == "replay":
+        from .arenas.replay import read_rows
+        times, closes = read_rows(cfg["arena"]["csv"])
+    else:  # live: the journal is the tape (#30)
+        from .arenas.live import _read_file
+        times, closes = [], []
+        for seg in sorted(Path(cfg["arena"]["journal"]).glob("*.csv")):
+            t, c = _read_file(seg)
+            times.extend(t)
+            closes.extend(c)
+    times, closes = times[: tick + 1], closes[: tick + 1]
+    if len(closes) < 2:
+        return None
+    initial = cfg["initial_treasury_u"]
+    bench = benchmark.buy_and_hold(closes, initial, cfg["venue"],
+                                   cfg["arena"].get("lot_denominator", 1))
+    years = benchmark.span_years(times[0], times[-1])
+    block = {"bh_u": bench, "span_years": years,
+             "bh_cagr": benchmark.cagr(initial, bench, years)}
+    _bh_cache.clear()
+    _bh_cache[key] = block
+    return block
+
+
 def _extracted_since(con, arena_now, boundary_utc):
     """-(delta ARENA) since the last metric at or before boundary_utc. The
     arena account starts at 0, so a missing base row means 'since genesis'."""
@@ -79,6 +118,16 @@ def api_summary(con, _query):
         per_second = -(m["arena_u"] - prev["arena_u"]) / (utc - prev["utc"])
     state = json.loads(run["state_json"])
     imm_capacity = cfg["initial_treasury_u"] * cfg.get("immigration_budget_apr_bps", 2_000) // 10_000
+    system_total = m["treasury_u"] + m["colony_wealth_u"]
+    vs_bh = _vs_buy_and_hold(cfg, m["tick"])
+    if vs_bh is not None:
+        # signed, colored, allowed to be red on the client (spec v3 8.1):
+        # a red delta on a green treasury is the honest CASH-tier picture
+        from . import benchmark
+        vs_bh = dict(vs_bh, vs_bh_u=system_total - vs_bh["bh_u"],
+                     system_cagr=benchmark.cagr(cfg["initial_treasury_u"],
+                                                system_total,
+                                                vs_bh["span_years"]))
     return {
         "run_id": run["id"],
         "tick": m["tick"],
@@ -88,7 +137,8 @@ def api_summary(con, _query):
         "colony_wealth_u": m["colony_wealth_u"],
         "colony_cash_u": colony_cash,
         "marked_u": open_lots * m["price_u"],
-        "system_total_u": m["treasury_u"] + m["colony_wealth_u"],
+        "system_total_u": system_total,
+        "vs_bh": vs_bh,
         "arena_extracted_u": -m["arena_u"],
         "extracted_today_u": _extracted_since(con, m["arena_u"], utc - (utc % 86_400)),
         "extracted_hour_u": _extracted_since(con, m["arena_u"], utc - (utc % 3_600)),
@@ -184,9 +234,12 @@ def api_leaderboard(con, query):
     price = m["price_u"] if m else cfg["arena"].get("start_price_u", 0)
     tick = m["tick"] if m else 0
     min_age = max(cfg["min_ticks_for_fitness"], 3 * cfg["snapshot_every"])
+    has_origin = any(r[1] == "origin"
+                     for r in con.execute("PRAGMA table_info(agents)"))
     rows = con.execute(
-        """
+        f"""
         SELECT a.id, a.generation, a.genome_json, a.born_tick,
+               {"a.origin" if has_origin else "NULL AS origin"},
                b.balance_u + COALESCE(p.lots, 0) * ? AS equity_u,
                s.first_snap_equity_u, s.peak_equity_u
         FROM agents a
@@ -205,6 +258,7 @@ def api_leaderboard(con, query):
             "id": row["id"],
             "generation": row["generation"],
             "archetype": json.loads(row["genome_json"])["archetype"],
+            "origin": row["origin"],
             "equity_u": row["equity_u"],
             "fitness": evolution.fitness(
                 row["equity_u"], row["first_snap_equity_u"],
@@ -259,10 +313,12 @@ def api_agent(con, agent_id):
         " ORDER BY tick DESC LIMIT 1",
         (agent_id,),
     ).fetchone()
+    keys = row.keys()
     return {
         "id": row["id"],
         "genome": json.loads(row["genome_json"]),
         "generation": row["generation"],
+        "origin": row["origin"] if "origin" in keys else None,
         "parents": [row["parent_a"], row["parent_b"]],
         "born_tick": row["born_tick"],
         "died_tick": row["died_tick"],
@@ -274,6 +330,40 @@ def api_agent(con, agent_id):
         "trades": trades,
         "lineage": _lineage_chain(con, agent_id),
     }
+
+
+def api_bank(con, _query):
+    """The Champions panel (spec v3 8.2): the snapshot this colony was
+    initialized with, plus how many living agents descend from each champion
+    (the bank immigrant and its whole lineage, via origin)."""
+    try:
+        rows = con.execute("SELECT genome_hash, genome_json, provenance"
+                           " FROM bank_snapshot ORDER BY genome_hash").fetchall()
+    except sqlite3.OperationalError:
+        return []  # pre-v3 database: no snapshot table
+    out = []
+    for row in rows:
+        prefix = row["genome_hash"][:12]
+        living = con.execute(
+            """
+            WITH RECURSIVE clan(id) AS (
+              SELECT id FROM agents WHERE origin = ?
+              UNION
+              SELECT a.id FROM agents a JOIN clan c
+                ON a.parent_a = c.id OR a.parent_b = c.id
+            )
+            SELECT COUNT(*) FROM clan JOIN agents ag ON ag.id = clan.id
+            WHERE ag.died_tick IS NULL
+            """,
+            (f"bank:{prefix}",),
+        ).fetchone()[0]
+        out.append({
+            "hash_prefix": prefix,
+            "archetype": json.loads(row["genome_json"])["archetype"],
+            "provenance": row["provenance"],
+            "living_descendants": living,
+        })
+    return out
 
 
 def api_health(db_path):
@@ -300,7 +390,7 @@ def api_runs(con, _query):
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "Observatory/2.0"
+    server_version = "Observatory/3.0"
     db_path = "colony.db"
     records_root = RECORDS_ROOT
     sse_interval = SSE_INTERVAL
@@ -349,6 +439,8 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_json(api_health(self.db_path))
             elif path == "/api/tape":
                 self._with_db(api_tape, query)
+            elif path == "/api/bank":
+                self._with_db(api_bank, query)
             elif path == "/api/events":
                 self._serve_events()
             elif path == "/api/runs":

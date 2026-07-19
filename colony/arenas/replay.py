@@ -32,12 +32,31 @@ def to_price_u(close, denominator):
     return max(1, round(close * 1_000_000 / denominator))
 
 
+def read_rows(path):
+    """(utc_times, closes) from a Date,Close CSV — the one tape reader,
+    shared by the arena, the benchmark, and the window-slicing experiments."""
+    with open(path, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        fields = reader.fieldnames or []
+        close = next((c for c in fields if c.strip().lower() == "close"), None)
+        date = next((c for c in fields if c.strip().lower() == "date"), None)
+        if close is None:
+            raise ValueError(f"{path}: no 'Close' column in header {fields}")
+        times, closes = [], []
+        for row in reader:
+            if not row.get(close):
+                continue
+            times.append(parse_utc(row[date]) if date and row.get(date) else 0)
+            closes.append(float(row[close]))
+        return times, closes
+
+
 class Replay:
     def __init__(self, arena_cfg):
         self.name = arena_cfg["name"]
         self.csv_path = arena_cfg["csv"]
         self.denominator = arena_cfg.get("lot_denominator", 1)
-        times, closes = self._read_rows(self.csv_path)
+        times, closes = read_rows(self.csv_path)
         if len(closes) < 2:
             raise ValueError(f"{self.csv_path}: need at least 2 price rows")
         self._times = times
@@ -46,23 +65,6 @@ class Replay:
             ",".join(map(str, self._prices)).encode()
         ).hexdigest()[:16]
         self._idx = 0
-
-    @staticmethod
-    def _read_rows(path):
-        with open(path, newline="", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            fields = reader.fieldnames or []
-            close = next((c for c in fields if c.strip().lower() == "close"), None)
-            date = next((c for c in fields if c.strip().lower() == "date"), None)
-            if close is None:
-                raise ValueError(f"{path}: no 'Close' column in header {fields}")
-            times, closes = [], []
-            for row in reader:
-                if not row.get(close):
-                    continue
-                times.append(parse_utc(row[date]) if date and row.get(date) else 0)
-                closes.append(float(row[close]))
-            return times, closes
 
     def step(self, rng):
         if self.exhausted():

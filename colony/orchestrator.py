@@ -43,9 +43,29 @@ def init_colony(con, cfg):
         ledger.create_account(con, TREASURY, "TREASURY")
         ledger.genesis(con, TREASURY, cfg["initial_treasury_u"])
         ledger.create_account(con, f"ARENA:{arena.name}", "ARENA")
+        if cfg.get("bank_path"):
+            # copy the certified set into bank_snapshot (spec v3 5.1): the
+            # run never reads the live bank file again — refreshing champions
+            # into a running colony means starting a new colony
+            from . import bank as bank_mod
+
+            for h, entry in sorted(bank_mod.fold(cfg["bank_path"]).items()):
+                if entry["status"] != "certified":
+                    continue
+                src = entry["admit"]["source"]
+                oos = entry["certify"]["audited"]["realized_bps_per_day"]
+                prov = (f"{src['arena']} {src['window'][0][:10]}..{src['window'][1][:10]}"
+                        f" seed {src['config_seed']} agent {src['agent_id']}"
+                        f" | oos {oos:+.2f} bps/day")
+                con.execute("INSERT INTO bank_snapshot VALUES (?, ?, ?)",
+                            (h, json.dumps(entry["genome"]), prov))
         debt = int(cfg["repay_multiple"] * cfg["gen0_seed_u"])
         for i in range(1, cfg["gen0_population"] + 1):
-            genome = evolution.random_genome(rng, evolution.ARCHETYPES[(i - 1) % 3])
+            # round-robin over all four archetypes (v3 section 6); the sitter
+            # control group stays in the rotation
+            genome = evolution.random_genome(
+                rng, evolution.ARCHETYPES[(i - 1) % len(evolution.ARCHETYPES)]
+            )
             agents.spawn(
                 con, 0, f"{i:06d}", genome, 0, (None, None),
                 [(TREASURY, cfg["gen0_seed_u"], "seed")], debt,
@@ -58,6 +78,8 @@ def init_colony(con, cfg):
             # the bucket starts FULL (one year's budget, spec v2 7.3): early
             # deaths can be replaced; only sustained churn exhausts it
             "immigration_tokens_u": immigration_capacity(cfg),
+            # v3 5.4: the compounding ratchet starts at initial capitalization
+            "treasury_high_water_u": cfg["initial_treasury_u"],
         }
         con.execute(
             "INSERT INTO runs (started_at, config_json, last_tick, state_json) VALUES (?, ?, 0, ?)",
@@ -91,10 +113,27 @@ class Orchestrator:
         self.imm_capacity = immigration_capacity(self.cfg)
         self.imm_accrual = immigration_accrual(self.cfg)
         self.imm_tokens = state.get("immigration_tokens_u", self.imm_capacity)
+        # v3 5.4: the one-way compounding ratchet, persisted in run state so a
+        # hard-kill resume is byte-identical (spec v3 10.4)
+        self.high_water = state.get("treasury_high_water_u",
+                                    self.cfg["initial_treasury_u"])
         self.arena = make_arena(self.cfg["arena"])
         self.arena.set_state(state["arena"])
         self.arena_account = f"ARENA:{self.arena.name}"
         self.venue = self.cfg["venue"]
+        # v3 additive schema: pre-v3 databases resume with no snapshot and
+        # gain the origin column in place (ledger bytes are untouched)
+        if not con.execute("SELECT COUNT(*) FROM sqlite_master"
+                           " WHERE name = 'bank_snapshot'").fetchone()[0]:
+            con.execute("CREATE TABLE bank_snapshot (genome_hash TEXT PRIMARY KEY,"
+                        " genome_json TEXT NOT NULL, provenance TEXT NOT NULL)")
+        if "origin" not in [r[1] for r in con.execute("PRAGMA table_info(agents)")]:
+            con.execute("ALTER TABLE agents ADD COLUMN origin TEXT")
+        self.bank_pool = [
+            (row[0], json.loads(row[1])) for row in con.execute(
+                "SELECT genome_hash, genome_json FROM bank_snapshot"
+                " ORDER BY genome_hash")
+        ]
         self.agents = agents.load_living(con)
         self.queue = sorted(
             (a.id for a in self.agents.values() if a.queue_since is not None),
@@ -169,11 +208,17 @@ class Orchestrator:
         """Advance one tick inside an already-open transaction."""
         cfg = self.cfg
         t = self.tick + 1
-        self.imm_tokens = min(self.imm_capacity, self.imm_tokens + self.imm_accrual)
+        # accrual fills only up to base capacity; tokens reinvested above it
+        # (v3 5.4) are spent down, never clamped away
+        if self.imm_tokens < self.imm_capacity:
+            self.imm_tokens = min(self.imm_capacity, self.imm_tokens + self.imm_accrual)
         self._quota_sweep(t)
+        prev_day = self.arena.utc() // 86_400
         self.arena.step(self.rng)
         price = self.arena.price()
         utc = self.arena.utc()
+        if utc // 86_400 > prev_day:
+            self._reinvest()
         self._live_phase(t, utc, price)
         self._death_phase(t, utc, price)
         self._breeding_phase(t, price)
@@ -197,8 +242,31 @@ class Orchestrator:
                 self._die(self.tick, utc, self.agents[aid], cause, price)
             self._flush(self.tick)
         ledger.verify_invariants(self.con, self.cfg["initial_treasury_u"])
+        if self.cfg.get("bank_path"):
+            # bank admission is automatic at every terminal audit (spec v3
+            # 4.3) — in-sample by definition, candidate status only
+            from . import bank
+
+            bank.admit_from_db(self.con, self.cfg["bank_path"],
+                               records_root=self.cfg.get("records_root", "records"))
 
     # ---------------------------------------------------------------- phases
+
+    def _reinvest(self):
+        """The compounding ratchet (spec v3 5.4), at each UTC-day boundary:
+        redeploy reinvest_fraction of treasury headroom above the high-water
+        mark into the immigration token bucket (capped at 4x base capacity),
+        then ratchet the mark up. Tokens are budget, not money — no ledger
+        rows; the money moves only when an immigrant is seeded. Drawdowns
+        below high-water redeploy nothing: a losing colony cannot
+        chain-refill itself."""
+        treasury = ledger.balance(self.con, TREASURY)
+        if treasury <= self.high_water:
+            return
+        headroom = treasury - self.high_water
+        add = headroom * self.cfg.get("reinvest_fraction_bps", 5_000) // 10_000
+        self.imm_tokens = min(self.imm_tokens + add, 4 * self.imm_capacity)
+        self.high_water = treasury
 
     def _quota_sweep(self, t):
         """Spec 3.14: house-funded agents sweep min(debt, cash - baseline) to
@@ -371,6 +439,8 @@ class Orchestrator:
         while (len(self.agents) < cfg["population_floor"]
                and ledger.balance(self.con, TREASURY) >= cfg["gen0_seed_u"]
                and self.imm_tokens >= cfg["gen0_seed_u"]):
+            if self._bank_immigrant(t):
+                continue
             self.imm_tokens -= cfg["gen0_seed_u"]
             if self.hall and self.rng.random() < cfg["hall_immigrant_prob"]:
                 genome = evolution.mutate(
@@ -383,6 +453,29 @@ class Orchestrator:
                 [(TREASURY, cfg["gen0_seed_u"], "immigrant_seed")],
                 debt=int(cfg["repay_multiple"] * cfg["gen0_seed_u"]),
             )
+
+    def _bank_immigrant(self, t):
+        """Spec v3 5.2/5.3: with probability bank_immigrant_share, clone a
+        uniformly-drawn snapshot genome UNMUTATED (pure reuse; diversity is
+        the other half's job), funded at gen0_seed x champion_seed_multiple
+        from the same token bucket. Empty snapshot -> always random (and no
+        RNG is consumed, so pre-v3 streams replay identically)."""
+        cfg = self.cfg
+        if not self.bank_pool:
+            return False
+        if self.rng.random() >= cfg.get("bank_immigrant_share_bps", 5_000) / 10_000:
+            return False
+        seed = cfg["gen0_seed_u"] * cfg.get("champion_seed_multiple", 2)
+        if self.imm_tokens < seed or ledger.balance(self.con, TREASURY) < seed:
+            return False  # champion unaffordable right now: random gen-0 instead
+        h, genome = self.bank_pool[self.rng.randrange(len(self.bank_pool))]
+        self.imm_tokens -= seed
+        self._birth(
+            t, json.loads(json.dumps(genome)), 0, (None, None),
+            [(TREASURY, seed, "immigrant_seed")],
+            debt=int(cfg["repay_multiple"] * seed), origin=f"bank:{h[:12]}",
+        )
+        return True
 
     def _pop_cap(self, elite_involved):
         cfg = self.cfg
@@ -431,12 +524,14 @@ class Orchestrator:
         )
         self.queue.remove(aid)
 
-    def _birth(self, t, genome, generation, parents, funders, debt, funder_agents=()):
+    def _birth(self, t, genome, generation, parents, funders, debt, funder_agents=(),
+               origin=None):
         """One atomic birth: seed transfers + baseline resets + agent rows.
         Either everything lands or nothing does (spec 3.4)."""
         aid = f"{self.next_id:06d}"
         with db.savepoint(self.con, "birth"):
-            child = agents.spawn(self.con, t, aid, genome, generation, parents, funders, debt)
+            child = agents.spawn(self.con, t, aid, genome, generation, parents, funders,
+                                 debt, origin)
             for funder in funder_agents:
                 funder.baseline = agents.cash(self.con, funder)
                 funder.last_birth_tick = t
@@ -524,6 +619,7 @@ class Orchestrator:
             "max_gen_seen": self.max_gen_seen,
             "arena": self.arena.get_state(),
             "immigration_tokens_u": self.imm_tokens,
+            "treasury_high_water_u": self.high_water,
         }
         self.con.execute(
             "UPDATE runs SET last_tick = ?, state_json = ? WHERE id = ?",

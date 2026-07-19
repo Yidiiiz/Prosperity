@@ -20,13 +20,16 @@ def death_causes(con):
 def test_sitters_die_of_stagnation_and_never_survive_past_grace(tmp_path):
     cfg = make_cfg()
     con, orch = make_colony(tmp_path, cfg)
-    orch.run(cfg["stagnation_ticks"] + 50)
+    end = cfg["stagnation_ticks"] + 50
+    orch.run(end)
     rows = con.execute(
         "SELECT genome_json, born_tick, died_tick, death_cause FROM agents"
     ).fetchall()
     sitters = [r for r in rows if json.loads(r["genome_json"])["archetype"] == "sitter"]
     assert sitters
     for row in sitters:
+        if row["born_tick"] + cfg["stagnation_ticks"] > end:
+            continue  # born too late (immigrant/child) to have exhausted grace
         assert row["died_tick"] is not None
         assert row["death_cause"] == "stagnation"
         assert row["died_tick"] - row["born_tick"] <= cfg["stagnation_ticks"] + 1

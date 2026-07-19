@@ -1,0 +1,22 @@
+record: experiments/profit_matrix_20260719T043357121Z_seed[42, 7, 2026, 11, 99]_p37716.txt
+utc: 2026-07-19T04:33:57+00:00
+git: 6049f65-dirty
+rng_seed: [42, 7, 2026, 11, 99]
+config: {"seeds": [42, 7, 2026, 11, 99], "ticks": 3000, "probes": {"momentum": {"archetype": "momentum", "params": {"lookback": 30, "entry_z": 1.5, "exit_z": -0.8, "risk_fraction": 0.6, "hold_max": 1500}, "econ": {"child_seed_fraction": 0.4}, "genes": []}, "mean_revert": {"archetype": "mean_revert", "params": {"lookback": 60, "entry_z": 1.5, "exit_z": 0.2, "risk_fraction": 0.6, "hold_max": 1500}, "econ": {"child_seed_fraction": 0.4}, "genes": []}, "breakout": {"archetype": "breakout", "params": {"lookback": 30, "confirm_bps": 5, "trail_bps": 400, "entry_z": 1.0, "exit_z": 0.0, "risk_fraction": 0.6, "hold_max": 1500}, "econ": {"child_seed_fraction": 0.4}, "genes": []}}, "regimes": {"trend_up": {"kind": "trend_up", "ticks": 3000, "drift_bps": 12, "vol_bps": 60}, "mean_revert": {"kind": "mean_revert", "ticks": 3000, "kappa": 0.15, "vol_bps": 200}}, "venue": {"taker_bps": 20, "maker_bps": 0, "spread_bps": 2, "min_fee_u": 0, "fill_delay_ticks": 0}}
+========================================================================
+
+--- matrix ------------------------------------------------------
+profitability matrix: 3000 ticks x seeds [42, 7, 2026, 11, 99]
+venue: taker 20 bps + spread 2 bps (v2 baseline, spread ON)
+
+regime        archetype       mean bps/t   per-seed
+trend_up      momentum             +4.15   +4.0 +4.5 +4.5 +3.9 +3.9   [PASS: want >= +3]
+trend_up      mean_revert          -1.76   -1.8 -1.7 -1.8 -1.7 -1.7   [PASS: want <= +0]
+trend_up      breakout             +5.30   +4.8 +5.1 +5.7 +5.8 +5.1   [PASS: want >= +2]
+mean_revert   momentum            -69.08   -69.1 -69.1 -69.1 -69.1 -69.1   [PASS: want <= -2]
+mean_revert   mean_revert          +5.77   +5.6 +5.3 +5.5 +6.8 +5.6   [PASS: want >= +2]
+mean_revert   breakout            -38.24   -19.2 -69.1 -19.8 -69.1 -14.1   [PASS: want <= +0]
+
+MATRIX PASS
+
+=== RESULT: PASS

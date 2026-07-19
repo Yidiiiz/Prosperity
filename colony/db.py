@@ -44,7 +44,17 @@ CREATE TABLE IF NOT EXISTS agents (
   born_tick    INTEGER NOT NULL,
   debt_u   INTEGER NOT NULL DEFAULT 0,
   died_tick    INTEGER,
-  death_cause  TEXT
+  death_cause  TEXT,
+  origin       TEXT  -- 'bank:<hash-prefix>' for bank-sourced immigrants (v3 5.2)
+);
+
+-- v3 (spec v3 5.1): the certified-champion set copied from the bank file at
+-- init. A run NEVER reads the live bank after init — immigration draws come
+-- from this table, so resume and replay-twin stay byte-identical.
+CREATE TABLE IF NOT EXISTS bank_snapshot (
+  genome_hash TEXT PRIMARY KEY,
+  genome_json TEXT NOT NULL,
+  provenance  TEXT NOT NULL
 );
 
 -- Runtime state per agent, persisted every tick so runs resume exactly.

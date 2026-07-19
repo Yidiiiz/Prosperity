@@ -1,0 +1,94 @@
+record: experiments/real_market_20260719T041137187Z_seed[42, 7, 2026]_p49748.txt
+utc: 2026-07-19T04:11:37+00:00
+git: 6049f65-dirty
+rng_seed: [42, 7, 2026]
+config: {"csv": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\spy_d.csv", "seeds": [42, 7, 2026], "rung": "all"}
+========================================================================
+
+--- results -----------------------------------------------------
+real market replay: SPY daily closes, capitalization ladder
+
+== rung 1: full stakes ($200,000, lot = 1/100 share) ==
+
+seed 42  [CASH]  (meets the v2 bar)
+  8422 ticks (trading days) | pop 40 | births 229 deaths 289 | survived: ok
+  at data end: colony wealth $32,703.76 | lot price $7.43 | mom 48% mr 45% sit 8%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $207,268.36 cash vs $200,000.00 initial  (+3.6%) | buy-and-hold same tape $3,375,955.44
+
+seed 7  [CASH]  (meets the v2 bar)
+  8422 ticks (trading days) | pop 40 | births 223 deaths 283 | survived: ok
+  at data end: colony wealth $33,419.18 | lot price $7.43 | mom 50% mr 38% sit 12%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $207,937.33 cash vs $200,000.00 initial  (+4.0%) | buy-and-hold same tape $3,375,955.44
+
+seed 2026  [CASH]  (meets the v2 bar)
+  8422 ticks (trading days) | pop 40 | births 224 deaths 284 | survived: ok
+  at data end: colony wealth $34,127.25 | lot price $7.43 | mom 40% mr 52% sit 8%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $208,945.75 cash vs $200,000.00 initial  (+4.5%) | buy-and-hold same tape $3,375,955.44
+
+== rung 2: micro stakes ($100.00 TOTAL, lot = 1/1000 share) ==
+
+seed 42  [CASH]  (meets the v2 bar)
+  8422 ticks (trading days) | pop 5 | births 40 deaths 45 | survived: ok
+  at data end: colony wealth $43.80 | lot price $0.74 | mom 20% mr 80% sit 0%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $110.80 cash vs $100.00 initial  (+10.8%) | buy-and-hold same tape $1,687.66
+
+seed 7  [CASH]  (meets the v2 bar)
+  8422 ticks (trading days) | pop 4 | births 45 deaths 51 | survived: ok
+  at data end: colony wealth $35.74 | lot price $0.74 | mom 25% mr 50% sit 25%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $111.22 cash vs $100.00 initial  (+11.2%) | buy-and-hold same tape $1,687.66
+
+seed 2026  [CASH]  (meets the v2 bar)
+  8422 ticks (trading days) | pop 8 | births 40 deaths 42 | survived: ok
+  at data end: colony wealth $69.21 | lot price $0.74 | mom 25% mr 50% sit 25%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $111.94 cash vs $100.00 initial  (+11.9%) | buy-and-hold same tape $1,687.66
+
+== rung 3: tiny stakes ($10.00 TOTAL, lot = 1/1000 share) ==
+
+seed 42  [FAIL]
+  8422 ticks (trading days) | pop 0 | births 0 deaths 4 | survived: FAIL
+  at data end: colony wealth $0.00 | lot price $0.74 | mom 0% mr 0% sit 0%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $11.09 cash vs $10.00 initial  (+10.9%) | buy-and-hold same tape $168.56
+
+seed 7  [FAIL]
+  8422 ticks (trading days) | pop 0 | births 0 deaths 4 | survived: FAIL
+  at data end: colony wealth $0.00 | lot price $0.74 | mom 0% mr 0% sit 0%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $10.07 cash vs $10.00 initial  (+0.7%) | buy-and-hold same tape $168.56
+
+seed 2026  [FAIL]
+  8422 ticks (trading days) | pop 0 | births 0 deaths 4 | survived: FAIL
+  at data end: colony wealth $0.00 | lot price $0.74 | mom 0% mr 0% sit 0%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $10.62 cash vs $10.00 initial  (+6.2%) | buy-and-hold same tape $168.56
+
+REAL MARKET BELOW v2 BAR  (full stakes: CASH, micro stakes: CASH, tiny stakes: FAIL)
+
+span: 1993-01-29T00:00:00+00:00 -> 2026-07-17T00:00:00+00:00 (33.46 years)
+wall: 111.0 s
+annualized: full seed 42 audited $207,268.36 vs initial $200,000.00 -> +0.11%/yr
+benchmark: full seed 42 buy-and-hold $3,375,955.44 (+8.81%/yr) | delta -8.71 pp/yr
+annualized: full seed 7 audited $207,937.33 vs initial $200,000.00 -> +0.12%/yr
+benchmark: full seed 7 buy-and-hold $3,375,955.44 (+8.81%/yr) | delta -8.70 pp/yr
+annualized: full seed 2026 audited $208,945.75 vs initial $200,000.00 -> +0.13%/yr
+benchmark: full seed 2026 buy-and-hold $3,375,955.44 (+8.81%/yr) | delta -8.68 pp/yr
+annualized: micro seed 42 audited $110.80 vs initial $100.00 -> +0.31%/yr
+benchmark: micro seed 42 buy-and-hold $1,687.66 (+8.81%/yr) | delta -8.51 pp/yr
+annualized: micro seed 7 audited $111.22 vs initial $100.00 -> +0.32%/yr
+benchmark: micro seed 7 buy-and-hold $1,687.66 (+8.81%/yr) | delta -8.49 pp/yr
+annualized: micro seed 2026 audited $111.94 vs initial $100.00 -> +0.34%/yr
+benchmark: micro seed 2026 buy-and-hold $1,687.66 (+8.81%/yr) | delta -8.47 pp/yr
+annualized: tiny seed 42 audited $11.09 vs initial $10.00 -> +0.31%/yr
+benchmark: tiny seed 42 buy-and-hold $168.56 (+8.81%/yr) | delta -8.50 pp/yr
+annualized: tiny seed 7 audited $10.07 vs initial $10.00 -> +0.02%/yr
+benchmark: tiny seed 7 buy-and-hold $168.56 (+8.81%/yr) | delta -8.79 pp/yr
+annualized: tiny seed 2026 audited $10.62 vs initial $10.00 -> +0.18%/yr
+benchmark: tiny seed 2026 buy-and-hold $168.56 (+8.81%/yr) | delta -8.63 pp/yr
+
+=== RESULT: BELOW v2 BAR — full stakes: CASH, micro stakes: CASH, tiny stakes: FAIL

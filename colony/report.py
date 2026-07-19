@@ -37,6 +37,63 @@ def treasury_flows(con):
     return inflows, outflows
 
 
+def agent_realized(con, agent_id):
+    """Realized per-agent stats, computed from the ledger and trades — never
+    stored (spec v3 3.1). realized_pnl_u is the agent's net ledger flow
+    against the ARENA (sells − buys − fees, spread inside the fill prices),
+    which equals everything it delivered to the system plus its holdings
+    minus everything it was funded with — fees, spread, and rent are already
+    inside it. Realized P&L, not fitness, decides banking (spec v3 3.1)."""
+    account = f"AGENT:{agent_id}"
+    pnl = con.execute(
+        "SELECT COALESCE(SUM(CASE WHEN l.credit_account = ? THEN l.amount_u"
+        " ELSE -l.amount_u END), 0) FROM ledger l"
+        " JOIN accounts a ON a.id = CASE WHEN l.credit_account = ?"
+        " THEN l.debit_account ELSE l.credit_account END"
+        " WHERE a.kind = 'ARENA' AND ? IN (l.credit_account, l.debit_account)",
+        (account, account, account),
+    ).fetchone()[0]
+    fees, fills, first, last = con.execute(
+        "SELECT COALESCE(SUM(fee_u), 0), COUNT(*), MIN(utc), MAX(utc)"
+        " FROM trades WHERE agent_id = ?",
+        (agent_id,),
+    ).fetchone()
+    seed = con.execute(
+        "SELECT birth_seed_u FROM agent_state WHERE agent_id = ?", (agent_id,)
+    ).fetchone()[0]
+    # active span floors at one day so single-bar lives don't divide by zero
+    active_days = max(last - first, 86_400) / 86_400 if fills else 0.0
+    bps_day = 10_000 * pnl / max(seed, 1) / active_days if fills else 0.0
+    return {"realized_pnl_u": pnl, "fees_u": fees, "fills": fills,
+            "active_days": active_days, "realized_bps_per_day": bps_day,
+            "birth_seed_u": seed}
+
+
+def realized_leaders(con, min_fills=1, top_k=None):
+    """(agent_id, stats) for agents with realized_pnl_u > 0 and >= min_fills
+    fills, ranked by realized_bps_per_day — the banking order (spec v3 4.3)."""
+    ids = [r[0] for r in con.execute("SELECT id FROM agents ORDER BY id")]
+    rows = [(aid, agent_realized(con, aid)) for aid in ids]
+    rows = [(aid, s) for aid, s in rows
+            if s["realized_pnl_u"] > 0 and s["fills"] >= min_fills]
+    rows.sort(key=lambda pair: (-pair[1]["realized_bps_per_day"], pair[0]))
+    return rows[:top_k] if top_k else rows
+
+
+def profitmakers_text(con, min_fills=1, top_k=10):
+    lines = [f"PROFITMAKERS (realized P&L from the ledger, top {top_k})"]
+    leaders = realized_leaders(con, min_fills, top_k)
+    if not leaders:
+        lines.append("  none: no agent has positive realized P&L"
+                     f" with >= {min_fills} fills")
+    for aid, s in leaders:
+        lines.append(f"  {aid}  {s['realized_bps_per_day']:+8.2f} bps/day"
+                     f" | pnl {money(s['realized_pnl_u'])}"
+                     f" | fees {money(s['fees_u'])} | {s['fills']} fills"
+                     f" over {s['active_days']:.1f} days")
+    return "\n".join(lines)
+
+
 def living_genomes(con):
     return [
         json.loads(row[0])
@@ -215,6 +272,11 @@ def inspect_text(con, agent_id):
         pnl = holding + given - state["birth_seed_u"]
         lines.append(f"lifetime P&L {money(pnl)} (equity {money(holding)}"
                      f" + paid out {money(given)} - seed {money(state['birth_seed_u'])})")
+        r = agent_realized(con, agent_id)
+        lines.append(f"realized (ledger, spec v3 3.1): {money(r['realized_pnl_u'])}"
+                     f" | {r['realized_bps_per_day']:+.2f} bps/day"
+                     f" | fees {money(r['fees_u'])} | {r['fills']} fills"
+                     f" over {r['active_days']:.1f} active days")
     lines.append(f"lineage: {' <- '.join(lineage(con, agent_id))}")
     trades = con.execute(
         "SELECT tick, side, lots, price_u, fee_u FROM trades WHERE agent_id = ?"

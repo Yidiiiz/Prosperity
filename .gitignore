@@ -13,3 +13,6 @@ venv/
 *.db-shm
 
 tree.dot
+
+# experiment workdirs (windows, banks-in-progress; the evidence lives in records/)
+work_*/

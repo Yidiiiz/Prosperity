@@ -25,9 +25,54 @@ SITTER = {
     "genes": [],
 }
 
+BREAKOUT = {
+    "archetype": "breakout",
+    "params": {"lookback": 10, "confirm_bps": 100, "trail_bps": 500,
+               "entry_z": 1.5, "exit_z": 0.0, "risk_fraction": 0.40,
+               "hold_max": 600},
+    "econ": {"child_seed_fraction": 0.40},
+    "genes": [],
+}
+
 FLAT = [200] * 11
 SPIKE_UP = [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 230]
 SPIKE_DOWN = [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 170]
+
+
+def test_breakout_buys_confirmed_new_high_only():
+    # 230 is a new 10-bar high by 1500 bps >= confirm 100: enter
+    d = decide(BREAKOUT, SPIKE_UP, 0, 0, 100_000, 0)
+    assert d == Decision("BUY", int(0.40 * 100_000) // 230)
+    # a marginal new high below the confirm margin does not enter
+    marginal = FLAT[:-1] + [201]  # +50 bps < 100 bps confirm
+    assert decide(BREAKOUT, marginal, 0, 0, 100_000, 0) is None
+    assert decide(BREAKOUT, FLAT, 0, 0, 100_000, 0) is None
+    assert decide(BREAKOUT, SPIKE_DOWN, 0, 0, 100_000, 0) is None
+
+
+def test_breakout_trails_from_post_entry_high():
+    # entered at 230 (hold 2 since): post-entry high 240; 5% trail => 228
+    held = SPIKE_UP + [240, 227]
+    assert decide(BREAKOUT, held, 3, 2, 100_000, 0) == Decision("SELL", 3)
+    # above the trail: keep holding
+    held_ok = SPIKE_UP + [240, 235]
+    assert decide(BREAKOUT, held_ok, 3, 2, 100_000, 0) is None
+
+
+def test_breakout_exits_on_hold_max():
+    held = SPIKE_UP + [240, 239]
+    genome = {**BREAKOUT, "params": {**BREAKOUT["params"], "hold_max": 2}}
+    assert decide(genome, held, 3, 2, 100_000, 0) == Decision("SELL", 3)
+
+
+def test_breakout_respects_the_gates():
+    gated = {**BREAKOUT, "params": {**BREAKOUT["params"], "max_trades_per_day": 1}}
+    assert decide(gated, SPIKE_UP, 0, 0, 100_000, 0, trades_24h=1) is None
+    masked = {**BREAKOUT, "params": {**BREAKOUT["params"], "active_hours_mask": 1}}
+    assert decide(masked, SPIKE_UP, 0, 0, 100_000, 0, utc_hour=12) is None
+    # gates block OPENS only: a held position can always exit
+    assert decide(masked, SPIKE_UP + [240, 100], 3, 2, 100_000, 0,
+                  utc_hour=12) == Decision("SELL", 3)
 
 
 def test_zstats_needs_lookback_plus_one():

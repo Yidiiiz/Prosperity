@@ -49,18 +49,21 @@ def equity(con, agent, price):
     return cash(con, agent) + agent.lots * price
 
 
-def spawn(con, tick, agent_id_str, genome, generation, parents, funders, debt):
+def spawn(con, tick, agent_id_str, genome, generation, parents, funders, debt,
+          origin=None):
     """Create an agent: account, seed transfer(s), rows. Caller wraps in a
-    transaction (or savepoint — births must be atomic, spec 3.4)."""
+    transaction (or savepoint — births must be atomic, spec 3.4). origin
+    marks bank-sourced immigrants ('bank:<hash-prefix>', spec v3 5.2)."""
     ledger.create_account(con, account_id(agent_id_str), "AGENT")
     seed = 0
     for funder_account, amount, memo in funders:
         ledger.transfer(con, tick, funder_account, account_id(agent_id_str), amount, memo)
         seed += amount
     con.execute(
-        "INSERT INTO agents (id, genome_json, generation, parent_a, parent_b, born_tick, debt_u)"
-        " VALUES (?, ?, ?, ?, ?, ?, ?)",
-        (agent_id_str, json.dumps(genome), generation, parents[0], parents[1], tick, debt),
+        "INSERT INTO agents (id, genome_json, generation, parent_a, parent_b, born_tick,"
+        " debt_u, origin) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        (agent_id_str, json.dumps(genome), generation, parents[0], parents[1], tick,
+         debt, origin),
     )
     con.execute(
         "INSERT INTO positions (agent_id, asset, lots) VALUES (?, ?, 0)", (agent_id_str, ASSET)

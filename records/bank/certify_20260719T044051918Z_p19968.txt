@@ -1,0 +1,18 @@
+record: bank/certify_20260719T044051918Z_p19968.txt
+utc: 2026-07-19T04:40:51+00:00
+git: 6049f65-dirty
+rng_seed: n/a
+config: n/a
+========================================================================
+
+--- events ------------------------------------------------------
+lapse 375cc27cac29 pnl -124682637 u
+lapse 4ed10766e1d7 pnl -274331585 u
+certify 6146996a15f8 pnl 173039080 u
+lapse bc3b69c1f3b4 pnl -151074990 u
+lapse e4698f8537d5 pnl -156042046 u
+lapse fb13f5337ba4 pnl -93179541 u
+certify fe34693616b0 pnl 123387586 u
+lapse ffb9fe5de896 pnl -110311684 u
+
+=== RESULT: 2/8 probe(s) certified on window_2.csv

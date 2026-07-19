@@ -1,4 +1,4 @@
-"""The three archetypes as pure functions: (genome, history, state) -> Decision.
+"""The trading archetypes as pure functions: (genome, history, state) -> Decision.
 
 TODO(v2): cognition layer — a v2 archetype whose decide() calls an external
 LLM provider (configured by environment variable). Same inputs, same Decision
@@ -91,4 +91,20 @@ def decide(genome, history, lots, hold, equity, fee_bps, utc_hour=0, trades_24h=
             return Decision("BUY", int(params["risk_fraction"] * equity) // price)
         if lots > 0 and (z >= params["exit_z"] or hold >= params["hold_max"]):
             return Decision("SELL", lots)
+    elif archetype == "breakout":  # v3 section 6
+        lookback = params["lookback"]
+        if lots == 0 and len(history) >= lookback + 1:
+            prior_high = max(history[-lookback - 1:-1])
+            if price * 10_000 >= prior_high * (10_000 + params["confirm_bps"]):
+                if (_gate_blocked(params, mean, stdev, utc_hour, trades_24h)
+                        or _fee_blocked(genome, z, mean, stdev, fee_bps)):
+                    return None
+                return Decision("BUY", int(params["risk_fraction"] * equity) // price)
+        if lots > 0:
+            # post-entry high approximated over visible history (hold bars
+            # since entry, capped by the 101-bar window the engine passes)
+            post_high = max(history[-(hold + 1):])
+            if (price * 10_000 <= post_high * (10_000 - params["trail_bps"])
+                    or hold >= params["hold_max"]):
+                return Decision("SELL", lots)
     return None

@@ -10,6 +10,7 @@
   :root {
     --bg: #0B0E14; --panel: #11151F; --border: #1D2433;
     --momentum: #E8A33D; --mean-revert: #3DBFB0; --sitter: #6B7280;
+    --breakout: #A78BFA;
     --bone: #EFE7D3; --alert: #E5484D; --text: #B8C0CF; --dim: #6B7280;
     --amber: #E8A33D; --green: #3DBFB0;
     --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
@@ -96,6 +97,8 @@
   tbody tr:hover { background: #171c29; }
   tbody tr:focus-visible { outline: 1px solid var(--bone); outline-offset: -1px; }
   .dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; }
+  .bank-badge { font-size: 9px; letter-spacing: 0.08em; padding: 1px 5px; margin-left: 6px;
+                border: 1px solid var(--breakout); color: var(--breakout); }
 
   /* agent drawer + inline lineage (spec v2 8.7) */
   #drawer {
@@ -174,6 +177,15 @@
           <div class="sub" id="m-utc">—</div></div>
       </div>
     </div>
+    <div class="group">
+      <h2>vs B&amp;H — system minus buy-and-hold, same tape, same costs</h2>
+      <div class="figures">
+        <div class="fig"><div class="cap">delta</div><div class="val num" id="b-delta">—</div>
+          <div class="sub" id="b-detail">a red delta on a green treasury is the honest picture</div></div>
+        <div class="fig"><div class="cap">annualized</div><div class="val num" style="font-size:14px" id="b-cagr">—</div>
+          <div class="sub" id="b-span">—</div></div>
+      </div>
+    </div>
   </section>
 
   <section id="hero" class="panel">
@@ -182,6 +194,7 @@
       <span style="color:var(--momentum)">■ momentum</span>
       <span style="color:var(--mean-revert)">■ mean_revert</span>
       <span style="color:var(--sitter)">■ sitter</span>
+      <span style="color:var(--breakout)">■ breakout</span>
       <span>▨ regime bands</span>
       <span>│ UTC day rules</span>
     </div>
@@ -235,6 +248,19 @@
       <tbody id="leader-rows"></tbody>
     </table>
   </section>
+
+  <section class="panel" id="champions">
+    <h2>Champions — the bank snapshot this colony was initialized with</h2>
+    <table>
+      <thead><tr>
+        <th class="left">genome</th><th class="left">archetype</th>
+        <th class="left">provenance</th><th>living descendants</th>
+      </tr></thead>
+      <tbody id="champ-rows"></tbody>
+    </table>
+    <div class="nochart" id="champ-empty" hidden>
+      snapshot empty — every immigrant is random gen-0</div>
+  </section>
 </div>
 
 <aside id="drawer" aria-label="agent inspector">
@@ -247,6 +273,7 @@
 "use strict";
 const COLORS = {
   momentum: "#E8A33D", mean_revert: "#3DBFB0", sitter: "#6B7280",
+  breakout: "#A78BFA",
   bone: "#EFE7D3", alert: "#E5484D", dim: "#6B7280", border: "#1D2433",
 };
 const REGIME_TINT = {
@@ -259,7 +286,7 @@ const THIN = " ";
 
 const S = {  // accumulated timeseries (bucketed initial load + incremental tail)
   tick: [], utc: [], treasury: [], colony: [], population: [], price: [], regime: [],
-  mom: [], mr: [], sit: [], div: [], births: [], deaths: [],
+  mom: [], mr: [], sit: [], brk: [], div: [], births: [], deaths: [],
   system: [], lastTick: 0, initialTreasury: null, charts: {}, timer: null,
   tape: [], sseErrors: 0, sse: null, polling: false,
 };
@@ -368,6 +395,8 @@ function makeCharts() {
         borderColor: COLORS.mean_revert, fill: true, stack: "s" },
       { label: "sitter", data: [], backgroundColor: COLORS.sitter + "CC",
         borderColor: COLORS.sitter, fill: true, stack: "s" },
+      { label: "breakout", data: [], backgroundColor: COLORS.breakout + "CC",
+        borderColor: COLORS.breakout, fill: true, stack: "s" },
     ]},
     options: {
       maintainAspectRatio: false, animation: false,
@@ -416,7 +445,7 @@ function refreshCharts() {
   for (const chart of Object.values(S.charts)) chart.data.labels = lab;
   if (S.charts.strata) {
     const ds = S.charts.strata.data.datasets;
-    ds[0].data = S.mom; ds[1].data = S.mr; ds[2].data = S.sit;
+    ds[0].data = S.mom; ds[1].data = S.mr; ds[2].data = S.sit; ds[3].data = S.brk;
     S.charts.strata.update("none");
   }
   if (S.charts.wealth) {
@@ -465,9 +494,18 @@ function renderLeaderboard(rows) {
   body.innerHTML = rows.map(r =>
     `<tr tabindex="0" data-id="${r.id}">` +
     `<td class="left">${r.id}</td><td>${r.generation}</td>` +
-    `<td class="left"><span class="dot" style="background:${COLORS[r.archetype]}"></span>${r.archetype}</td>` +
+    `<td class="left"><span class="dot" style="background:${COLORS[r.archetype]}"></span>${r.archetype}` +
+    `${r.origin && r.origin.startsWith("bank:") ? '<span class="bank-badge">BANK</span>' : ""}</td>` +
     `<td>${money(r.equity_u)}</td><td>${r.fitness.toExponential(2)}</td>` +
     `<td>${r.age}</td><td>${r.lineage_depth}</td></tr>`).join("");
+}
+
+function renderChampions(rows) {
+  document.getElementById("champ-empty").hidden = rows.length > 0;
+  document.getElementById("champ-rows").innerHTML = rows.map(c =>
+    `<tr><td class="left">${c.hash_prefix}</td>` +
+    `<td class="left"><span class="dot" style="background:${COLORS[c.archetype]}"></span>${c.archetype}</td>` +
+    `<td class="left">${c.provenance}</td><td>${c.living_descendants}</td></tr>`).join("");
 }
 
 // ---- trade tape (spec v2 8.5) ----
@@ -531,6 +569,19 @@ function renderSummary(s) {
     `t=${s.tick} · ${s.regime_kind || "—"} · pop ${s.population}`;
   document.getElementById("m-utc").textContent =
     s.utc ? new Date(s.utc * 1000).toISOString().replace("T", " ").slice(0, 19) + " UTC" : "—";
+  if (s.vs_bh) {  // spec v3 8.1: signed, allowed to be red
+    const b = s.vs_bh;
+    signedMoney("b-delta", b.vs_bh_u);
+    document.getElementById("b-detail").textContent =
+      `system ${money(s.system_total_u)} vs B&H ${money(b.bh_u)}`;
+    document.getElementById("b-cagr").textContent =
+      `sys ${(b.system_cagr * 100).toFixed(2)}%/yr vs B&H ${(b.bh_cagr * 100).toFixed(2)}%/yr`;
+    document.getElementById("b-span").textContent =
+      b.span_years.toFixed(2) + " years" + (b.span_years < 1 ? " (projected)" : "");
+  } else {
+    document.getElementById("b-delta").textContent = "n/a";
+    document.getElementById("b-detail").textContent = "no tape to hold (petri arena)";
+  }
   const inv = document.getElementById("chip-invariant");
   inv.textContent = `INVARIANT ${s.invariant_ok ? "OK" : "HALT"} · t=${s.tick}`;
   inv.className = "chip " + (s.invariant_ok ? "live" : "bad");
@@ -573,6 +624,7 @@ async function openDrawer(id) {
     `<pre>born t=${a.born_tick}  parents ${a.parents.filter(Boolean).join(", ") || "house"}\n` +
     `seed ${money(a.birth_seed_u || 0)}  peak ${money(a.peak_equity_u || 0)}\n` +
     `debt ${money(a.debt_u)}` +
+    (a.origin ? `\norigin ${a.origin}` : "") +
     (a.last_snapshot ? `\nlast snapshot t=${a.last_snapshot.tick}: equity ${money(a.last_snapshot.equity_u)}` : "") +
     `</pre>` +
     `<h3>ancestry</h3>` + lineageHTML(a.lineage || []) +
@@ -599,7 +651,10 @@ function appendSeries(ts) {
     S.colony.push(ts.colony_wealth_u[i]); S.population.push(ts.population[i]);
     S.price.push(ts.price_u[i]); S.regime.push(ts.regime_kind[i]);
     S.mom.push(ts.share_momentum[i]); S.mr.push(ts.share_mean_revert[i]);
-    S.sit.push(ts.share_sitter[i]); S.div.push(ts.diversity[i]);
+    S.sit.push(ts.share_sitter[i]);
+    S.brk.push(ts.population[i] > 0 ? Math.max(0,  // share not stored pre-v3
+      1 - ts.share_momentum[i] - ts.share_mean_revert[i] - ts.share_sitter[i]) : 0);
+    S.div.push(ts.diversity[i]);
     S.births.push(ts.births_cum[i]); S.deaths.push(ts.deaths_cum[i]);
   }
   if (S.tick.length) S.lastTick = S.tick[S.tick.length - 1];
@@ -612,10 +667,12 @@ async function pollSeries() {
       getJSON("/api/timeseries?max_points=2000&after_tick=" + S.lastTick),
       getJSON("/api/deaths"),
       getJSON("/api/leaderboard?limit=20"),
+      getJSON("/api/bank"),
     ]);
     appendSeries(results[0]);
     renderDeaths(results[1]);
     renderLeaderboard(results[2]);
+    renderChampions(results[3]);
     refreshCharts();
     drawSpark();
     document.getElementById("v-diversity").textContent =

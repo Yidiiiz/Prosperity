@@ -1,0 +1,21 @@
+record: experiments/real_market_tiny_42_20260719T041502367Z_seed[42]_p49208.txt
+utc: 2026-07-19T04:15:02+00:00
+git: 6049f65
+rng_seed: [42]
+config: {"csv": "C:\\Users\\yzhao\\Documents\\GitHub\\Prosperity\\data\\spy_d.csv", "seeds": [42], "rung": "tiny"}
+========================================================================
+
+--- results -----------------------------------------------------
+real market replay: SPY daily closes, capitalization ladder
+
+== rung 3: tiny stakes ($10.00 TOTAL, lot = 1/1000 share) ==
+
+seed 42  [FAIL]
+  8422 ticks (trading days) | pop 0 | births 0 deaths 4 | survived: FAIL
+  at data end: colony wealth $0.00 | lot price $0.74 | mom 0% mr 0% sit 0%
+  terminal audit: all estates liquidated at the last real price ->
+    treasury $11.09 cash vs $10.00 initial  (+10.9%: ok)
+
+REAL MARKET FAIL  (tiny stakes: FAIL)
+
+=== RESULT: FAIL

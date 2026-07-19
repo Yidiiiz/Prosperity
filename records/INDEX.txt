@@ -21,3 +21,50 @@
 20260719T025359827Z | experiments | experiments/real_market_micro_42_20260719T025356422Z_seed[42]_p49096.txt | PASS
 20260719T025519612Z | experiments | experiments/regime_flip_20260719T025409901Z_seed[42, 7, 2026]_p52444.txt | PASS
 20260719T025953607Z | runs | runs/run_1_20260719T025952083Z_seed42_p5312.txt | completed @ tick 500 | population 40 | treasury $163,230.13 | invariants OK
+20260719T041122365Z | experiments | experiments/minute_ladder_20260719T040950114Z_seed[42, 7, 2026]_p52860.txt | LADDER MACHINERY OK — v3 tiers recorded per seed (v2 7.4, v3 2.4)
+20260719T041328206Z | experiments | experiments/real_market_20260719T041137187Z_seed[42, 7, 2026]_p49748.txt | BELOW v2 BAR — full stakes: CASH, micro stakes: CASH, tiny stakes: FAIL
+20260719T041503938Z | experiments | experiments/real_market_tiny_42_20260719T041502367Z_seed[42]_p49208.txt | FAIL
+20260719T042056449Z | experiments | experiments/real_market_20260719T041757643Z_seed[42, 7, 2026]_p46144.txt | full stakes: CASH, micro stakes: CASH, tiny stakes: CASH
+20260719T043357569Z | experiments | experiments/profit_matrix_20260719T043357121Z_seed[42, 7, 2026, 11, 99]_p37716.txt | PASS
+20260719T043627973Z | experiments | experiments/regime_flip_20260719T043406529Z_seed[42, 7, 2026]_p33968.txt | PASS
+20260719T043845848Z | experiments | experiments/walk_forward_42_20260719T043814241Z_seed[42]_p36884.txt | WALK-FORWARD seed 42: NO-EDGE
+20260719T043930219Z | bank | bank/admit_20260719T043930184Z_p19968.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_wf\wf_42_w1.db
+20260719T043931032Z | bank | bank/certify_20260719T043931003Z_p19968.txt | 3/8 probe(s) certified on window_2.csv
+20260719T043943008Z | bank | bank/admit_20260719T043942979Z_p19968.txt | 5 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_wf\wf_42_w2.db
+20260719T043943179Z | bank | bank/certify_20260719T043943149Z_p19968.txt | 5/5 probe(s) certified on window_3.csv
+20260719T043956056Z | bank | bank/admit_20260719T043956023Z_p19968.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_wf\wf_42_w3.db
+20260719T043956301Z | bank | bank/certify_20260719T043956271Z_p19968.txt | 8/8 probe(s) certified on window_4.csv
+20260719T044010158Z | bank | bank/admit_20260719T044010126Z_p19968.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_wf\wf_7_w1.db
+20260719T044010392Z | bank | bank/certify_20260719T044010363Z_p19968.txt | 2/8 probe(s) certified on window_2.csv
+20260719T044021960Z | bank | bank/admit_20260719T044021871Z_p19968.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_wf\wf_7_w2.db
+20260719T044022221Z | bank | bank/certify_20260719T044022184Z_p19968.txt | 8/8 probe(s) certified on window_3.csv
+20260719T044036320Z | bank | bank/admit_20260719T044036289Z_p19968.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_wf\wf_7_w3.db
+20260719T044036492Z | bank | bank/certify_20260719T044036466Z_p19968.txt | 7/8 probe(s) certified on window_4.csv
+20260719T044045634Z | experiments | experiments/bank_reuse_42_20260719T044043776Z_seed[42]_p19660.txt | REUSE A/B measured — direction reported, not demanded
+20260719T044051702Z | bank | bank/admit_20260719T044051671Z_p19968.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_wf\wf_2026_w1.db
+20260719T044051952Z | bank | bank/certify_20260719T044051918Z_p19968.txt | 2/8 probe(s) certified on window_2.csv
+20260719T044105247Z | bank | bank/admit_20260719T044105208Z_p19968.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_wf\wf_2026_w2.db
+20260719T044105515Z | bank | bank/certify_20260719T044105482Z_p19968.txt | 8/8 probe(s) certified on window_3.csv
+20260719T044118585Z | bank | bank/admit_20260719T044118552Z_p19968.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_wf\wf_2026_w3.db
+20260719T044118842Z | bank | bank/certify_20260719T044118806Z_p19968.txt | 7/8 probe(s) certified on window_4.csv
+20260719T044118847Z | experiments | experiments/walk_forward_20260719T043920398Z_seed[42, 7, 2026]_p19968.txt | WALK-FORWARD seed 42: NO-EDGE, seed 7: NO-EDGE, seed 2026: NO-EDGE
+20260719T044255322Z | bank | bank/admit_20260719T044255293Z_p33380.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_ab\wf_42_w1.db
+20260719T044255634Z | bank | bank/certify_20260719T044255596Z_p33380.txt | 4/8 probe(s) certified on window_2.csv
+20260719T044305372Z | bank | bank/admit_20260719T044305339Z_p33380.txt | 7 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_ab\wf_42_w2.db
+20260719T044305535Z | bank | bank/certify_20260719T044305508Z_p33380.txt | 1/7 probe(s) certified on window_3.csv
+20260719T044317102Z | bank | bank/admit_20260719T044317067Z_p33380.txt | 3 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_ab\wf_42_w3.db
+20260719T044317231Z | bank | bank/certify_20260719T044317200Z_p33380.txt | 3/3 probe(s) certified on window_4.csv
+20260719T044327831Z | bank | bank/admit_20260719T044327793Z_p33380.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_ab\wf_7_w1.db
+20260719T044328060Z | bank | bank/certify_20260719T044328025Z_p33380.txt | 3/8 probe(s) certified on window_2.csv
+20260719T044338162Z | bank | bank/admit_20260719T044338130Z_p33380.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_ab\wf_7_w2.db
+20260719T044338357Z | bank | bank/certify_20260719T044338328Z_p33380.txt | 1/8 probe(s) certified on window_3.csv
+20260719T044348234Z | bank | bank/admit_20260719T044348203Z_p33380.txt | 4 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_ab\wf_7_w3.db
+20260719T044348352Z | bank | bank/certify_20260719T044348321Z_p33380.txt | 4/4 probe(s) certified on window_4.csv
+20260719T044359898Z | bank | bank/admit_20260719T044359865Z_p33380.txt | 8 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_ab\wf_2026_w1.db
+20260719T044400098Z | bank | bank/certify_20260719T044400066Z_p33380.txt | 1/8 probe(s) certified on window_2.csv
+20260719T044409982Z | bank | bank/admit_20260719T044409953Z_p33380.txt | 7 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_ab\wf_2026_w2.db
+20260719T044410167Z | bank | bank/certify_20260719T044410138Z_p33380.txt | 1/7 probe(s) certified on window_3.csv
+20260719T044420232Z | bank | bank/admit_20260719T044420201Z_p33380.txt | 5 candidate(s) admitted from C:\Users\yzhao\Documents\GitHub\Prosperity\work_ab\wf_2026_w3.db
+20260719T044420396Z | bank | bank/certify_20260719T044420364Z_p33380.txt | 5/5 probe(s) certified on window_4.csv
+20260719T044420399Z | experiments | experiments/walk_forward_20260719T044248428Z_seed[42, 7, 2026]_p33380.txt | WALK-FORWARD seed 42: NO-EDGE, seed 7: NO-EDGE, seed 2026: NO-EDGE
+20260719T044521592Z | experiments | experiments/bank_reuse_20260719T044420580Z_seed[42, 7, 2026]_p40024.txt | REUSE A/B measured — direction reported, not demanded

@@ -15,6 +15,16 @@ micro-dollars (1 $ = 1,000,000 u) so second-scale economics don't round to
 zero; config speaks wall time (`_seconds`/`_hours`/`_days`, annualized rent)
 so the same colony definition runs at day, minute, or second bars.
 
+v3.0 is the **profitmaker economy**: every replay verdict is measured against
+buy-and-hold on the same tape at the same costs (tiers: **ALPHA** beats
+buy-and-hold, **CASH** beats initial, **EXPECTED-FAIL** made no money with
+sound machinery; **FAIL** means the machinery broke — the only failure);
+agents are ranked by **realized** P&L from the ledger, not marks; proven
+genomes are admitted to a **bank**, certified out-of-sample by a frozen solo
+probe on a postdating window, and reused as immigrants in later colonies;
+and treasury profit **compounds** — a one-way high-water ratchet redeploys
+half of each new high into the immigration budget.
+
 ## Quickstart (simulation)
 
 ```
@@ -67,8 +77,9 @@ counted and reported, never errors: the colony simply didn't tick.
 - **The venue is honest**: taker fees plus a bid/ask spread charged at the
   fill (rounded against the agent), and orders decided at bar N fill at bar
   N+1's price. Same-bar fills exist only in the scripted Petri arena.
-- **Three archetypes** (`momentum`, `mean_revert`, `sitter` — the deliberate
-  do-nothing control) share three universal **gate genes**: a volatility gate
+- **Four archetypes** (`momentum`, `mean_revert`, `breakout`, and `sitter` —
+  the deliberate do-nothing control) share three universal **gate genes**: a
+  volatility gate
   (don't play flat tapes), a trades-per-day throttle (rolling 24h fill
   window), and a 24-bit UTC active-hours mask. Gates block opens only;
   closing is always allowed. Evolution decides when *not* to trade.
@@ -78,6 +89,28 @@ counted and reported, never errors: the colony simply didn't tick.
   sits below the floor — visible on the dashboard — instead of the treasury
   churning itself into life support.
 
+## The bank — proven genomes, reused
+
+```
+python -m colony bank list                       # every genome ever admitted
+python -m colony bank show a1b2c3d4e5f6          # one genome, full history
+python -m colony bank certify --tape data/spy_d.csv --from 2019-01-01
+```
+
+When a replay colony winds down, the terminal audit admits the top realized
+profitmakers to an **append-only JSONL bank** as *candidates* — in-sample
+performance proves nothing. A candidate is **certified** by a frozen solo
+probe ($1,000, no rent, no evolution) on a window that must postdate its
+admission window; overlap is refused, not warned about. Lapsed genomes stay
+visible forever — the bank remembers its failures.
+
+A new colony configured with `bank_path` copies the certified set into an
+immutable `bank_snapshot` at init and draws half its immigrants from it
+(unmutated clones, seeded at `champion_seed_multiple ×` the gen-0 stake, paid
+from the same immigration budget — reputation buys size, not new money). A
+running colony **never** reads the live bank: to refresh champions, start a
+new colony. The bank stores parameter dictionaries, never code.
+
 ## The Observatory
 
 `python -m colony serve` (or the daemon's `--port`) serves a single-file,
@@ -86,14 +119,18 @@ read-only dashboard at `http://127.0.0.1:8477/`:
 - **The Money Strip**: EXTRACTED (audited cash pulled from the market —
   today, this hour, per second; the number is allowed to be red), CASH
   (treasury, colony cash), MARKED (position value, outlined, labeled
-  *unrealized* — never summed with cash).
+  *unrealized* — never summed with cash), and **vs B&H** (system total minus
+  buy-and-hold on the same tape at the same costs — a red delta on a green
+  treasury is the honest picture).
 - **Liveness chips**: feed LIVE/STALE/RECONNECTING, ticks-behind, invariant
   badge, last audit ✓/✗, immigration-budget gauge.
 - **Strata chart** — stacked archetype shares over wall-clock time with
   regime bands and UTC day rules; the colony's history reads like sediment.
 - **Trade tape** — the last 50 fills, streamed live.
-- Wealth/price charts, death causes, diversity, a leaderboard opening an
-  agent inspector with an inline collapsible ancestry chain.
+- Wealth/price charts, death causes, diversity, a leaderboard (bank-descended
+  agents wear a BANK badge) opening an agent inspector with origin and an
+  inline collapsible ancestry chain, and a **Champions** panel: the bank
+  snapshot this colony started from, with living descendants per champion.
 
 Data arrives by Server-Sent Events (`/api/events`: coalesced summaries ≤1/s,
 per-fill events, health changes) with automatic fallback to polling; series
@@ -125,6 +162,8 @@ python -m experiments.regime_flip       # the flagship adaptation experiment
 python -m experiments.real_market       # SPY dailies, $200k → $100 → $10
 python -m experiments.minute_ladder     # BTC 1m, $200k → $1k → $10 (--parallel)
 python -m experiments.live_soak --hours 24   # the acceptance soak (daemon + kill)
+python -m experiments.walk_forward      # evolve on window k, certify on k+1
+python -m experiments.bank_reuse --bank BANK.jsonl --csv TAPE --from DATE
 ```
 
 Every experiment is per-seed, incremental (results print the moment a seed
@@ -136,6 +175,15 @@ EXPECTED-FAIL (sound machinery, negative economics, numbers recorded) — only
 the machinery can truly fail. The soak starts the daemon, hard-kills it at a
 random moment, verifies exact resume, and hands the verdict to the
 replay-twin audit.
+
+The v3 evidence experiments *measure* rather than demand: `walk_forward`
+splits a tape into contiguous windows, evolves on each, certifies champions
+on the next, and reports EDGE/NO-EDGE per seed (SPY 1993–2026: NO-EDGE — the
+honest result); `bank_reuse` runs a with-bank vs without-bank A/B on a
+held-out window that must not overlap any banked genome's history, and
+reports the delta whichever way it points. Every replay record ends with the
+mandatory footer: span, wall, annualized return (marked "(projected)" under
+a year), and the buy-and-hold benchmark with delta.
 
 ## Money conservation, stated plainly
 
@@ -161,7 +209,8 @@ replay of its own journal.
   public market data.
 - **No self-modification.** Genomes change only between generations, via the
   orchestrator's genetic operators; agents cannot rewrite themselves or the
-  rules.
+  rules. The bank stores parameter dictionaries, never code, and a running
+  colony never reads it.
 - **Airtight accounting.** Double-entry ledger, integer micro-dollars,
   conservation checked continuously, crash-on-violation.
 - Remaining seams (an LLM cognition layer, treasury withdrawal, order

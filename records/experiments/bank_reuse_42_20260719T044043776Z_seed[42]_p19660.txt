@@ -1,0 +1,22 @@
+record: experiments/bank_reuse_42_20260719T044043776Z_seed[42]_p19660.txt
+utc: 2026-07-19T04:40:43+00:00
+git: 6049f65-dirty
+rng_seed: [42]
+config: {"csv": "C:\\Users\\yzhao\\AppData\\Local\\Temp\\claude\\c--Users-yzhao-Documents-GitHub-Prosperity\\2e8267b7-32e1-4750-88a2-6a29ba6dbc01\\scratchpad\\ab\\held.csv", "digest": "78fce14eed788131", "bank": "C:\\Users\\yzhao\\AppData\\Local\\Temp/claude/c--Users-yzhao-Documents-GitHub-Prosperity/2e8267b7-32e1-4750-88a2-6a29ba6dbc01/scratchpad/ab/bank.jsonl", "certified": 1, "from": null, "seeds": [42]}
+========================================================================
+
+--- results -----------------------------------------------------
+bank reuse A/B: held.csv, held-out 2030-03-01..2030-11-05, bank C:\Users\yzhao\AppData\Local\Temp/claude/c--Users-yzhao-Documents-GitHub-Prosperity/2e8267b7-32e1-4750-88a2-6a29ba6dbc01/scratchpad/ab/bank.jsonl (1 certified), seeds [42]
+
+seed 42: A 202149655116 u vs B 202149655116 u (B-A +0 u, B >= A) | bank agents in B: 0 | first surplus tick A None B None
+
+REUSE A/B measured — direction reported, not demanded
+
+span: 2030-03-01T00:00:00+00:00 -> 2030-11-05T00:00:00+00:00 (0.68 years)
+wall: 1.8 s
+annualized: seed 42 A random audited $202,149.66 vs initial $200,000.00 -> +1.58%/yr (projected)
+benchmark: seed 42 A random buy-and-hold $266,604.48 (+52.45%/yr (projected)) | delta -50.87 pp/yr
+annualized: seed 42 B bank audited $202,149.66 vs initial $200,000.00 -> +1.58%/yr (projected)
+benchmark: seed 42 B bank buy-and-hold $266,604.48 (+52.45%/yr (projected)) | delta -50.87 pp/yr
+
+=== RESULT: REUSE A/B measured — direction reported, not demanded
