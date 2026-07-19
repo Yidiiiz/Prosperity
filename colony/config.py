@@ -167,6 +167,14 @@ def validate(cfg):
     _derive_lifecycle(cfg)
     _warn_commensurate(cfg)
     _check_venue(cfg, kind)
+    feed = cfg.get("feed")
+    if feed is not None:
+        if not isinstance(feed, dict):
+            raise ConfigError("feed must be an object")
+        if not feed.get("cmd") and not feed.get("symbol"):
+            raise ConfigError("feed needs a 'symbol' (or a 'cmd' override)")
+        if feed.get("mode", "ws") not in ("ws", "poll"):
+            raise ConfigError("feed.mode must be 'ws' or 'poll'")
     flush_every = cfg.setdefault("flush_every", 1)
     if not isinstance(flush_every, int) or isinstance(flush_every, bool) or flush_every < 1:
         raise ConfigError("flush_every must be a positive integer")

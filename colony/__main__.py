@@ -115,6 +115,33 @@ def cmd_serve(args):
     return 0
 
 
+def cmd_daemon(args):
+    from . import audit as audit_mod
+    from . import daemon as daemon_mod
+
+    if args.action == "status":
+        return daemon_mod.status(args.port)
+    if args.action == "clear-audit":
+        audit_mod.clear_critical(RECORDS_ROOT)
+        print("audit CRITICAL flag cleared")
+        return 0
+    cfg = load_config(args.config)
+    d = daemon_mod.Daemon(args.db, cfg, records_root=RECORDS_ROOT, port=args.port)
+    print(f"colony daemon starting (db {args.db}, journal"
+          f" {cfg['arena']['journal']}); Ctrl-C or SIGTERM to stop")
+    ticks = d.run(max_ticks=args.max_ticks)
+    print(f"daemon stopped cleanly after {ticks} ticks")
+    return 0
+
+
+def cmd_audit(args):
+    from . import audit as audit_mod
+
+    ok, detail = audit_mod.audit(args.db, records_root=args.records)
+    print(detail)
+    return 0 if ok else 1
+
+
 def cmd_test(args):
     record = records.Record(RECORDS_ROOT, "tests", "pytest")
     proc = subprocess.run(
@@ -164,6 +191,19 @@ def main(argv=None):
     p = sub.add_parser("serve", help="read-only Observatory dashboard")
     p.add_argument("--port", type=int, default=8477)
     p.set_defaults(fn=cmd_serve)
+
+    p = sub.add_parser("daemon", help="always-on colony: supervise feed, tick, audit")
+    p.add_argument("action", nargs="?", default="run",
+                   choices=("run", "status", "clear-audit"))
+    p.add_argument("--config", default="config.live.json")
+    p.add_argument("--port", type=int, default=8477)
+    p.add_argument("--max-ticks", type=int, default=None,
+                   help="stop after N ticks (soaks/tests; default: run forever)")
+    p.set_defaults(fn=cmd_daemon)
+
+    p = sub.add_parser("audit", help="replay-twin audit of closed journal segments")
+    p.add_argument("--records", default=RECORDS_ROOT)
+    p.set_defaults(fn=cmd_audit)
 
     p = sub.add_parser("test", help="run pytest, tee output into records/tests/")
     p.set_defaults(fn=cmd_test)

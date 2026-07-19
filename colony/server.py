@@ -164,6 +164,16 @@ def api_agent(con, agent_id):
     }
 
 
+def api_health(db_path):
+    """Daemon health (spec v2 6.4): served from the sidecar JSON the daemon
+    writes atomically each second; the web layer stays read-only."""
+    sidecar = Path(f"{db_path}.health.json")
+    try:
+        return json.loads(sidecar.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {"state": "no-daemon"}
+
+
 def api_runs(con, _query):
     return [
         {
@@ -222,6 +232,8 @@ class Handler(BaseHTTPRequestHandler):
                     self._send_json({"error": "no such agent"}, 404)
                 else:
                     self._send_json(result)
+            elif path == "/api/health":
+                self._send_json(api_health(self.db_path))
             elif path == "/api/runs":
                 self._with_db(api_runs, query)
             elif path.startswith("/records"):

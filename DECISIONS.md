@@ -307,3 +307,46 @@ parentheses.
     the segmented resume digest is (digests of fully-consumed segments) +
     (prefix digest and row count within the cursor's segment), exactly the
     #31 consumed-prefix guarantee lifted to a chain of files.
+
+44. **The daemon is a supervisor around the unchanged orchestrator.** One
+    process: it spawns the feed subprocess (restart with 1s->60s backoff,
+    output teed into records/feed/), consumes the journal through the
+    exact same Orchestrator.step() every mode uses, and pins
+    flush_every 1 so a hard kill at any instant resumes byte-identically
+    (proven by killing the real CLI subprocess mid-run in
+    test_daemon_hard_kill_resumes_byte_identically). Stale (#30) pauses
+    forever in production; only bounded runs (--max-ticks, i.e. tests and
+    soaks) exit on stale, because a test journal never grows.
+
+45. **Liveness by pid file + OpenProcess, not os.kill.** A second daemon
+    on the same db must refuse to start. The pid file next to the db is
+    checked with kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION)
+    on Windows — os.kill(pid, 0) on Windows calls TerminateProcess and
+    would murder the daemon it was checking on. Stale pid files (dead
+    process) are reclaimed with a printed notice.
+
+46. **Health is a sidecar file, not shared state.** The daemon atomically
+    rewrites {db}.health.json about once a second (tick, feed
+    connected/reconnects/gaps, last invariant check, last audit,
+    audit_critical). The web layer serves it verbatim as /api/health and
+    stays read-only against the db; `colony daemon status` exits 0/1/2
+    (healthy / unhealthy-or-critical / unreachable) for cron and
+    scripting. "stale" is healthy: a paused colony is a paused market,
+    not a failure.
+
+47. **Feed gaps are counted, never raised.** If consecutive consumed bars
+    are further apart than tick_seconds, gap_count increments and the
+    colony simply didn't tick for the missing seconds — the tape is still
+    the tape (#30). The audit records the gap ranges it saw so a PASS
+    documents exactly what data it covered.
+
+48. **The audit unit is the fully-consumed closed segment.** The
+    replay-twin (#31 continuous) audits only segments that are (a) not
+    the growing tail and (b) entirely behind the live cursor, replaying
+    from genesis through the last such segment in one twin run
+    (flush_every 100 — flush cadence is ledger-neutral, proven at stage
+    4) and comparing sha256 over the full ledger prefix. State lives in
+    records/audits/state.json; a mismatch is CRITICAL, latches until
+    `colony daemon clear-audit`, and prefixes its INDEX.txt line with
+    `!! ` — but the daemon keeps running, because an audit failure is an
+    alarm about the past, not a reason to stop the present.
