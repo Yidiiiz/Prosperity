@@ -453,7 +453,7 @@ parentheses.
     per tick inside the daemon, so the soak only has to prove continuity
     and collect the evidence into one record.
 
-61. **Final line budget: 3,165 non-blank lines against the ~2,600 ceiling,
+61. **Final line budget: 3,169 non-blank lines against the ~2,600 ceiling,
     accepted with cause.** The dead-code pass removed everything actually
     dead (two v1 report helpers; the API layer had superseded them). The
     overage is three spec-mandated systems that did not exist when the
