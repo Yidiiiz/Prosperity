@@ -52,7 +52,21 @@ def _fee_blocked(genome, z, mean, stdev, fee_bps):
     return edge_bps < 2 * fee_bps
 
 
-def decide(genome, history, lots, hold, equity, fee_bps):
+def _gate_blocked(params, mean, stdev, utc_hour, trades_24h):
+    """The v2 universal gates (spec v2 7.1). They block OPENS only — closing
+    is always allowed. Neutral values (gate 0, 500/day, all-hours mask) make
+    every gate a no-op, preserving v1 behavior exactly."""
+    if not (params.get("active_hours_mask", (1 << 24) - 1) >> utc_hour) & 1:
+        return True
+    if trades_24h >= params.get("max_trades_per_day", 500):
+        return True
+    gate = params.get("vol_gate_bps", 0)
+    if gate and (mean <= 0 or (stdev / mean) * 10_000 < gate):
+        return True  # too flat to pay the fees; a 0 gate is always-on
+    return False
+
+
+def decide(genome, history, lots, hold, equity, fee_bps, utc_hour=0, trades_24h=0):
     """One decision per tick. Returns a Decision or None (do nothing)."""
     archetype = genome["archetype"]
     if archetype == "sitter":  # the deliberate control: never trades
@@ -63,14 +77,16 @@ def decide(genome, history, lots, hold, equity, fee_bps):
 
     if archetype == "momentum":
         if lots == 0 and z >= params["entry_z"]:
-            if _fee_blocked(genome, z, mean, stdev, fee_bps):
+            if (_gate_blocked(params, mean, stdev, utc_hour, trades_24h)
+                    or _fee_blocked(genome, z, mean, stdev, fee_bps)):
                 return None
             return Decision("BUY", int(params["risk_fraction"] * equity) // price)
         if lots > 0 and (z <= params["exit_z"] or hold >= params["hold_max"]):
             return Decision("SELL", lots)
     elif archetype == "mean_revert":
         if lots == 0 and z <= -params["entry_z"]:
-            if _fee_blocked(genome, z, mean, stdev, fee_bps):
+            if (_gate_blocked(params, mean, stdev, utc_hour, trades_24h)
+                    or _fee_blocked(genome, z, mean, stdev, fee_bps)):
                 return None
             return Decision("BUY", int(params["risk_fraction"] * equity) // price)
         if lots > 0 and (z >= params["exit_z"] or hold >= params["hold_max"]):

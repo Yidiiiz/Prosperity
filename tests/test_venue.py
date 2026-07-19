@@ -64,7 +64,7 @@ def test_zero_fee_posts_no_ledger_row(tmp_path):
 
 
 def force_buy_decide(lots):
-    def fake(genome, history, held, hold, equity, fee_bps):
+    def fake(genome, history, held, hold, equity, fee_bps, utc_hour=0, trades_24h=0):
         return strategies.Decision("BUY", lots) if held == 0 else None
     return fake
 

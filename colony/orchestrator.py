@@ -8,7 +8,7 @@ import statistics
 
 from . import agents, db, evolution, ledger, risk, strategies
 from .arenas import make_arena
-from .config import ConfigError, rent_due
+from .config import ConfigError, immigration_accrual, immigration_capacity, rent_due
 
 TREASURY = "TREASURY"
 EPSILON = 1e-6  # matchmaker weight floor so zero-fitness agents can still pair
@@ -55,6 +55,9 @@ def init_colony(con, cfg):
             "sigma": cfg["mutation"]["sigma_fraction"],
             "max_gen_seen": 0,
             "arena": arena.get_state(),
+            # the bucket starts FULL (one year's budget, spec v2 7.3): early
+            # deaths can be replaced; only sustained churn exhausts it
+            "immigration_tokens_u": immigration_capacity(cfg),
         }
         con.execute(
             "INSERT INTO runs (started_at, config_json, last_tick, state_json) VALUES (?, ?, 0, ?)",
@@ -85,6 +88,9 @@ class Orchestrator:
         self.rng.setstate(_decode_rng(state["rng"]))
         self.sigma = state["sigma"]
         self.max_gen_seen = state["max_gen_seen"]
+        self.imm_capacity = immigration_capacity(self.cfg)
+        self.imm_accrual = immigration_accrual(self.cfg)
+        self.imm_tokens = state.get("immigration_tokens_u", self.imm_capacity)
         self.arena = make_arena(self.cfg["arena"])
         self.arena.set_state(state["arena"])
         self.arena_account = f"ARENA:{self.arena.name}"
@@ -163,6 +169,7 @@ class Orchestrator:
         """Advance one tick inside an already-open transaction."""
         cfg = self.cfg
         t = self.tick + 1
+        self.imm_tokens = min(self.imm_capacity, self.imm_tokens + self.imm_accrual)
         self._quota_sweep(t)
         self.arena.step(self.rng)
         price = self.arena.price()
@@ -221,6 +228,8 @@ class Orchestrator:
         delay = venue.get("fill_delay_ticks", 1)
         cost_bps = risk.per_side_cost_bps(venue)
         history = self.arena.history(evolution.PARAM_BOUNDS["lookback"][1] + 1)
+        utc_hour = (utc // 3_600) % 24
+        fill_cutoff = utc - 86_400  # rolling 24h fill window (spec v2 7.1)
         for aid in sorted(self.agents):
             agent = self.agents[aid]
             # Pending order from the last bar fills FIRST at THIS bar's price
@@ -252,8 +261,12 @@ class Orchestrator:
                 ledger.transfer(self.con, t, agents.account_id(aid), TREASURY, rent, "rent")
                 c -= rent
             equity = c + agent.lots * price
+            fills = agent.fills
+            while fills and fills[0] <= fill_cutoff:  # prune is deterministic,
+                fills.pop(0)  # so no dirty flag: stale entries re-prune on load
             decision = strategies.decide(
-                agent.genome, history, agent.lots, agent.hold, equity, cost_bps
+                agent.genome, history, agent.lots, agent.hold, equity, cost_bps,
+                utc_hour, len(fills),
             )
             decision = risk.check(
                 decision, c, equity, agent.lots, price, cfg["max_action_fraction"], venue
@@ -351,10 +364,14 @@ class Orchestrator:
             agent = self.agents[aid]
             if t - agent.queue_since >= cfg["solo_breed_patience"]:
                 self._try_solo(t, aid, elite)
-        # e. immigration (spec 3.12): extinction is impossible while the
-        # treasury can afford a seed; funded ONLY by recycled colony money
+        # e. immigration (spec 3.12, budget-capped in v2 7.3): funded ONLY by
+        # recycled colony money AND the rolling budget. An exhausted budget
+        # leaves the population below the floor — the honest signal that the
+        # venue cannot support it, not treasury life support.
         while (len(self.agents) < cfg["population_floor"]
-               and ledger.balance(self.con, TREASURY) >= cfg["gen0_seed_u"]):
+               and ledger.balance(self.con, TREASURY) >= cfg["gen0_seed_u"]
+               and self.imm_tokens >= cfg["gen0_seed_u"]):
+            self.imm_tokens -= cfg["gen0_seed_u"]
             if self.hall and self.rng.random() < cfg["hall_immigrant_prob"]:
                 genome = evolution.mutate(
                     self.rng.choice(self.hall), self.sigma * 2, cfg["mutation"], self.rng
@@ -506,6 +523,7 @@ class Orchestrator:
             "sigma": self.sigma,
             "max_gen_seen": self.max_gen_seen,
             "arena": self.arena.get_state(),
+            "immigration_tokens_u": self.imm_tokens,
         }
         self.con.execute(
             "UPDATE runs SET last_tick = ?, state_json = ? WHERE id = ?",

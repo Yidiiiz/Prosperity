@@ -186,10 +186,20 @@ def test_replay_twin_audit_passes_and_records(tmp_path):
     assert "PASS" in index and "!! " not in index
 
 
-def test_replay_twin_mismatch_is_critical_and_latches(tmp_path):
+def test_replay_twin_mismatch_is_critical_and_latches(tmp_path, monkeypatch):
+    # force constant trading so the ledger DEPENDS on the tape: the patch
+    # covers both the live run and the in-process twin, so a clean tape
+    # would still replay identically — only tampering breaks it
+    from colony import strategies
+
+    def forced(genome, history, lots, hold, equity, fee_bps, utc_hour=0, trades_24h=0):
+        return strategies.Decision("BUY", 1) if lots == 0 else strategies.Decision("SELL", lots)
+
+    monkeypatch.setattr(strategies, "decide", forced)
     db_path, journal = audited_colony(tmp_path)
-    # a fresh records root: the daemon audited (and PASSed) these segments
-    # in-run, so re-audit them from scratch against a tampered tape
+    # a fresh records root: the daemon's own in-run audit already claimed
+    # these segments (its subprocess twin is unpatched), so re-audit from
+    # scratch against the tampered tape
     records_root = tmp_path / "records2"
     # rewrite consumed history (subtly — prices stay plausible): the tape
     # no longer matches the live ledger

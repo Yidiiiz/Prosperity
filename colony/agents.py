@@ -6,7 +6,7 @@ orchestrator so runs resume exactly.
 """
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from . import ledger
 from .risk import buy_price_u, fee_u, sell_price_u
@@ -37,6 +37,7 @@ class AgentState:
     queue_since: int | None = None
     pending_side: str | None = None  # unfilled order awaiting next bar (v2 2.3)
     pending_lots: int = 0
+    fills: list = field(default_factory=list)  # fill utcs, rolling 24h (v2 7.1)
     dirty: bool = True
 
 
@@ -82,13 +83,14 @@ def save_state(con, agent, final_equity=None):
     con.execute(
         "INSERT OR REPLACE INTO agent_state (agent_id, birth_seed_u, baseline_u,"
         " peak_equity_u, first_snap_equity_u, hold_ticks, ever_traded,"
-        " last_birth_tick, queue_since, pending_side, pending_lots, final_equity_u)"
-        " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+        " last_birth_tick, queue_since, pending_side, pending_lots, fills_json,"
+        " final_equity_u)"
+        " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
         (
             agent.id, agent.birth_seed, agent.baseline, agent.peak_equity,
             agent.first_snap_equity, agent.hold, int(agent.ever_traded),
             agent.last_birth_tick, agent.queue_since, agent.pending_side,
-            agent.pending_lots, final_equity,
+            agent.pending_lots, json.dumps(agent.fills), final_equity,
         ),
     )
     agent.dirty = False
@@ -102,7 +104,7 @@ def load_living(con):
                s.birth_seed_u, s.baseline_u, s.peak_equity_u,
                s.first_snap_equity_u, s.hold_ticks, s.ever_traded,
                s.last_birth_tick, s.queue_since, s.pending_side, s.pending_lots,
-               COALESCE(p.lots, 0) AS lots
+               s.fills_json, COALESCE(p.lots, 0) AS lots
         FROM agents a
         JOIN agent_state s ON s.agent_id = a.id
         LEFT JOIN positions p ON p.agent_id = a.id AND p.asset = ?
@@ -129,6 +131,7 @@ def load_living(con):
             queue_since=row["queue_since"],
             pending_side=row["pending_side"],
             pending_lots=row["pending_lots"],
+            fills=json.loads(row["fills_json"]),
             dirty=False,
         )
     return living
@@ -159,6 +162,7 @@ def buy(con, tick, utc, agent, lots, price, venue, arena_account):
     )
     agent.hold = 0
     agent.ever_traded = True
+    agent.fills.append(utc)
     agent.dirty = True
 
 
@@ -179,6 +183,7 @@ def sell(con, tick, utc, agent, lots, price, venue, arena_account):
         (tick, utc, agent.id, lots, fill, fee, lots * (price - fill)),
     )
     agent.ever_traded = True
+    agent.fills.append(utc)
     agent.dirty = True
 
 

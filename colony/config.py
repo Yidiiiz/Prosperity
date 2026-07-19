@@ -65,6 +65,19 @@ def rent_due(equity_u, cfg):
     return max(cfg["rent_min_u"], rent)
 
 
+def immigration_capacity(cfg):
+    """The immigration token bucket's capacity (spec v2 7.3): one year of
+    budget — treasury spend on immigrant seeds is rate-limited to
+    initial_treasury x budget APR, accrued per tick like rent."""
+    return cfg["initial_treasury_u"] * cfg["immigration_budget_apr_bps"] // 10_000
+
+
+def immigration_accrual(cfg):
+    """Tokens accrued per tick (floor division; may be 0 at tiny stakes)."""
+    return (cfg["initial_treasury_u"] * cfg["immigration_budget_apr_bps"]
+            * cfg["_tick_seconds"] // (10_000 * SECONDS_PER_YEAR))
+
+
 def _derive_lifecycle(cfg):
     """Convert the wall-time lifecycle block to ticks (rounded, minimum 1),
     rejecting unknown keys, missing keys, and a base key given twice."""
@@ -175,6 +188,9 @@ def validate(cfg):
             raise ConfigError("feed needs a 'symbol' (or a 'cmd' override)")
         if feed.get("mode", "ws") not in ("ws", "poll"):
             raise ConfigError("feed.mode must be 'ws' or 'poll'")
+    budget = cfg.setdefault("immigration_budget_apr_bps", 2_000)
+    if not isinstance(budget, int) or isinstance(budget, bool) or budget < 0:
+        raise ConfigError("immigration_budget_apr_bps must be a non-negative integer")
     flush_every = cfg.setdefault("flush_every", 1)
     if not isinstance(flush_every, int) or isinstance(flush_every, bool) or flush_every < 1:
         raise ConfigError("flush_every must be a positive integer")

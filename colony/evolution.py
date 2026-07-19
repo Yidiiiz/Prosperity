@@ -9,13 +9,20 @@ from collections import Counter
 
 ARCHETYPES = ["momentum", "mean_revert", "sitter"]
 
+MASK24 = "mask24"  # 24-bit UTC-hour bitmask gene: bit-flip mutation, not gauss
+
 # gene: (min, max, type). Mutation output is clamped to these.
+# v2 (spec v2 7.1): three universal gates so evolution can discover when NOT
+# to play — the flat-tape and fee-predation lessons as heritable traits.
 PARAM_BOUNDS = {
     "lookback": (5, 100, int),
     "entry_z": (0.2, 3.0, float),
     "exit_z": (-2.0, 2.0, float),
     "risk_fraction": (0.05, 0.80, float),
     "hold_max": (20, 1500, int),
+    "vol_gate_bps": (0, 100, int),
+    "max_trades_per_day": (1, 500, int),
+    "active_hours_mask": (1, (1 << 24) - 1, MASK24),
 }
 ECON_BOUNDS = {
     "child_seed_fraction": (0.30, 0.55, float),
@@ -32,9 +39,12 @@ def repair(genome):
     """Constraint repair after mutation/crossover (spec 6.1, exit_z semantics).
 
     exit_z is the SIGNED z-level the agent exits at: momentum exits DOWN
-    through it, mean_revert exits UP through it.
+    through it, mean_revert exits UP through it. An all-zero hours mask
+    (an agent that would never open) repairs to all hours (spec v2 7.1).
     """
     params = genome["params"]
+    if params.get("active_hours_mask") == 0:
+        params["active_hours_mask"] = (1 << 24) - 1
     if genome["archetype"] == "momentum" and params["exit_z"] >= params["entry_z"]:
         params["exit_z"] = params["entry_z"] - 1.0
     if genome["archetype"] == "mean_revert" and params["exit_z"] <= -params["entry_z"]:
@@ -44,10 +54,14 @@ def repair(genome):
     return genome
 
 
+def _draw_one(lo, hi, typ, rng):
+    if typ is MASK24:
+        return rng.getrandbits(24)  # 0 is repaired to all-hours
+    return _clamp(rng.uniform(lo, hi), lo, hi, typ)
+
+
 def _draw(bounds, rng):
-    return {
-        key: _clamp(rng.uniform(lo, hi), lo, hi, typ) for key, (lo, hi, typ) in bounds.items()
-    }
+    return {key: _draw_one(lo, hi, typ, rng) for key, (lo, hi, typ) in bounds.items()}
 
 
 def random_genome(rng, archetype=None):
@@ -69,7 +83,14 @@ def mutate(genome, sigma, mut_cfg, rng):
         "genes": list(genome.get("genes", [])),
     }
     for key, (lo, hi, typ) in PARAM_BOUNDS.items():
-        child["params"][key] = _clamp(child["params"][key] + rng.gauss(0, sigma * (hi - lo)), lo, hi, typ)
+        if key not in child["params"]:
+            # a pre-v2 genome (old hall of fame): the new gene joins by draw
+            child["params"][key] = _draw_one(lo, hi, typ, rng)
+        elif typ is MASK24:
+            if sigma > 0:  # sigma 0 must be a pure blend, like the gauss genes
+                child["params"][key] ^= 1 << rng.randrange(24)  # flip one hour
+        else:
+            child["params"][key] = _clamp(child["params"][key] + rng.gauss(0, sigma * (hi - lo)), lo, hi, typ)
     for key, (lo, hi, typ) in ECON_BOUNDS.items():
         child["econ"][key] = _clamp(child["econ"][key] + rng.gauss(0, sigma * (hi - lo)), lo, hi, typ)
     if rng.random() < mut_cfg["gene_flip_prob"]:

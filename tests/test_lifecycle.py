@@ -201,7 +201,10 @@ def test_only_house_funded_agents_carry_debt(tmp_path):
 
 
 def test_immigration_holds_population_floor(tmp_path):
-    cfg = make_cfg(arena=CRASH_ARENA, population_floor=8)
+    # a deliberately huge budget: this test proves the refill MECHANISM;
+    # budget exhaustion semantics (v2 7.3) live in test_genome.py
+    cfg = make_cfg(arena=CRASH_ARENA, population_floor=8,
+                   immigration_budget_apr_bps=200_000)
     con, orch = make_colony(tmp_path, cfg)
     orch.run(600)
     # the crash killed most of gen-0, but immigration refilled to the floor

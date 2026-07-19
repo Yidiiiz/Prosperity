@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS agent_state (
   queue_since             INTEGER,
   pending_side            TEXT,
   pending_lots            INTEGER NOT NULL DEFAULT 0,
+  fills_json              TEXT NOT NULL DEFAULT '[]',
   final_equity_u          INTEGER
 );
 

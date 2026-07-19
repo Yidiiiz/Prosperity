@@ -350,3 +350,46 @@ parentheses.
     `colony daemon clear-audit`, and prefixes its INDEX.txt line with
     `!! ` — but the daemon keeps running, because an audit failure is an
     alarm about the past, not a reason to stop the present.
+
+49. **The hours mask is a first-class gene type, not a hack.** MASK24 joins
+    PARAM_BOUNDS as (1, 2^24-1, mask24): drawn with getrandbits(24),
+    mutated by flipping exactly one random bit — but only when sigma > 0,
+    because sigma 0 means "pure blend" for every other gene and the mask
+    honors the same contract — and repaired 0 -> all-hours (an agent that
+    can never open is not a genome, it's a bug). Pre-v2 genomes (an old
+    hall of fame) gain missing genes by uniform draw on first mutation.
+
+50. **Gates block opens only, and read as neutral when absent.** decide()
+    gains utc_hour and trades_24h; the three gates run before the
+    fee_aware check and only on the entry branch — closing is ALWAYS
+    allowed (a throttled agent may still exit risk). vol_gate_bps is
+    measured as the trailing window's coefficient of variation in bps
+    (stdev/mean x 10^4), the same units fee_aware uses. Missing genes
+    default to gate 0 / 500 per day / all hours, so a v1 genome behaves
+    exactly as it did in v1 (the Petri regression bar, proven in
+    test_neutral_genes_are_a_no_op_at_every_hour_and_count).
+
+51. **The fill window is pruned on use, persisted lazily.** Every fill
+    (including forced liquidations) appends its bar utc to agent_state's
+    fills_json; the orchestrator prunes to (utc - 86400, utc] before each
+    decision. Pruning does not dirty the row — the persisted list may be
+    a stale superset that re-prunes deterministically on load, so resume
+    and replay-twin agree. At Petri day-bars the window degenerates to
+    the current bar, and every Petri bar is hour 0 UTC, so random hour
+    masks make ~half of random genomes unable to open there — selection
+    and stagnation deaths handle them; that is measurement, not a bug.
+
+52. **The immigration budget is a token bucket that starts full.**
+    Capacity is one year's budget (initial_treasury x apr / 10^4), accrual
+    per tick converts like rent, spend is one gen0 seed per immigrant, and
+    the bucket persists in runs.state_json. Starting full means early
+    catastrophes can still be repopulated; only sustained churn exhausts
+    it, after which the population honestly sits below the floor (visible
+    in /api/health's immigration block). The v1 floor test re-bases with
+    an explicit 200,000 bps budget because it tests the refill mechanism,
+    not the budget.
+
+53. **Breeding bars per arena class (spec v2 7.2).** Petri keeps
+    repro_multiple 1.25 (validated); config.spy.json and config.live.json
+    ship 1.08 — the mitosis mechanics are untouched, only the bar moves
+    to match real-data drift rates.

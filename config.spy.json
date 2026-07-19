@@ -8,7 +8,7 @@
   "population_floor": 40,
   "death_floor_u": 100000000,
   "rent_min_u": 100000,
-  "repro_multiple": 1.25,
+  "repro_multiple": 1.08,
   "repay_multiple": 0.15,
   "reserve_floor_u": 150000000,
   "max_action_fraction": 0.8,

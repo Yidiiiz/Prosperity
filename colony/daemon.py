@@ -189,6 +189,12 @@ class Daemon:
                 "gap_count": self.gap_count,
             },
             "last_invariant_check_utc": self.last_invariant_utc,
+            "immigration": {  # spec v2 11.6: budget exhaustion must be visible
+                "tokens_u": orch.imm_tokens,
+                "capacity_u": orch.imm_capacity,
+                "population": len(orch.agents),
+                "floor": self.cfg["population_floor"],
+            },
             "last_audit": last_audit,
             "audit_critical": audit_state["critical"],
             "flush_every": 1,
