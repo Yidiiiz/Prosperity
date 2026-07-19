@@ -9,7 +9,7 @@ import json
 from dataclasses import dataclass
 
 from . import ledger
-from .risk import fee_cents
+from .risk import fee_u
 
 ASSET = "SIM"
 TREASURY = "TREASURY"
@@ -55,7 +55,7 @@ def spawn(con, tick, agent_id_str, genome, generation, parents, funders, debt):
         ledger.transfer(con, tick, funder_account, account_id(agent_id_str), amount, memo)
         seed += amount
     con.execute(
-        "INSERT INTO agents (id, genome_json, generation, parent_a, parent_b, born_tick, debt_cents)"
+        "INSERT INTO agents (id, genome_json, generation, parent_a, parent_b, born_tick, debt_u)"
         " VALUES (?, ?, ?, ?, ?, ?, ?)",
         (agent_id_str, json.dumps(genome), generation, parents[0], parents[1], tick, debt),
     )
@@ -78,9 +78,9 @@ def spawn(con, tick, agent_id_str, genome, generation, parents, funders, debt):
 
 def save_state(con, agent, final_equity=None):
     con.execute(
-        "INSERT OR REPLACE INTO agent_state (agent_id, birth_seed_cents, baseline_cents,"
-        " peak_equity_cents, first_snap_equity_cents, hold_ticks, ever_traded,"
-        " last_birth_tick, queue_since, final_equity_cents) VALUES (?,?,?,?,?,?,?,?,?,?)",
+        "INSERT OR REPLACE INTO agent_state (agent_id, birth_seed_u, baseline_u,"
+        " peak_equity_u, first_snap_equity_u, hold_ticks, ever_traded,"
+        " last_birth_tick, queue_since, final_equity_u) VALUES (?,?,?,?,?,?,?,?,?,?)",
         (
             agent.id, agent.birth_seed, agent.baseline, agent.peak_equity,
             agent.first_snap_equity, agent.hold, int(agent.ever_traded),
@@ -94,9 +94,9 @@ def load_living(con):
     """Rebuild in-memory state for all living agents from the database."""
     rows = con.execute(
         """
-        SELECT a.id, a.genome_json, a.generation, a.born_tick, a.debt_cents,
-               s.birth_seed_cents, s.baseline_cents, s.peak_equity_cents,
-               s.first_snap_equity_cents, s.hold_ticks, s.ever_traded,
+        SELECT a.id, a.genome_json, a.generation, a.born_tick, a.debt_u,
+               s.birth_seed_u, s.baseline_u, s.peak_equity_u,
+               s.first_snap_equity_u, s.hold_ticks, s.ever_traded,
                s.last_birth_tick, s.queue_since, COALESCE(p.lots, 0) AS lots
         FROM agents a
         JOIN agent_state s ON s.agent_id = a.id
@@ -112,14 +112,14 @@ def load_living(con):
             genome=json.loads(row["genome_json"]),
             generation=row["generation"],
             born_tick=row["born_tick"],
-            birth_seed=row["birth_seed_cents"],
-            baseline=row["baseline_cents"],
-            debt=row["debt_cents"],
+            birth_seed=row["birth_seed_u"],
+            baseline=row["baseline_u"],
+            debt=row["debt_u"],
             lots=row["lots"],
             hold=row["hold_ticks"],
             ever_traded=bool(row["ever_traded"]),
-            peak_equity=row["peak_equity_cents"],
-            first_snap_equity=row["first_snap_equity_cents"],
+            peak_equity=row["peak_equity_u"],
+            first_snap_equity=row["first_snap_equity_u"],
             last_birth_tick=row["last_birth_tick"],
             queue_since=row["queue_since"],
             dirty=False,
@@ -137,12 +137,12 @@ def _set_lots(con, agent, lots):
 
 def buy(con, tick, agent, lots, price, fee_bps, arena_account):
     cost = lots * price
-    fee = fee_cents(cost, fee_bps)
+    fee = fee_u(cost, fee_bps)
     ledger.transfer(con, tick, account_id(agent.id), arena_account, cost, "buy")
     ledger.transfer(con, tick, account_id(agent.id), arena_account, fee, "fee")
     _set_lots(con, agent, agent.lots + lots)
     con.execute(
-        "INSERT INTO trades (tick, agent_id, side, lots, price_cents, fee_cents)"
+        "INSERT INTO trades (tick, agent_id, side, lots, price_u, fee_u)"
         " VALUES (?, ?, 'BUY', ?, ?, ?)",
         (tick, agent.id, lots, price, fee),
     )
@@ -153,12 +153,12 @@ def buy(con, tick, agent, lots, price, fee_bps, arena_account):
 
 def sell(con, tick, agent, lots, price, fee_bps, arena_account):
     proceeds = lots * price
-    fee = fee_cents(proceeds, fee_bps)
+    fee = fee_u(proceeds, fee_bps)
     ledger.transfer(con, tick, arena_account, account_id(agent.id), proceeds, "sell")
     ledger.transfer(con, tick, account_id(agent.id), arena_account, fee, "fee")
     _set_lots(con, agent, agent.lots - lots)
     con.execute(
-        "INSERT INTO trades (tick, agent_id, side, lots, price_cents, fee_cents)"
+        "INSERT INTO trades (tick, agent_id, side, lots, price_u, fee_u)"
         " VALUES (?, ?, 'SELL', ?, ?, ?)",
         (tick, agent.id, lots, price, fee),
     )
@@ -181,11 +181,11 @@ def die(con, tick, agent, cause, price, fee_bps, arena_account):
             con, tick, account_id(agent.id), TREASURY, residue, f"death_residue:{cause}"
         )
     con.execute(
-        "UPDATE agents SET died_tick = ?, death_cause = ?, debt_cents = ? WHERE id = ?",
+        "UPDATE agents SET died_tick = ?, death_cause = ?, debt_u = ? WHERE id = ?",
         (tick, cause, agent.debt, agent.id),
     )
     con.execute(
-        "INSERT OR REPLACE INTO snapshots (tick, agent_id, cash_cents, equity_cents)"
+        "INSERT OR REPLACE INTO snapshots (tick, agent_id, cash_u, equity_u)"
         " VALUES (?, ?, ?, ?)",
         (tick, agent.id, residue, residue),
     )

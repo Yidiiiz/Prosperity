@@ -31,16 +31,16 @@ def replay_cfg(csv_path, **overrides):
                     **overrides)
 
 
-def test_prices_convert_to_integer_cents(tmp_path):
-    path = write_csv(tmp_path / "p.csv", [10.0, 10.51, 0.001])
+def test_prices_convert_to_integer_u(tmp_path):
+    path = write_csv(tmp_path / "p.csv", [10.0, 10.51, 0.0000004])
     arena = Replay({"name": "x", "csv": path})
-    assert arena._prices == [1000, 1051, 1]  # sub-cent closes floor at 1
+    assert arena._prices == [10_000_000, 10_510_000, 1]  # sub-u closes floor at 1 u
 
 
 def test_lot_denominator_scales_price(tmp_path):
     path = write_csv(tmp_path / "p.csv", [500.0, 600.0])
     arena = Replay({"name": "x", "csv": path, "lot_denominator": 100})
-    assert arena._prices == [500, 600]
+    assert arena._prices == [5_000_000, 6_000_000]
 
 
 def test_replay_ignores_rng_and_is_deterministic(tmp_path):
@@ -93,7 +93,7 @@ def test_granularity_check_at_init(tmp_path):
     # $10.00 lots vs a $1,000 seed violates the 200x rule (spec 3.11) ...
     path = write_csv(tmp_path / "p.csv", [10.0] * 200)
     cfg = replay_cfg(path)
-    cfg["gen0_seed_cents"] = 100_000
+    cfg["gen0_seed_u"] = 100_000
     with pytest.raises(ConfigError):
         make_colony(tmp_path, cfg, "strict.db")
     # ... unless small stakes are explicitly accepted
@@ -127,8 +127,8 @@ def test_zero_rent_posts_no_ledger_row(tmp_path):
     """At small stakes rent rounds to 0; a 0-cent rent is a no-op, not a row."""
     path = write_csv(tmp_path / "p.csv", [2.0] * 150)
     cfg = replay_cfg(
-        path, gen0_seed_cents=250, death_floor_cents=50, reserve_floor_cents=50,
-        rent_min_cents=0, small_stakes=True,
+        path, gen0_seed_u=250, death_floor_u=50, reserve_floor_u=50,
+        rent_min_u=0, small_stakes=True,
     )
     con, orch = make_colony(tmp_path, cfg)
     orch.run(100)
@@ -147,16 +147,16 @@ def test_wind_down_returns_everything_to_treasury(tmp_path):
     orch.wind_down()
     assert len(orch.agents) == 0
     agent_cash = con.execute(
-        "SELECT COALESCE(SUM(balance_cents), 0) FROM balances WHERE account_id LIKE 'AGENT:%'"
+        "SELECT COALESCE(SUM(balance_u), 0) FROM balances WHERE account_id LIKE 'AGENT:%'"
     ).fetchone()[0]
     assert agent_cash == 0
     treasury = con.execute(
-        "SELECT balance_cents FROM balances WHERE account_id = 'TREASURY'"
+        "SELECT balance_u FROM balances WHERE account_id = 'TREASURY'"
     ).fetchone()[0]
     arena = con.execute(
-        "SELECT balance_cents FROM balances WHERE account_id LIKE 'ARENA:%'"
+        "SELECT balance_u FROM balances WHERE account_id LIKE 'ARENA:%'"
     ).fetchone()[0]
-    assert treasury + arena == cfg["initial_treasury_cents"]
+    assert treasury + arena == cfg["initial_treasury_u"]
     assert con.execute(
         "SELECT COUNT(*) FROM agents WHERE death_cause = 'horizon'"
     ).fetchone()[0] > 0

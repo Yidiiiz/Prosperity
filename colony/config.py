@@ -5,10 +5,10 @@ import json
 from .evolution import PARAM_BOUNDS
 
 REQUIRED_KEYS = [
-    "rng_seed", "debug", "initial_treasury_cents", "gen0_population", "gen0_seed_cents",
-    "max_population", "population_floor", "death_floor_cents", "rent_min_cents",
+    "rng_seed", "debug", "initial_treasury_u", "gen0_population", "gen0_seed_u",
+    "max_population", "population_floor", "death_floor_u", "rent_min_u",
     "rent_bps_of_equity", "fee_bps", "repro_multiple", "repay_multiple",
-    "reserve_floor_cents", "breed_cooldown_ticks", "solo_breed_patience", "max_age_ticks",
+    "reserve_floor_u", "breed_cooldown_ticks", "solo_breed_patience", "max_age_ticks",
     "stagnation_ticks", "max_action_fraction", "min_ticks_for_fitness", "snapshot_every",
     "hall_size", "hall_immigrant_prob", "mutation", "elitism_top_k", "arena",
 ]
@@ -32,13 +32,13 @@ def validate(cfg):
         if key not in cfg:
             raise ConfigError(f"missing config key {key!r}")
     for key, value in cfg.items():
-        if key.endswith("_cents") and not isinstance(value, int):
+        if key.endswith("_u") and not isinstance(value, int):
             raise ConfigError(f"{key} must be an integer number of cents, got {value!r}")
 
     arena = cfg["arena"]
     kind = arena.get("kind", "petri")
     if kind == "petri":
-        for key in ("name", "start_price_cents", "price_floor_cents", "regimes"):
+        for key in ("name", "start_price_u", "price_floor_u", "regimes"):
             if key not in arena:
                 raise ConfigError(f"missing arena key {key!r}")
         if not arena["regimes"]:
@@ -61,15 +61,15 @@ def validate(cfg):
     else:
         raise ConfigError(f"unknown arena kind {kind!r}")
 
-    if not cfg["death_floor_cents"] < cfg["gen0_seed_cents"]:
-        raise ConfigError("death_floor_cents must be below gen0_seed_cents")
-    if not cfg["reserve_floor_cents"] >= cfg["death_floor_cents"]:
-        raise ConfigError("reserve_floor_cents must be at least death_floor_cents")
+    if not cfg["death_floor_u"] < cfg["gen0_seed_u"]:
+        raise ConfigError("death_floor_u must be below gen0_seed_u")
+    if not cfg["reserve_floor_u"] >= cfg["death_floor_u"]:
+        raise ConfigError("reserve_floor_u must be at least death_floor_u")
     # Lot granularity can silently kill the colony (spec 3.11). Replay start
     # prices come from the CSV, so init_colony re-checks against real data.
     if (kind == "petri" and not cfg.get("small_stakes")
-            and cfg["gen0_seed_cents"] < 200 * arena["start_price_cents"]):
-        raise ConfigError("gen0_seed_cents must be at least 200 x arena.start_price_cents"
+            and cfg["gen0_seed_u"] < 200 * arena["start_price_u"]):
+        raise ConfigError("gen0_seed_u must be at least 200 x arena.start_price_u"
                           " (or set 'small_stakes': true to accept the risk)")
     max_lookback = PARAM_BOUNDS["lookback"][1]
     if not cfg["stagnation_ticks"] > max_lookback:
@@ -77,8 +77,8 @@ def validate(cfg):
     # Rent must stay far below achievable earn rates (spec 3.6).
     if cfg["rent_bps_of_equity"] > 2:
         raise ConfigError("rent_bps_of_equity must be <= 2")
-    if cfg["gen0_population"] * cfg["gen0_seed_cents"] > cfg["initial_treasury_cents"]:
-        raise ConfigError("treasury cannot fund gen0_population x gen0_seed_cents")
+    if cfg["gen0_population"] * cfg["gen0_seed_u"] > cfg["initial_treasury_u"]:
+        raise ConfigError("treasury cannot fund gen0_population x gen0_seed_u")
     if cfg["population_floor"] > cfg["max_population"]:
         raise ConfigError("population_floor must not exceed max_population")
     # The seed-repayment quota has a SILENT failure cliff above 0.15 (spec 3.14).

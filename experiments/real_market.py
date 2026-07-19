@@ -71,14 +71,14 @@ def full_stakes_config(seed):
 def micro_stakes_config(seed):
     cfg = base_config(seed)
     cfg.update({
-        "initial_treasury_cents": 10_000,  # $100.00, total
+        "initial_treasury_u": 10_000,  # $100.00, total
         "gen0_population": 10,
-        "gen0_seed_cents": 1_000,          # $10.00 per agent, ~200 lots
+        "gen0_seed_u": 1_000,          # $10.00 per agent, ~200 lots
         "max_population": 40,
         "population_floor": 8,
-        "death_floor_cents": 100,
-        "reserve_floor_cents": 150,
-        "rent_min_cents": 0,               # 1c/tick rent would be ~0.1%/day
+        "death_floor_u": 100,
+        "reserve_floor_u": 150,
+        "rent_min_u": 0,               # 1c/tick rent would be ~0.1%/day
         "elitism_top_k": 2,
     })
     cfg["arena"] = {"kind": "replay", "name": "spy", "csv": str(CSV),
@@ -90,14 +90,14 @@ def micro_stakes_config(seed):
 def tiny_stakes_config(seed):
     cfg = base_config(seed)
     cfg.update({
-        "initial_treasury_cents": 1_000,   # $10.00, total
+        "initial_treasury_u": 1_000,   # $10.00, total
         "gen0_population": 4,
-        "gen0_seed_cents": 250,            # $2.50 per agent
+        "gen0_seed_u": 250,            # $2.50 per agent
         "max_population": 20,
         "population_floor": 4,
-        "death_floor_cents": 50,
-        "reserve_floor_cents": 50,
-        "rent_min_cents": 0,               # 1c/tick rent would be ~0.4%/day
+        "death_floor_u": 50,
+        "reserve_floor_u": 50,
+        "rent_min_u": 0,               # 1c/tick rent would be ~0.4%/day
         "elitism_top_k": 2,
         "small_stakes": True,
     })
@@ -132,7 +132,7 @@ def run_seed(cfg, workdir, label):
         # re-running an already-audited db: recover pre-audit stats from the
         # last populated snapshot instead of reporting an empty world
         m = con.execute(
-            "SELECT population, colony_wealth_cents, births_cum, deaths_cum,"
+            "SELECT population, colony_wealth_u, births_cum, deaths_cum,"
             " share_momentum, share_mean_revert, share_sitter FROM colony_metrics"
             " WHERE population > 0 ORDER BY tick DESC LIMIT 1"
         ).fetchone()
@@ -146,7 +146,7 @@ def run_seed(cfg, workdir, label):
         "ticks": ticks, "pop": pop, "births": births, "deaths": deaths,
         "colony": colony, "wealth": wealth, "survived": survived,
         "treasury_liq": ledger.balance(con, "TREASURY"),
-        "initial": cfg["initial_treasury_cents"],
+        "initial": cfg["initial_treasury_u"],
         "shares": shares, "price": price,
     }
     con.close()

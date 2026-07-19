@@ -40,23 +40,23 @@ def api_summary(con, _query):
     m = _latest_metrics(con)
     if m is None:
         return {"run_id": run["id"], "tick": 0, "config": cfg}
-    total = con.execute("SELECT COALESCE(SUM(balance_cents), 0) FROM balances").fetchone()[0]
+    total = con.execute("SELECT COALESCE(SUM(balance_u), 0) FROM balances").fetchone()[0]
     debt = con.execute(
-        "SELECT COALESCE(SUM(debt_cents), 0) FROM agents WHERE died_tick IS NULL"
+        "SELECT COALESCE(SUM(debt_u), 0) FROM agents WHERE died_tick IS NULL"
     ).fetchone()[0]
     return {
         "run_id": run["id"],
         "tick": m["tick"],
         "regime_kind": m["regime_kind"],
-        "treasury_cents": m["treasury_cents"],
-        "colony_wealth_cents": m["colony_wealth_cents"],
-        "system_total_cents": m["treasury_cents"] + m["colony_wealth_cents"],
-        "arena_extracted_cents": -m["arena_cents"],
+        "treasury_u": m["treasury_u"],
+        "colony_wealth_u": m["colony_wealth_u"],
+        "system_total_u": m["treasury_u"] + m["colony_wealth_u"],
+        "arena_extracted_u": -m["arena_u"],
         "population": m["population"],
         "births_cum": m["births_cum"],
         "deaths_cum": m["deaths_cum"],
-        "outstanding_debt_cents": debt,
-        "invariant_ok": total == cfg["initial_treasury_cents"],
+        "outstanding_debt_u": debt,
+        "invariant_ok": total == cfg["initial_treasury_u"],
         "config": cfg,
     }
 
@@ -66,7 +66,7 @@ def api_timeseries(con, query):
     rows = con.execute(
         "SELECT * FROM colony_metrics WHERE tick > ? ORDER BY tick", (after,)
     ).fetchall()
-    columns = ["tick", "treasury_cents", "colony_wealth_cents", "population", "price_cents",
+    columns = ["tick", "treasury_u", "colony_wealth_u", "population", "price_u",
                "regime_kind", "share_momentum", "share_mean_revert", "share_sitter",
                "diversity", "births_cum", "deaths_cum"]
     return {c: [row[c] for row in rows] for c in columns}
@@ -95,20 +95,20 @@ def api_leaderboard(con, query):
     limit = min(int(query.get("limit", ["20"])[0]), 100)
     cfg = _config(con)
     m = _latest_metrics(con)
-    price = m["price_cents"] if m else cfg["arena"].get("start_price_cents", 0)
+    price = m["price_u"] if m else cfg["arena"].get("start_price_u", 0)
     tick = m["tick"] if m else 0
     min_age = max(cfg["min_ticks_for_fitness"], 3 * cfg["snapshot_every"])
     rows = con.execute(
         """
         SELECT a.id, a.generation, a.genome_json, a.born_tick,
-               b.balance_cents + COALESCE(p.lots, 0) * ? AS equity_cents,
-               s.first_snap_equity_cents, s.peak_equity_cents
+               b.balance_u + COALESCE(p.lots, 0) * ? AS equity_u,
+               s.first_snap_equity_u, s.peak_equity_u
         FROM agents a
         JOIN balances b ON b.account_id = 'AGENT:' || a.id
         LEFT JOIN positions p ON p.agent_id = a.id AND p.asset = 'SIM'
         JOIN agent_state s ON s.agent_id = a.id
         WHERE a.died_tick IS NULL
-        ORDER BY equity_cents DESC, a.id
+        ORDER BY equity_u DESC, a.id
         LIMIT ?
         """,
         (price, limit),
@@ -119,10 +119,10 @@ def api_leaderboard(con, query):
             "id": row["id"],
             "generation": row["generation"],
             "archetype": json.loads(row["genome_json"])["archetype"],
-            "equity_cents": row["equity_cents"],
+            "equity_u": row["equity_u"],
             "fitness": evolution.fitness(
-                row["equity_cents"], row["first_snap_equity_cents"],
-                tick - row["born_tick"], row["peak_equity_cents"], min_age,
+                row["equity_u"], row["first_snap_equity_u"],
+                tick - row["born_tick"], row["peak_equity_u"], min_age,
             ),
             "age": tick - row["born_tick"],
             "lineage_depth": _lineage_depth(con, row["id"]),
@@ -138,13 +138,13 @@ def api_agent(con, agent_id):
     trades = [
         dict(t)
         for t in con.execute(
-            "SELECT tick, side, lots, price_cents, fee_cents FROM trades"
+            "SELECT tick, side, lots, price_u, fee_u FROM trades"
             " WHERE agent_id = ? ORDER BY seq DESC LIMIT 50",
             (agent_id,),
         )
     ]
     last_snap = con.execute(
-        "SELECT tick, cash_cents, equity_cents FROM snapshots WHERE agent_id = ?"
+        "SELECT tick, cash_u, equity_u FROM snapshots WHERE agent_id = ?"
         " ORDER BY tick DESC LIMIT 1",
         (agent_id,),
     ).fetchone()
@@ -156,9 +156,9 @@ def api_agent(con, agent_id):
         "born_tick": row["born_tick"],
         "died_tick": row["died_tick"],
         "death_cause": row["death_cause"],
-        "debt_cents": row["debt_cents"],
-        "birth_seed_cents": state["birth_seed_cents"] if state else None,
-        "peak_equity_cents": state["peak_equity_cents"] if state else None,
+        "debt_u": row["debt_u"],
+        "birth_seed_u": state["birth_seed_u"] if state else None,
+        "peak_equity_u": state["peak_equity_u"] if state else None,
         "last_snapshot": dict(last_snap) if last_snap else None,
         "trades": trades,
     }

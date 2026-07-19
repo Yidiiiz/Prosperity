@@ -2,7 +2,7 @@
 
 TODO(v2): cognition layer — a v2 archetype whose decide() calls an external
 LLM provider (configured by environment variable). Same inputs, same Decision
-dataclass out, plus a cost_cents the orchestrator debits via SINK:METABOLISM.
+dataclass out, plus a cost_u the orchestrator debits via SINK:METABOLISM.
 """
 
 import statistics

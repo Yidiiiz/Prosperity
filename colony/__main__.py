@@ -50,11 +50,11 @@ def cmd_run(args):
         executed = orch.run(args.ticks, checkpoint_cb=checkpoint)
     except KeyboardInterrupt:
         interrupted = True
-    ledger.verify_invariants(con, orch.cfg["initial_treasury_cents"])
+    ledger.verify_invariants(con, orch.cfg["initial_treasury_u"])
     summary = report.summary_text(con)
     record.section("final state", summary)
     metrics = report.latest_metrics(con)
-    treasury = metrics["treasury_cents"] if metrics else 0
+    treasury = metrics["treasury_u"] if metrics else 0
     if interrupted:
         status = "INTERRUPTED"
     elif executed < args.ticks:
@@ -98,11 +98,11 @@ def cmd_verify(args):
         con.execute("SELECT config_json FROM runs ORDER BY id DESC LIMIT 1").fetchone()[0]
     )
     try:
-        ledger.verify_invariants(con, cfg["initial_treasury_cents"])
+        ledger.verify_invariants(con, cfg["initial_treasury_u"])
     except ledger.AccountingError as exc:
         print(f"INVARIANT VIOLATION: {exc}", file=sys.stderr)
         return 1
-    total = con.execute("SELECT SUM(balance_cents) FROM balances").fetchone()[0]
+    total = con.execute("SELECT SUM(balance_u) FROM balances").fetchone()[0]
     print(f"invariants OK: all balances match the ledger;"
           f" system total {report.money(total)} == initial capitalization")
     return 0

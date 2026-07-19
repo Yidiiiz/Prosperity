@@ -371,7 +371,7 @@ function renderLeaderboard(rows) {
     `<tr tabindex="0" data-id="${r.id}">` +
     `<td class="left">${r.id}</td><td>${r.generation}</td>` +
     `<td class="left"><span class="dot" style="background:${COLORS[r.archetype]}"></span>${r.archetype}</td>` +
-    `<td>${money(r.equity_cents)}</td><td>${r.fitness.toExponential(2)}</td>` +
+    `<td>${money(r.equity_u)}</td><td>${r.fitness.toExponential(2)}</td>` +
     `<td>${r.age}</td><td>${r.lineage_depth}</td></tr>`).join("");
 }
 
@@ -381,13 +381,13 @@ async function openDrawer(id) {
     `agent ${a.id} · gen ${a.generation}` + (a.died_tick ? ` · dead: ${a.death_cause}` : "");
   const trades = a.trades.map(t =>
     `<tr><td>${t.tick}</td><td class="left">${t.side}</td><td>${t.lots}</td>` +
-    `<td>${money(t.price_cents)}</td><td>${money(t.fee_cents)}</td></tr>`).join("");
+    `<td>${money(t.price_u)}</td><td>${money(t.fee_u)}</td></tr>`).join("");
   document.getElementById("drawer-body").innerHTML =
     `<pre>${JSON.stringify(a.genome, null, 1)}</pre>` +
     `<pre>born t=${a.born_tick}  parents ${a.parents.filter(Boolean).join(", ") || "house"}\n` +
-    `seed ${money(a.birth_seed_cents || 0)}  peak ${money(a.peak_equity_cents || 0)}\n` +
-    `debt ${money(a.debt_cents)}` +
-    (a.last_snapshot ? `\nlast snapshot t=${a.last_snapshot.tick}: equity ${money(a.last_snapshot.equity_cents)}` : "") +
+    `seed ${money(a.birth_seed_u || 0)}  peak ${money(a.peak_equity_u || 0)}\n` +
+    `debt ${money(a.debt_u)}` +
+    (a.last_snapshot ? `\nlast snapshot t=${a.last_snapshot.tick}: equity ${money(a.last_snapshot.equity_u)}` : "") +
     `</pre>` +
     `<table><thead><tr><th>tick</th><th class="left">side</th><th>lots</th>` +
     `<th>price</th><th>fee</th></tr></thead><tbody>${trades}</tbody></table>`;
@@ -414,25 +414,25 @@ async function poll() {
       getJSON("/api/leaderboard?limit=20"),
     ]);
     const summary = results[0], ts = results[1], deaths = results[2], leaders = results[3];
-    if (S.initialTreasury === null) S.initialTreasury = summary.config.initial_treasury_cents;
+    if (S.initialTreasury === null) S.initialTreasury = summary.config.initial_treasury_u;
     for (let i = 0; i < (ts.tick || []).length; i++) {
-      S.tick.push(ts.tick[i]); S.treasury.push(ts.treasury_cents[i]);
-      S.colony.push(ts.colony_wealth_cents[i]); S.population.push(ts.population[i]);
-      S.price.push(ts.price_cents[i]); S.regime.push(ts.regime_kind[i]);
+      S.tick.push(ts.tick[i]); S.treasury.push(ts.treasury_u[i]);
+      S.colony.push(ts.colony_wealth_u[i]); S.population.push(ts.population[i]);
+      S.price.push(ts.price_u[i]); S.regime.push(ts.regime_kind[i]);
       S.mom.push(ts.share_momentum[i]); S.mr.push(ts.share_mean_revert[i]);
       S.sit.push(ts.share_sitter[i]); S.div.push(ts.diversity[i]);
       S.births.push(ts.births_cum[i]); S.deaths.push(ts.deaths_cum[i]);
     }
     if (S.tick.length) S.lastTick = S.tick[S.tick.length - 1];
 
-    setNum("v-treasury", summary.treasury_cents || 0);
-    const delta = (summary.treasury_cents || 0) - S.initialTreasury;
+    setNum("v-treasury", summary.treasury_u || 0);
+    const delta = (summary.treasury_u || 0) - S.initialTreasury;
     document.getElementById("v-treasury-delta").textContent =
       "Δ since start " + (delta >= 0 ? "+" : "") + money(delta);
     document.getElementById("badge-recovered").classList.toggle("on", delta > 0);
-    setNum("v-system", summary.system_total_cents || 0);
-    setNum("v-colony", summary.colony_wealth_cents || 0);
-    setNum("v-extracted", summary.arena_extracted_cents || 0);
+    setNum("v-system", summary.system_total_u || 0);
+    setNum("v-colony", summary.colony_wealth_u || 0);
+    setNum("v-extracted", summary.arena_extracted_u || 0);
     setNum("v-population", summary.population || 0, v => String(v));
     document.getElementById("v-flux").textContent =
       `births ${summary.births_cum || 0} · deaths ${summary.deaths_cum || 0}`;
@@ -443,7 +443,7 @@ async function poll() {
       `tick ${summary.tick} · ${summary.regime_kind || "—"}`;
     document.getElementById("v-diversity").textContent =
       (S.div.length ? S.div[S.div.length - 1] : 0).toFixed(3) + " nats";
-    const debt = summary.outstanding_debt_cents || 0;
+    const debt = summary.outstanding_debt_u || 0;
     document.getElementById("v-debt").textContent = money(debt) + " outstanding";
     const debtScale = Math.max(debt, S.initialTreasury * 0.05);
     document.getElementById("gauge-fill").style.width =

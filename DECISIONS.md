@@ -196,3 +196,16 @@ parentheses.
     to zero because a per-tick rent calibrated for simulated ticks would be
     absurd at seconds-per-tick pacing; senescence and death residues remain
     the treasury's return path.
+
+## v2.0 — the always-on colony (BUILD_SPEC_V2)
+
+33. **Unit migration is a rename plus a re-base, nothing else.** Every
+    `_cents` identifier became `_u` (micro-dollars, ×10,000 from cents) in
+    one mechanical pass — schema columns, config keys, variables, tests —
+    so v1 semantics carried over exactly. `PRAGMA user_version = 2` stamps
+    v2 databases; `db.connect` refuses any initialized file with a
+    different version (spec v2 §1.7, no migration path). Until the venue
+    model lands (§2.2), the interim fee keeps a 1 µ$ floor so fee ledger
+    rows stay valid; the venue model replaces it and skips 0-amount fees
+    per #27. `report.money` renders dollars with 2 decimals at or above
+    $1 and 6 below; raw µ$ appears only in ledger/debug output.

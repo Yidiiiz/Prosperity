@@ -11,8 +11,8 @@ class Petri:
     def __init__(self, arena_cfg):
         self.name = arena_cfg["name"]
         self.regimes = arena_cfg["regimes"]
-        self.floor = arena_cfg["price_floor_cents"]
-        self._price = arena_cfg["start_price_cents"]
+        self.floor = arena_cfg["price_floor_u"]
+        self._price = arena_cfg["start_price_u"]
         self._hist = [self._price]
         self._regime_idx = 0
         self._regime_tick = 0

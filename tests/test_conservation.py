@@ -17,9 +17,9 @@ def test_conservation_over_2000_tick_run(tmp_path):
     )
     con, orch = make_colony(tmp_path, cfg)
     orch.run(2000)  # verifies every 100 ticks and at the end
-    ledger.verify_invariants(con, cfg["initial_treasury_cents"])
-    total = con.execute("SELECT SUM(balance_cents) FROM balances").fetchone()[0]
-    assert total == cfg["initial_treasury_cents"]
+    ledger.verify_invariants(con, cfg["initial_treasury_u"])
+    total = con.execute("SELECT SUM(balance_u) FROM balances").fetchone()[0]
+    assert total == cfg["initial_treasury_u"]
     # the colony saw real churn, not a vacuous pass
     assert orch.deaths_cum > 0
     assert con.execute("SELECT COUNT(*) FROM trades").fetchone()[0] > 0
@@ -51,18 +51,18 @@ def test_property_1000_random_valid_operations(tmp_path):
                     agents.sell(con, tick, agent, rng.randint(1, agent.lots), price,
                                 cfg["fee_bps"], "ARENA:petri")
             elif op < 0.90:  # rent
-                rent = max(cfg["rent_min_cents"], cash * 2 // 10_000)
+                rent = max(cfg["rent_min_u"], cash * 2 // 10_000)
                 if cash >= rent:
                     ledger.transfer(con, tick, f"AGENT:{aid}", "TREASURY", rent, "rent")
             elif op < 0.97:  # death
                 orch._die(tick, agent, "bankrupt", price)
             else:  # house birth (immigrant-style spawn)
-                if ledger.balance(con, "TREASURY") >= cfg["gen0_seed_cents"]:
+                if ledger.balance(con, "TREASURY") >= cfg["gen0_seed_u"]:
                     orch._birth(
                         tick, agent.genome, 0, (None, None),
-                        [("TREASURY", cfg["gen0_seed_cents"], "immigrant_seed")],
+                        [("TREASURY", cfg["gen0_seed_u"], "immigrant_seed")],
                         debt=15_000,
                     )
-    ledger.verify_invariants(con, cfg["initial_treasury_cents"])
-    total = con.execute("SELECT SUM(balance_cents) FROM balances").fetchone()[0]
-    assert total == cfg["initial_treasury_cents"]
+    ledger.verify_invariants(con, cfg["initial_treasury_u"])
+    total = con.execute("SELECT SUM(balance_u) FROM balances").fetchone()[0]
+    assert total == cfg["initial_treasury_u"]

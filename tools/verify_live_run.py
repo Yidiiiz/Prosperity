@@ -29,7 +29,7 @@ def ledger_hash(con):
     h = hashlib.sha256()
     n = 0
     for row in con.execute(
-        "SELECT tick, debit_account, credit_account, amount_cents, memo"
+        "SELECT tick, debit_account, credit_account, amount_u, memo"
         " FROM ledger ORDER BY seq"
     ):
         h.update(repr(tuple(row)).encode())

@@ -7,7 +7,7 @@ archetype distribution at the flip and at the end.
 Pass (every seed in {42, 7, 2026}):
   - living-population share of mean_revert rises >= +20 percentage points
   - total system wealth (treasury + agent wealth) ends above its start
-  - ending treasury > initial_treasury_cents (spec 13.3c: full capital
+  - ending treasury > initial_treasury_u (spec 13.3c: full capital
     recovery + banked profit, via rent + death residues + debt_repay alone)
 
 Usage: python -m experiments.regime_flip
@@ -66,7 +66,7 @@ def run_seed(seed, workdir):
     orch.run(MR_TICKS)
     after_mr, pop_mr = shares_of_living(orch)
     treasury, colony = system_wealth(con, orch)
-    ledger.verify_invariants(con, cfg["initial_treasury_cents"])
+    ledger.verify_invariants(con, cfg["initial_treasury_u"])
     con.close()
     return {
         "seed": seed,
@@ -76,7 +76,7 @@ def run_seed(seed, workdir):
         "start_wealth": start_treasury + start_colony,
         "end_wealth": treasury + colony,
         "treasury": treasury,
-        "initial_treasury": cfg["initial_treasury_cents"],
+        "initial_treasury": cfg["initial_treasury_u"],
     }
 
 

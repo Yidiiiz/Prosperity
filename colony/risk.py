@@ -7,8 +7,8 @@ from .strategies import Decision
 log = logging.getLogger(__name__)
 
 
-def fee_cents(amount_cents, fee_bps):
-    return max(1, round(amount_cents * fee_bps / 10_000))
+def fee_u(amount_u, fee_bps):
+    return max(1, round(amount_u * fee_bps / 10_000))
 
 
 def check(decision, cash, equity, lots_held, price, max_action_fraction, fee_bps):
@@ -33,7 +33,7 @@ def check(decision, cash, equity, lots_held, price, max_action_fraction, fee_bps
             int(max_action_fraction * equity) // price,
             cash // price,
         )
-        while lots > 0 and lots * price + fee_cents(lots * price, fee_bps) > cash:
+        while lots > 0 and lots * price + fee_u(lots * price, fee_bps) > cash:
             lots -= 1
         if lots <= 0:
             log.debug("reject BUY: cannot afford one lot within caps")

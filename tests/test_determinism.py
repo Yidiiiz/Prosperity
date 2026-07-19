@@ -9,7 +9,7 @@ from tests.conftest import make_cfg, make_colony
 def ledger_hash(con):
     h = hashlib.sha256()
     for row in con.execute(
-        "SELECT tick, debit_account, credit_account, amount_cents, memo FROM ledger ORDER BY seq"
+        "SELECT tick, debit_account, credit_account, amount_u, memo FROM ledger ORDER BY seq"
     ):
         h.update(repr(tuple(row)).encode())
     return h.hexdigest()
@@ -48,7 +48,7 @@ def test_resume_matches_uninterrupted_run(tmp_path):
 
 def test_petri_deterministic_given_seed():
     arena_cfg = {
-        "name": "petri", "start_price_cents": 200, "price_floor_cents": 20,
+        "name": "petri", "start_price_u": 200, "price_floor_u": 20,
         "regimes": [
             {"kind": "trend_up", "ticks": 50, "drift_bps": 12, "vol_bps": 60},
             {"kind": "mean_revert", "ticks": 50, "kappa": 0.15, "vol_bps": 200},
@@ -66,7 +66,7 @@ def test_petri_deterministic_given_seed():
 
 def test_petri_price_floor():
     arena = Petri({
-        "name": "petri", "start_price_cents": 25, "price_floor_cents": 20,
+        "name": "petri", "start_price_u": 25, "price_floor_u": 20,
         "regimes": [{"kind": "crash", "ticks": 10_000, "drift_bps": -300, "vol_bps": 200}],
     })
     rng = random.Random(1)
@@ -77,7 +77,7 @@ def test_petri_price_floor():
 
 def test_petri_regime_boundaries_and_looping():
     arena = Petri({
-        "name": "petri", "start_price_cents": 200, "price_floor_cents": 20,
+        "name": "petri", "start_price_u": 200, "price_floor_u": 20,
         "regimes": [
             {"kind": "trend_up", "ticks": 10, "drift_bps": 12, "vol_bps": 0},
             {"kind": "mean_revert", "ticks": 5, "kappa": 0.15, "vol_bps": 0},

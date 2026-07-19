@@ -1,5 +1,5 @@
 """Live arena: journal tailing, stale-feed timeout, torn lines, resume
-guard, and the core claim — a live run equals its replay twin. All offline;
+guard, and the core claim â€” a live run equals its replay twin. All offline;
 tests play the role of the feed daemon by appending rows."""
 
 import time
@@ -40,15 +40,15 @@ def test_empty_or_missing_journal_refused(tmp_path):
 def test_consumes_appended_rows(tmp_path):
     path = write_csv(tmp_path / "j.csv", [2.0, 2.5])
     arena = Live({"name": "x", "csv": path})
-    assert arena.price() == 200
+    assert arena.price() == 2_000_000
     assert arena.wait_for_data()
     arena.step(None)
-    assert arena.price() == 250
+    assert arena.price() == 2_500_000
     append_row(path, 3.0)
     assert arena.wait_for_data()
     arena.step(None)
-    assert arena.price() == 300
-    assert arena.history(3) == [200, 250, 300]
+    assert arena.price() == 3_000_000
+    assert arena.history(3) == [2_000_000, 2_500_000, 3_000_000]
 
 
 def test_stale_feed_times_out(tmp_path):
@@ -69,7 +69,7 @@ def test_torn_tail_line_ignored_until_complete(tmp_path):
         f.write("\n")  # the rest of the write arrives
     assert arena.wait_for_data()
     arena.step(None)
-    assert arena.price() == 999
+    assert arena.price() == 9_990_000
 
 
 def test_resume_guard_accepts_growth_rejects_tampering(tmp_path):
@@ -80,7 +80,7 @@ def test_resume_guard_accepts_growth_rejects_tampering(tmp_path):
     append_row(path, 3.5)  # append-only growth is fine
     resumed = Live({"name": "x", "csv": path})
     resumed.set_state(state)
-    assert resumed.price() == 250
+    assert resumed.price() == 2_500_000
     tampered = write_csv(tmp_path / "t.csv", [9.0, 9.0, 9.0])
     other = Live({"name": "x", "csv": tampered})
     with pytest.raises(RuntimeError):

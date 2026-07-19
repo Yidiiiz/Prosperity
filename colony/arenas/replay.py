@@ -6,8 +6,8 @@ construction — the past is already written, so `step` ignores the RNG and
 the same CSV always yields the same price path.
 
 `lot_denominator` scales the asset down so one lot is an affordable slice
-(lot price = close * 100 / denominator, floored at 1 cent). History ends:
-the arena reports `exhausted()` and the run loop stops cleanly.
+(lot price = close * 1,000,000 / denominator micro-dollars, floored at 1 u).
+History ends: the arena reports `exhausted()` and the run loop stops cleanly.
 """
 
 import csv
@@ -26,7 +26,7 @@ class Replay:
         closes = self._read_closes(self.csv_path)
         if len(closes) < 2:
             raise ValueError(f"{self.csv_path}: need at least 2 price rows")
-        self._prices = [max(1, round(c * 100 / self.denominator)) for c in closes]
+        self._prices = [max(1, round(c * 1_000_000 / self.denominator)) for c in closes]
         self._digest = hashlib.sha256(
             ",".join(map(str, self._prices)).encode()
         ).hexdigest()[:16]

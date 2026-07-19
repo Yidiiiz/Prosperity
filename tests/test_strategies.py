@@ -1,4 +1,4 @@
-from colony.risk import check, fee_cents
+from colony.risk import check, fee_u
 from colony.strategies import Decision, decide, zstats
 
 MOMENTUM = {
@@ -96,7 +96,7 @@ def test_risk_caps_buy_at_cash_including_fee():
     d = check(Decision("BUY", 5), cash=1_000, equity=1_000_000, lots_held=0,
               price=200, max_action_fraction=0.80, fee_bps=20)
     assert d.lots == 4
-    assert 4 * 200 + fee_cents(4 * 200, 20) <= 1_000
+    assert 4 * 200 + fee_u(4 * 200, 20) <= 1_000
 
 
 def test_risk_rejects_unaffordable_buy():

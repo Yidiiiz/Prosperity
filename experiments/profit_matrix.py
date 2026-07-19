@@ -63,7 +63,7 @@ CRITERIA = {  # (regime, archetype) -> (comparator, threshold_bps)
 def run_single(genome, regime, seed):
     """One agent against one pure regime, in-memory cash, real strategy/risk/fee code."""
     rng = random.Random(seed)
-    arena = Petri({"name": "petri", "start_price_cents": 200, "price_floor_cents": 20,
+    arena = Petri({"name": "petri", "start_price_u": 200, "price_floor_u": 20,
                    "regimes": [regime]})
     cash, lots, hold = START_CASH, 0, 0
     for _ in range(TICKS):
@@ -73,7 +73,7 @@ def run_single(genome, regime, seed):
         rent = max(RENT_MIN, equity * RENT_BPS // 10_000)
         if cash < rent and lots > 0:  # force-liquidate, as in the real loop
             proceeds = lots * price
-            cash += proceeds - risk.fee_cents(proceeds, FEE_BPS)
+            cash += proceeds - risk.fee_u(proceeds, FEE_BPS)
             lots = 0
         cash = max(0, cash - rent)
         equity = cash + lots * price
@@ -83,12 +83,12 @@ def run_single(genome, regime, seed):
         if decision is not None:
             if decision.side == "BUY":
                 cost = decision.lots * price
-                cash -= cost + risk.fee_cents(cost, FEE_BPS)
+                cash -= cost + risk.fee_u(cost, FEE_BPS)
                 lots += decision.lots
                 hold = 0
             else:
                 proceeds = decision.lots * price
-                cash += proceeds - risk.fee_cents(proceeds, FEE_BPS)
+                cash += proceeds - risk.fee_u(proceeds, FEE_BPS)
                 lots -= decision.lots
         if lots > 0:
             hold += 1

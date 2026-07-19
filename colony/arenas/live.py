@@ -55,7 +55,7 @@ class Live:
     def _load(self):
         closes = _journal_closes(self.csv_path)
         if len(closes) > len(self._prices):
-            self._prices = [max(1, round(c * 100 / self.denominator)) for c in closes]
+            self._prices = [max(1, round(c * 1_000_000 / self.denominator)) for c in closes]
 
     def wait_for_data(self):
         """Block until an unconsumed row exists. False = the feed went stale

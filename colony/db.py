@@ -1,7 +1,16 @@
-"""SQLite schema, connections, transactions. Raw sqlite3, WAL mode, no ORM."""
+"""SQLite schema, connections, transactions. Raw sqlite3, WAL mode, no ORM.
+
+v2: the ledger unit is the micro-dollar (u = 1/1,000,000 dollar, int64).
+PRAGMA user_version = 2 stamps every v2 database; opening any other version
+refuses — there is no migration path from v1 (the money unit changed,
+BUILD_SPEC_V2 section 1.7). Old colonies are archives; new colonies are
+fresh inits.
+"""
 
 import sqlite3
 from contextlib import contextmanager
+
+SCHEMA_VERSION = 2
 
 SCHEMA = """
 -- Every account that can hold cash. kind: TREASURY | AGENT | ARENA
@@ -10,20 +19,20 @@ CREATE TABLE IF NOT EXISTS accounts (
   kind TEXT NOT NULL
 );
 
--- The single source of truth for money. Append-only. amount_cents > 0 always.
+-- The single source of truth for money. Append-only. amount_u > 0 always.
 CREATE TABLE IF NOT EXISTS ledger (
   seq            INTEGER PRIMARY KEY AUTOINCREMENT,
   tick           INTEGER NOT NULL,
   debit_account  TEXT NOT NULL REFERENCES accounts(id),
   credit_account TEXT NOT NULL REFERENCES accounts(id),
-  amount_cents   INTEGER NOT NULL CHECK (amount_cents > 0),
+  amount_u   INTEGER NOT NULL CHECK (amount_u > 0),
   memo           TEXT NOT NULL
 );
 
 -- Cached balances, updated in the same transaction as each ledger insert.
 CREATE TABLE IF NOT EXISTS balances (
   account_id    TEXT PRIMARY KEY REFERENCES accounts(id),
-  balance_cents INTEGER NOT NULL
+  balance_u INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS agents (
@@ -33,7 +42,7 @@ CREATE TABLE IF NOT EXISTS agents (
   parent_a     TEXT,
   parent_b     TEXT,
   born_tick    INTEGER NOT NULL,
-  debt_cents   INTEGER NOT NULL DEFAULT 0,
+  debt_u   INTEGER NOT NULL DEFAULT 0,
   died_tick    INTEGER,
   death_cause  TEXT
 );
@@ -41,15 +50,15 @@ CREATE TABLE IF NOT EXISTS agents (
 -- Runtime state per agent, persisted every tick so runs resume exactly.
 CREATE TABLE IF NOT EXISTS agent_state (
   agent_id                TEXT PRIMARY KEY REFERENCES agents(id),
-  birth_seed_cents        INTEGER NOT NULL,
-  baseline_cents          INTEGER NOT NULL,
-  peak_equity_cents       INTEGER NOT NULL,
-  first_snap_equity_cents INTEGER,
+  birth_seed_u        INTEGER NOT NULL,
+  baseline_u          INTEGER NOT NULL,
+  peak_equity_u       INTEGER NOT NULL,
+  first_snap_equity_u INTEGER,
   hold_ticks              INTEGER NOT NULL,
   ever_traded             INTEGER NOT NULL,
   last_birth_tick         INTEGER,
   queue_since             INTEGER,
-  final_equity_cents      INTEGER
+  final_equity_u      INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS positions (
@@ -65,29 +74,29 @@ CREATE TABLE IF NOT EXISTS trades (
   agent_id    TEXT NOT NULL,
   side        TEXT NOT NULL CHECK (side IN ('BUY','SELL')),
   lots        INTEGER NOT NULL,
-  price_cents INTEGER NOT NULL,
-  fee_cents   INTEGER NOT NULL
+  price_u INTEGER NOT NULL,
+  fee_u   INTEGER NOT NULL
 );
 
 -- Periodic equity snapshots (every snapshot_every ticks and at death).
 CREATE TABLE IF NOT EXISTS snapshots (
   tick         INTEGER NOT NULL,
   agent_id     TEXT NOT NULL,
-  cash_cents   INTEGER NOT NULL,
-  equity_cents INTEGER NOT NULL,
+  cash_u   INTEGER NOT NULL,
+  equity_u INTEGER NOT NULL,
   PRIMARY KEY (tick, agent_id)
 );
 
 -- Aggregate time series written every snapshot_every ticks.
 CREATE TABLE IF NOT EXISTS colony_metrics (
   tick              INTEGER PRIMARY KEY,
-  treasury_cents    INTEGER NOT NULL,
-  colony_wealth_cents INTEGER NOT NULL,
-  arena_cents       INTEGER NOT NULL,
+  treasury_u    INTEGER NOT NULL,
+  colony_wealth_u INTEGER NOT NULL,
+  arena_u       INTEGER NOT NULL,
   population        INTEGER NOT NULL,
   births_cum        INTEGER NOT NULL,
   deaths_cum        INTEGER NOT NULL,
-  price_cents       INTEGER NOT NULL,
+  price_u       INTEGER NOT NULL,
   regime_kind       TEXT NOT NULL,
   share_momentum    REAL NOT NULL,
   share_mean_revert REAL NOT NULL,
@@ -109,21 +118,46 @@ CREATE INDEX IF NOT EXISTS idx_trades_agent  ON trades (agent_id);
 """
 
 
+class SchemaVersionError(Exception):
+    pass
+
+
+class Connection(sqlite3.Connection):
+    """sqlite3.Connection that allows attributes (the in-memory mirrors)."""
+
+    balances = None  # account_id -> balance_u mirror, attached by ledger
+
+
+def check_version(con, path):
+    """Refuse any initialized database whose schema version is not v2."""
+    if not con.execute("SELECT COUNT(*) FROM sqlite_master WHERE type='table'").fetchone()[0]:
+        return  # brand-new file: init_schema will stamp it
+    version = con.execute("PRAGMA user_version").fetchone()[0]
+    if version != SCHEMA_VERSION:
+        raise SchemaVersionError(
+            f"{path} has schema version {version}, this build requires {SCHEMA_VERSION}."
+            " v1 databases cannot be migrated (the money unit changed);"
+            " keep the old file as an archive and `colony init` a fresh database."
+        )
+
+
 def connect(path, readonly=False):
     """Open a connection. Writers get WAL mode and explicit transactions."""
     if readonly:
-        con = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+        con = sqlite3.connect(f"file:{path}?mode=ro", uri=True, factory=Connection)
     else:
-        con = sqlite3.connect(path, isolation_level=None)
+        con = sqlite3.connect(path, isolation_level=None, factory=Connection)
         con.execute("PRAGMA journal_mode=WAL")
         con.execute("PRAGMA synchronous=NORMAL")
         con.execute("PRAGMA foreign_keys=ON")
     con.row_factory = sqlite3.Row
+    check_version(con, path)
     return con
 
 
 def init_schema(con):
     con.executescript(SCHEMA)
+    con.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
 
 
 @contextmanager

@@ -12,7 +12,7 @@ def con(tmp_path):
     with db.tx(con):
         ledger.create_account(con, "TREASURY", "TREASURY")
         con.execute(
-            "UPDATE balances SET balance_cents = ? WHERE account_id = 'TREASURY'", (1_000_000,)
+            "UPDATE balances SET balance_u = ? WHERE account_id = 'TREASURY'", (1_000_000,)
         )
         ledger.create_account(con, "ARENA:petri", "ARENA")
         ledger.create_account(con, "AGENT:000001", "AGENT")
@@ -76,7 +76,7 @@ def test_cache_matches_ledger_sums(con):
         ledger.transfer(con, 2, "AGENT:000001", "TREASURY", 20, "rent")
     ledger.verify_invariants(con, 1_000_000)
     # corrupt the cache: verification must catch it
-    con.execute("UPDATE balances SET balance_cents = balance_cents + 1 WHERE account_id = 'AGENT:000001'")
+    con.execute("UPDATE balances SET balance_u = balance_u + 1 WHERE account_id = 'AGENT:000001'")
     with pytest.raises(ledger.AccountingError):
         ledger.verify_invariants(con, 1_000_000)
 
@@ -93,5 +93,28 @@ def test_conservation_under_random_transfers(con):
             except ledger.InsufficientFunds:
                 pass
     ledger.verify_invariants(con, 1_000_000)
-    total = con.execute("SELECT SUM(balance_cents) FROM balances").fetchone()[0]
+    total = con.execute("SELECT SUM(balance_u) FROM balances").fetchone()[0]
     assert total == 1_000_000
+
+
+def test_v1_database_refused(tmp_path):
+    """Schema is versioned (spec v2 1.7): any initialized db that is not
+    user_version 2 refuses to open — v1 colonies are archives, not inputs."""
+    import sqlite3
+    path = tmp_path / "old.db"
+    old = sqlite3.connect(path)
+    old.execute("CREATE TABLE ledger (seq INTEGER PRIMARY KEY)")  # v1-era table, version 0
+    old.commit()
+    old.close()
+    with pytest.raises(db.SchemaVersionError):
+        db.connect(path)
+    with pytest.raises(db.SchemaVersionError):
+        db.connect(path, readonly=True)
+
+
+def test_fresh_database_is_stamped_v2(tmp_path):
+    con = db.connect(tmp_path / "new.db")
+    db.init_schema(con)
+    assert con.execute("PRAGMA user_version").fetchone()[0] == 2
+    con.close()
+    db.connect(tmp_path / "new.db").close()  # reopens cleanly

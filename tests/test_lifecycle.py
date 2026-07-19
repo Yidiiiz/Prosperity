@@ -38,22 +38,22 @@ def test_bankruptcy_is_full_liquidation_with_residue(tmp_path):
     aid = sorted(orch.agents)[0]
     agent = orch.agents[aid]
     with db.tx(con):
-        # commit nearly everything at 200, then mark to market at 18:
-        # equity = 802 + 495*18 = 9712 <= death_floor 10000 -> bankrupt
-        agents.buy(con, 1, agent, 495, 200, cfg["fee_bps"], "ARENA:petri")
-        orch._death_phase(1, 18)
+        # commit nearly everything at $2.00, then mark to market at $0.18:
+        # equity = 8_020_000 + 495*180_000 = 97_120_000 u <= death_floor -> bankrupt
+        agents.buy(con, 1, agent, 495, 2_000_000, cfg["fee_bps"], "ARENA:petri")
+        orch._death_phase(1, 180_000)
     row = con.execute("SELECT died_tick, death_cause FROM agents WHERE id = ?", (aid,)).fetchone()
     assert row["death_cause"] == "bankrupt" and row["died_tick"] == 1
     # full liquidation: no lots left, estate swept to treasury, fee charged on the sale
     assert con.execute("SELECT lots FROM positions WHERE agent_id = ?", (aid,)).fetchone()[0] == 0
     assert ledger.balance(con, f"AGENT:{aid}") == 0
     residue = con.execute(
-        "SELECT amount_cents FROM ledger WHERE debit_account = ? AND memo = 'death_residue:bankrupt'",
+        "SELECT amount_u FROM ledger WHERE debit_account = ? AND memo = 'death_residue:bankrupt'",
         (f"AGENT:{aid}",),
     ).fetchone()[0]
-    assert residue == 802 + 495 * 18 - 18  # cash + proceeds - sale fee
+    assert residue == 8_020_000 + 495 * 180_000 - 178_200  # cash + proceeds - sale fee
     assert aid not in orch.agents
-    ledger.verify_invariants(con, cfg["initial_treasury_cents"])
+    ledger.verify_invariants(con, cfg["initial_treasury_u"])
 
 
 def test_rent_shortfall_forces_full_liquidation(tmp_path):
@@ -62,12 +62,12 @@ def test_rent_shortfall_forces_full_liquidation(tmp_path):
     aid = sorted(orch.agents)[0]
     agent = orch.agents[aid]
     with db.tx(con):
-        agents.buy(con, 1, agent, 495, 200, cfg["fee_bps"], "ARENA:petri")
+        agents.buy(con, 1, agent, 495, 2_000_000, cfg["fee_bps"], "ARENA:petri")
         # drain remaining cash below rent (in-simulation: pay it to the arena)
-        ledger.transfer(con, 1, f"AGENT:{aid}", "ARENA:petri", 800, "fee")
-    assert agents.cash(con, agent) == 2
+        ledger.transfer(con, 1, f"AGENT:{aid}", "ARENA:petri", 8_000_000, "fee")
+    assert agents.cash(con, agent) == 20_000
     with db.tx(con):
-        orch._live_phase(2, 200)
+        orch._live_phase(2, 2_000_000)
     # position force-sold in one sale, rent paid, agent survived
     assert agent.lots == 0
     assert agents.cash(con, agent) > 0
@@ -75,7 +75,7 @@ def test_rent_shortfall_forces_full_liquidation(tmp_path):
         "SELECT COUNT(*) FROM ledger WHERE debit_account = ? AND memo = 'rent'", (f"AGENT:{aid}",)
     ).fetchone()[0]
     assert rent_rows == 1
-    ledger.verify_invariants(con, cfg["initial_treasury_cents"])
+    ledger.verify_invariants(con, cfg["initial_treasury_u"])
 
 
 def test_old_age_death(tmp_path):
@@ -98,20 +98,20 @@ def test_breeding_produces_funded_children(tmp_path):
     ).fetchall()
     assert children, "a strong bull market must produce births"
     for child in children:
-        assert child["debt_cents"] == 0  # parent-funded children owe nothing
+        assert child["debt_u"] == 0  # parent-funded children owe nothing
         seeds = con.execute(
-            "SELECT amount_cents FROM ledger WHERE credit_account = ? AND memo = 'child_seed'",
+            "SELECT amount_u FROM ledger WHERE credit_account = ? AND memo = 'child_seed'",
             (f"AGENT:{child['id']}",),
         ).fetchall()
-        assert seeds and sum(s[0] for s in seeds) > 2 * cfg["death_floor_cents"]
+        assert seeds and sum(s[0] for s in seeds) > 2 * cfg["death_floor_u"]
     # parents' baselines were reset below their prior cash (mitosis)
     a_parent = con.execute(
-        "SELECT s.baseline_cents, s.birth_seed_cents FROM agent_state s"
+        "SELECT s.baseline_u, s.birth_seed_u FROM agent_state s"
         " JOIN agents a ON a.id = s.agent_id WHERE a.id = ?",
         (children[0]["parent_a"],),
     ).fetchone()
-    assert a_parent["baseline_cents"] > 0
-    ledger.verify_invariants(con, cfg["initial_treasury_cents"])
+    assert a_parent["baseline_u"] > 0
+    ledger.verify_invariants(con, cfg["initial_treasury_u"])
 
 
 def test_atomic_birth_rolls_back_on_injected_crash(tmp_path, monkeypatch):
@@ -143,7 +143,7 @@ def test_atomic_birth_rolls_back_on_injected_crash(tmp_path, monkeypatch):
     assert con.execute(
         "SELECT COUNT(*) FROM ledger WHERE memo = 'child_seed'"
     ).fetchone()[0] == 0
-    ledger.verify_invariants(con, cfg["initial_treasury_cents"])
+    ledger.verify_invariants(con, cfg["initial_treasury_u"])
 
 
 def test_quota_sweep_never_dips_below_baseline(tmp_path):
@@ -151,18 +151,18 @@ def test_quota_sweep_never_dips_below_baseline(tmp_path):
     con, orch = make_colony(tmp_path, cfg)
     aid = sorted(orch.agents)[0]
     agent = orch.agents[aid]
-    assert agent.debt == int(cfg["repay_multiple"] * cfg["gen0_seed_cents"])
+    assert agent.debt == int(cfg["repay_multiple"] * cfg["gen0_seed_u"])
     # give the agent a surplus above baseline, in-simulation money (from arena)
     with db.tx(con):
         ledger.transfer(con, 1, "ARENA:petri", f"AGENT:{aid}", 4_000, "sell")
         orch._quota_sweep(1)
     assert agents.cash(con, agent) == agent.baseline
-    assert agent.debt == int(cfg["repay_multiple"] * cfg["gen0_seed_cents"]) - 4_000
+    assert agent.debt == int(cfg["repay_multiple"] * cfg["gen0_seed_u"]) - 4_000
     # at baseline exactly: nothing more is swept
     with db.tx(con):
         orch._quota_sweep(2)
     assert agents.cash(con, agent) == agent.baseline
-    ledger.verify_invariants(con, cfg["initial_treasury_cents"])
+    ledger.verify_invariants(con, cfg["initial_treasury_u"])
 
 
 def test_agent_with_debt_never_enters_breeding_queue(tmp_path):
@@ -185,10 +185,10 @@ def test_only_house_funded_agents_carry_debt(tmp_path):
     cfg = make_cfg(arena=BULL_ARENA)
     con, orch = make_colony(tmp_path, cfg)
     orch.run(900)
-    rows = con.execute("SELECT parent_a, debt_cents FROM agents").fetchall()
+    rows = con.execute("SELECT parent_a, debt_u FROM agents").fetchall()
     for row in rows:
         if row["parent_a"] is not None:
-            assert row["debt_cents"] == 0
+            assert row["debt_u"] == 0
     # and the treasury only ever receives via the three sanctioned channels
     memos = {
         r[0]
@@ -212,10 +212,10 @@ def test_immigration_holds_population_floor(tmp_path):
     assert immigrants > 0
     # immigrants are house-funded: they carry the seed-repayment quota
     debtors = con.execute(
-        "SELECT COUNT(*) FROM agents WHERE born_tick > 0 AND parent_a IS NULL AND debt_cents > 0"
+        "SELECT COUNT(*) FROM agents WHERE born_tick > 0 AND parent_a IS NULL AND debt_u > 0"
     ).fetchone()[0]
     assert debtors > 0
-    ledger.verify_invariants(con, cfg["initial_treasury_cents"])
+    ledger.verify_invariants(con, cfg["initial_treasury_u"])
 
 
 def test_population_never_exceeds_cap_plus_elites(tmp_path):

@@ -15,27 +15,27 @@ def test_missing_key_rejected():
         validate(cfg)
 
 
-def test_float_cents_rejected():
+def test_float_u_rejected():
     cfg = make_cfg()
-    cfg["death_floor_cents"] = 10_000.5
+    cfg["death_floor_u"] = 100_000_000.5
     with pytest.raises(ConfigError):
         validate(cfg)
 
 
 def test_death_floor_must_be_below_seed():
     with pytest.raises(ConfigError):
-        make_cfg(death_floor_cents=100_000)
+        make_cfg(death_floor_u=1_000_000_000)
 
 
 def test_reserve_floor_at_least_death_floor():
     with pytest.raises(ConfigError):
-        make_cfg(reserve_floor_cents=9_999)
+        make_cfg(reserve_floor_u=99_999_999)
 
 
 def test_lot_granularity_constraint():
-    # gen0_seed_cents must be >= 200 x start_price_cents (spec 3.11)
+    # gen0_seed_u must be >= 200 x start_price_u (spec 3.11)
     with pytest.raises(ConfigError):
-        make_cfg(arena={"start_price_cents": 600})
+        make_cfg(arena={"start_price_u": 6_000_000})
 
 
 def test_stagnation_must_exceed_max_lookback():

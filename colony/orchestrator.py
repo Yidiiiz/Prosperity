@@ -32,25 +32,25 @@ def init_colony(con, cfg):
     arena = make_arena(cfg["arena"])
     # Lot granularity (spec 3.11): replay start prices come from the CSV, so
     # this check can only happen here. small_stakes acknowledges the risk.
-    if cfg["gen0_seed_cents"] < 200 * arena.price() and not cfg.get("small_stakes"):
+    if cfg["gen0_seed_u"] < 200 * arena.price() and not cfg.get("small_stakes"):
         raise ConfigError(
-            f"gen0_seed_cents must be at least 200 x the starting lot price"
+            f"gen0_seed_u must be at least 200 x the starting lot price"
             f" ({arena.price()} cents); set 'small_stakes': true to accept the"
             " lot-granularity risk"
         )
     with db.tx(con):
         ledger.create_account(con, TREASURY, "TREASURY")
         con.execute(
-            "UPDATE balances SET balance_cents = ? WHERE account_id = ?",
-            (cfg["initial_treasury_cents"], TREASURY),
+            "UPDATE balances SET balance_u = ? WHERE account_id = ?",
+            (cfg["initial_treasury_u"], TREASURY),
         )
         ledger.create_account(con, f"ARENA:{arena.name}", "ARENA")
-        debt = int(cfg["repay_multiple"] * cfg["gen0_seed_cents"])
+        debt = int(cfg["repay_multiple"] * cfg["gen0_seed_u"])
         for i in range(1, cfg["gen0_population"] + 1):
             genome = evolution.random_genome(rng, evolution.ARCHETYPES[(i - 1) % 3])
             agents.spawn(
                 con, 0, f"{i:06d}", genome, 0, (None, None),
-                [(TREASURY, cfg["gen0_seed_cents"], "seed")], debt,
+                [(TREASURY, cfg["gen0_seed_u"], "seed")], debt,
             )
         state = {
             "rng": _encode_rng(rng.getstate()),
@@ -106,7 +106,7 @@ class Orchestrator:
         ).fetchone()[0])
         self.dead_growth = {}  # generation -> [final_equity / birth_seed, ...]
         for row in con.execute(
-            "SELECT a.generation, s.birth_seed_cents, s.final_equity_cents FROM agents a"
+            "SELECT a.generation, s.birth_seed_u, s.final_equity_u FROM agents a"
             " JOIN agent_state s ON s.agent_id = a.id WHERE a.died_tick IS NOT NULL"
         ):
             self.dead_growth.setdefault(row[0], []).append(row[2] / max(1, row[1]))
@@ -116,7 +116,7 @@ class Orchestrator:
         (peak equity >= 2x birth seed), reconstructed from the fossil record."""
         rows = self.con.execute(
             "SELECT a.genome_json FROM agents a JOIN agent_state s ON s.agent_id = a.id"
-            " WHERE a.died_tick IS NOT NULL AND s.peak_equity_cents >= 2 * s.birth_seed_cents"
+            " WHERE a.died_tick IS NOT NULL AND s.peak_equity_u >= 2 * s.birth_seed_u"
             " ORDER BY a.died_tick, a.id"
         ).fetchall()
         return [json.loads(r[0]) for r in rows][-self.cfg["hall_size"]:]
@@ -135,7 +135,7 @@ class Orchestrator:
             self.step()
             if checkpoint_cb and self.tick % 2000 == 0:
                 checkpoint_cb(self.tick)
-        ledger.verify_invariants(self.con, self.cfg["initial_treasury_cents"])
+        ledger.verify_invariants(self.con, self.cfg["initial_treasury_u"])
         return self.tick - start
 
     def step(self):
@@ -153,7 +153,7 @@ class Orchestrator:
             self._flush(t)
         self.tick = t
         if cfg["debug"] or t % 100 == 0:
-            ledger.verify_invariants(self.con, cfg["initial_treasury_cents"])
+            ledger.verify_invariants(self.con, cfg["initial_treasury_u"])
 
     def wind_down(self, cause="horizon"):
         """Terminal audit for finite arenas: liquidate every living agent at
@@ -164,7 +164,7 @@ class Orchestrator:
             for aid in sorted(list(self.agents)):
                 self._die(self.tick, self.agents[aid], cause, price)
             self._flush(self.tick)
-        ledger.verify_invariants(self.con, self.cfg["initial_treasury_cents"])
+        ledger.verify_invariants(self.con, self.cfg["initial_treasury_u"])
 
     # ---------------------------------------------------------------- phases
 
@@ -180,7 +180,7 @@ class Orchestrator:
                 continue
             ledger.transfer(self.con, t, agents.account_id(aid), TREASURY, pay, "debt_repay")
             agent.debt -= pay
-            self.con.execute("UPDATE agents SET debt_cents = ? WHERE id = ?", (agent.debt, aid))
+            self.con.execute("UPDATE agents SET debt_u = ? WHERE id = ?", (agent.debt, aid))
 
     def _live_phase(self, t, price):
         cfg = self.cfg
@@ -189,7 +189,7 @@ class Orchestrator:
             agent = self.agents[aid]
             c = agents.cash(self.con, agent)
             equity = c + agent.lots * price
-            rent = max(cfg["rent_min_cents"], equity * cfg["rent_bps_of_equity"] // 10_000)
+            rent = max(cfg["rent_min_u"], equity * cfg["rent_bps_of_equity"] // 10_000)
             if c < rent and agent.lots > 0:
                 # force-liquidate the ENTIRE position in one sale (fees apply)
                 agents.sell_all(self.con, t, agent, price, cfg["fee_bps"], self.arena_account)
@@ -229,7 +229,7 @@ class Orchestrator:
             agent = self.agents[aid]
             equity = agents.equity(self.con, agent, price)
             age = t - agent.born_tick
-            if equity <= cfg["death_floor_cents"]:
+            if equity <= cfg["death_floor_u"]:
                 cause = "bankrupt"
             elif age >= cfg["max_age_ticks"]:
                 cause = "old_age"
@@ -301,7 +301,7 @@ class Orchestrator:
         # e. immigration (spec 3.12): extinction is impossible while the
         # treasury can afford a seed; funded ONLY by recycled colony money
         while (len(self.agents) < cfg["population_floor"]
-               and ledger.balance(self.con, TREASURY) >= cfg["gen0_seed_cents"]):
+               and ledger.balance(self.con, TREASURY) >= cfg["gen0_seed_u"]):
             if self.hall and self.rng.random() < cfg["hall_immigrant_prob"]:
                 genome = evolution.mutate(
                     self.rng.choice(self.hall), self.sigma * 2, cfg["mutation"], self.rng
@@ -310,8 +310,8 @@ class Orchestrator:
                 genome = evolution.random_genome(self.rng)
             self._birth(
                 t, genome, 0, (None, None),
-                [(TREASURY, cfg["gen0_seed_cents"], "immigrant_seed")],
-                debt=int(cfg["repay_multiple"] * cfg["gen0_seed_cents"]),
+                [(TREASURY, cfg["gen0_seed_u"], "immigrant_seed")],
+                debt=int(cfg["repay_multiple"] * cfg["gen0_seed_u"]),
             )
 
     def _pop_cap(self, elite_involved):
@@ -326,9 +326,9 @@ class Orchestrator:
         seed_a = int(agent_a.genome["econ"]["child_seed_fraction"] / 2 * cash_a)
         seed_b = int(agent_b.genome["econ"]["child_seed_fraction"] / 2 * cash_b)
         seed = seed_a + seed_b
-        if (cash_a - seed_a < cfg["reserve_floor_cents"]
-                or cash_b - seed_b < cfg["reserve_floor_cents"]
-                or seed <= 2 * cfg["death_floor_cents"]
+        if (cash_a - seed_a < cfg["reserve_floor_u"]
+                or cash_b - seed_b < cfg["reserve_floor_u"]
+                or seed <= 2 * cfg["death_floor_u"]
                 or len(self.agents) >= self._pop_cap(a_id in elite or b_id in elite)):
             return  # hard gate: skip the attempt, both stay in queue
         genome = evolution.crossover(
@@ -349,8 +349,8 @@ class Orchestrator:
         agent = self.agents[aid]
         c = agents.cash(self.con, agent)
         seed = int(agent.genome["econ"]["child_seed_fraction"] * c)
-        if (c - seed < cfg["reserve_floor_cents"]
-                or seed <= 2 * cfg["death_floor_cents"]
+        if (c - seed < cfg["reserve_floor_u"]
+                or seed <= 2 * cfg["death_floor_u"]
                 or len(self.agents) >= self._pop_cap(aid in elite)):
             return  # stays in queue, retried next tick
         genome = evolution.mutate(agent.genome, self.sigma, cfg["mutation"], self.rng)
@@ -419,7 +419,7 @@ class Orchestrator:
             genomes.append(agent.genome)
             wealth += equity
         self.con.executemany(
-            "INSERT OR REPLACE INTO snapshots (tick, agent_id, cash_cents, equity_cents)"
+            "INSERT OR REPLACE INTO snapshots (tick, agent_id, cash_u, equity_u)"
             " VALUES (?, ?, ?, ?)",
             rows,
         )

@@ -5,9 +5,14 @@ import json
 from . import evolution
 
 
-def money(cents):
-    sign = "-" if cents < 0 else ""
-    return f"{sign}${abs(cents) / 100:,.2f}"
+def money(u):
+    """Render micro-dollars as dollars: 2 decimals at or above $1, 6 below
+    (raw u appears only in the ledger and debug output, spec v2 2.1)."""
+    sign = "-" if u < 0 else ""
+    dollars = abs(u) / 1_000_000
+    if dollars >= 1 or u == 0:
+        return f"{sign}${dollars:,.2f}"
+    return f"{sign}${dollars:.6f}"
 
 
 def latest_metrics(con):
@@ -20,13 +25,13 @@ def treasury_flows(con):
     gen-0 seeds and immigrant seeds. Nothing else may touch the treasury."""
     inflows = {}
     for memo, total in con.execute(
-        "SELECT memo, SUM(amount_cents) FROM ledger WHERE credit_account = 'TREASURY' GROUP BY memo"
+        "SELECT memo, SUM(amount_u) FROM ledger WHERE credit_account = 'TREASURY' GROUP BY memo"
     ):
         key = "death_residue" if memo.startswith("death_residue:") else memo
         inflows[key] = inflows.get(key, 0) + total
     outflows = dict(
         con.execute(
-            "SELECT memo, SUM(amount_cents) FROM ledger WHERE debit_account = 'TREASURY' GROUP BY memo"
+            "SELECT memo, SUM(amount_u) FROM ledger WHERE debit_account = 'TREASURY' GROUP BY memo"
         ).fetchall()
     )
     return inflows, outflows
@@ -65,13 +70,13 @@ def lineage(con, agent_id):
 
 def agent_fitness(con, row, state, current_tick, cfg):
     """Lifetime fitness from snapshots + state (works for dead or alive)."""
-    first = state["first_snap_equity_cents"]
+    first = state["first_snap_equity_u"]
     if row["died_tick"] is not None:
-        equity_now = state["final_equity_cents"]
+        equity_now = state["final_equity_u"]
         age = row["died_tick"] - row["born_tick"]
     else:
         last = con.execute(
-            "SELECT equity_cents FROM snapshots WHERE agent_id = ? ORDER BY tick DESC LIMIT 1",
+            "SELECT equity_u FROM snapshots WHERE agent_id = ? ORDER BY tick DESC LIMIT 1",
             (row["id"],),
         ).fetchone()
         equity_now = last[0] if last else first
@@ -79,7 +84,7 @@ def agent_fitness(con, row, state, current_tick, cfg):
     if equity_now is None:
         return 0.0
     min_age = max(cfg["min_ticks_for_fitness"], 3 * cfg["snapshot_every"])
-    return evolution.fitness(equity_now, first, age, state["peak_equity_cents"], min_age)
+    return evolution.fitness(equity_now, first, age, state["peak_equity_u"], min_age)
 
 
 def hall_of_fame(con, k, cfg):
@@ -112,8 +117,8 @@ def summary_text(con, last_n=None):
 
     lines = []
     lines.append(f"=== colony report @ tick {tick}" + (f" (last {last_n} ticks)" if last_n else ""))
-    initial = cfg["initial_treasury_cents"]
-    treasury = metrics["treasury_cents"]
+    initial = cfg["initial_treasury_u"]
+    treasury = metrics["treasury_u"]
     delta = treasury - initial
     lines.append("")
     lines.append("TREASURY (north star)")
@@ -130,10 +135,10 @@ def summary_text(con, last_n=None):
     lines.append("")
     lines.append("COLONY")
     lines.append(f"  population       {metrics['population']}")
-    lines.append(f"  colony wealth    {money(metrics['colony_wealth_cents'])}")
-    lines.append(f"  system total     {money(treasury + metrics['colony_wealth_cents'])}")
-    lines.append(f"  extracted from market  {money(-metrics['arena_cents'])}")
-    lines.append(f"  price / regime   {money(metrics['price_cents'])} / {metrics['regime_kind']}")
+    lines.append(f"  colony wealth    {money(metrics['colony_wealth_u'])}")
+    lines.append(f"  system total     {money(treasury + metrics['colony_wealth_u'])}")
+    lines.append(f"  extracted from market  {money(-metrics['arena_u'])}")
+    lines.append(f"  price / regime   {money(metrics['price_u'])} / {metrics['regime_kind']}")
 
     births = con.execute(
         "SELECT COUNT(*) FROM agents WHERE born_tick > ? AND born_tick <= ?", (since, tick)
@@ -157,16 +162,16 @@ def summary_text(con, last_n=None):
                  + "  ".join(f"{a} {shares[a] * 100:.0f}%" for a in evolution.ARCHETYPES))
     lines.append(f"  diversity        {evolution.diversity(genomes):.3f} (Shannon entropy, nats)")
     outstanding = con.execute(
-        "SELECT COALESCE(SUM(debt_cents), 0) FROM agents WHERE died_tick IS NULL"
+        "SELECT COALESCE(SUM(debt_u), 0) FROM agents WHERE died_tick IS NULL"
     ).fetchone()[0]
     lines.append(f"  outstanding debt {money(outstanding)}")
     # lot-granularity watchdog (spec 3.11)
     median_eq = con.execute(
-        "SELECT equity_cents FROM snapshots WHERE tick = ? ORDER BY equity_cents"
+        "SELECT equity_u FROM snapshots WHERE tick = ? ORDER BY equity_u"
         " LIMIT 1 OFFSET (SELECT COUNT(*) FROM snapshots WHERE tick = ?) / 2",
         (tick, tick),
     ).fetchone()
-    if median_eq and metrics["price_cents"] * 200 > median_eq[0]:
+    if median_eq and metrics["price_u"] * 200 > median_eq[0]:
         lines.append("  WARNING: price per lot is large vs median equity"
                      " (lot granularity risk, spec 3.11)")
     return "\n".join(lines)
@@ -177,11 +182,11 @@ def tree_dot(con):
     lines = ["digraph colony {", '  node [shape=box, fontname="monospace"];']
     rows = con.execute(
         "SELECT a.id, a.generation, a.parent_a, a.parent_b, a.died_tick,"
-        " s.peak_equity_cents FROM agents a"
+        " s.peak_equity_u FROM agents a"
         " LEFT JOIN agent_state s ON s.agent_id = a.id ORDER BY a.id"
     ).fetchall()
     for row in rows:
-        peak = money(row["peak_equity_cents"] or 0)
+        peak = money(row["peak_equity_u"] or 0)
         style = "" if row["died_tick"] is None else ", style=dashed"
         lines.append(
             f'  "{row["id"]}" [label="{row["id"]}\\ngen {row["generation"]}\\npeak {peak}"{style}];'
@@ -213,16 +218,16 @@ def inspect_text(con, agent_id):
         lines.append(f"DIED tick {row['died_tick']} cause {row['death_cause']}")
     lines.append(f"genome: {json.dumps(genome)}")
     if state:
-        lines.append(f"birth seed {money(state['birth_seed_cents'])}"
-                     f" | baseline {money(state['baseline_cents'])}"
-                     f" | peak equity {money(state['peak_equity_cents'])}"
-                     f" | debt {money(row['debt_cents'])}")
+        lines.append(f"birth seed {money(state['birth_seed_u'])}"
+                     f" | baseline {money(state['baseline_u'])}"
+                     f" | peak equity {money(state['peak_equity_u'])}"
+                     f" | debt {money(row['debt_u'])}")
         lines.append(f"fitness {agent_fitness(con, row, state, current_tick, cfg):+.6f}")
         # lifetime P&L: wealth generated = what it holds/held + what it gave
         # away (rent, debt, child seeds, residue) minus what it was given
         account = f"AGENT:{agent_id}"
         given = con.execute(
-            "SELECT COALESCE(SUM(amount_cents), 0) FROM ledger WHERE debit_account = ?"
+            "SELECT COALESCE(SUM(amount_u), 0) FROM ledger WHERE debit_account = ?"
             " AND (memo IN ('rent', 'debt_repay', 'child_seed') OR memo LIKE 'death_residue:%')",
             (account,),
         ).fetchone()[0]
@@ -230,21 +235,21 @@ def inspect_text(con, agent_id):
             holding = 0
         else:
             last = con.execute(
-                "SELECT equity_cents FROM snapshots WHERE agent_id = ? ORDER BY tick DESC LIMIT 1",
+                "SELECT equity_u FROM snapshots WHERE agent_id = ? ORDER BY tick DESC LIMIT 1",
                 (agent_id,),
             ).fetchone()
             holding = last[0] if last else 0
-        pnl = holding + given - state["birth_seed_cents"]
+        pnl = holding + given - state["birth_seed_u"]
         lines.append(f"lifetime P&L {money(pnl)} (equity {money(holding)}"
-                     f" + paid out {money(given)} - seed {money(state['birth_seed_cents'])})")
+                     f" + paid out {money(given)} - seed {money(state['birth_seed_u'])})")
     lines.append(f"lineage: {' <- '.join(lineage(con, agent_id))}")
     trades = con.execute(
-        "SELECT tick, side, lots, price_cents, fee_cents FROM trades WHERE agent_id = ?"
+        "SELECT tick, side, lots, price_u, fee_u FROM trades WHERE agent_id = ?"
         " ORDER BY seq DESC LIMIT 50",
         (agent_id,),
     ).fetchall()
     lines.append(f"last {len(trades)} trades (newest first):")
     for t in trades:
         lines.append(f"  t={t['tick']:>7}  {t['side']:<4} {t['lots']:>6} lots"
-                     f" @ {money(t['price_cents'])}  fee {money(t['fee_cents'])}")
+                     f" @ {money(t['price_u'])}  fee {money(t['fee_u'])}")
     return "\n".join(lines)
