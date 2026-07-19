@@ -282,3 +282,28 @@ parentheses.
     (tests: flush 1 vs 100 identical; injected crash mid-window resumes
     identical). Live arenas pin flush_every 1 in the validator, which also
     keeps the blocking feed wait outside any open transaction.
+
+41. **Binance via the public data mirror.** api.binance.com geo-blocks this
+    build region; data-api.binance.vision (REST) and
+    data-stream.binance.vision (websocket) are Binance's official
+    public-market-data hosts with the same API shapes and no key. The
+    fetcher and feed default to them (--base / --ws-host to override). A
+    committed CI fixture (data/btcusdt_1m_fixture.csv, 4,321 real 1m rows,
+    close-series digest 34f6b17f238b6079) keeps replay tests offline (#25).
+
+42. **The websocket client is ~90 lines of stdlib.** RFC 6455 over
+    socket+ssl: handshake with Sec-WebSocket-Accept verification, masked
+    client frames, ping->pong, close handling, fragment reassembly. The
+    frame codec is pure functions (encode_frame/decode_frame) so it is
+    unit-tested offline; only tools/ touches the network (#25). One row is
+    written per @kline_1s candle CLOSE (k.x == true), stamped with the
+    candle's open second.
+
+43. **A mid-day feed stop does not seal the segment.** Journal.close()
+    leaves today's .csv unsealed; the .sha256 is written only on rotation
+    past UTC midnight, because the segment is still the day's growing tape
+    and a restart appends to it. The Live arena treats every segment
+    except the newest as complete/cacheable and re-reads only the tail;
+    the segmented resume digest is (digests of fully-consumed segments) +
+    (prefix digest and row count within the cursor's segment), exactly the
+    #31 consumed-prefix guarantee lifted to a chain of files.
