@@ -1,0 +1,211 @@
+record: experiments/alloc8_dir_20260724T001648125Z_p6904.txt
+utc: 2026-07-24T00:16:48+00:00
+git: 2158a9e
+rng_seed: n/a
+config: {"tapes": {"gld": "4029ec5933a6219d", "psq": "e1eae55bae5eb9a8", "qqq": "4e645c698e4d95ce", "sh": "954c560019ea2dbf", "spy": "7f758062b681ee8e", "tlt": "36f6789c28dee591"}, "universe": ["gld", "psq", "qqq", "sh", "spy", "tlt"], "joint_rows": 5049, "grid_rows": 4040, "windows": 10, "capital_u": 10000000000, "venue": {"taker_bps": 10, "maker_bps": 0, "spread_bps": 2, "min_fee_u": 0, "fill_delay_ticks": 1}}
+========================================================================
+
+--- results -----------------------------------------------------
+regime bench (dir: gld,psq,qqq,sh,spy,tlt): 5049 joint days, grid 4040 rows / 10 windows, holdout 1009 rows
+
+family regime_inv:
+  regime_inv [L=200,R=qqq,I=psq] w2: $9,119.79 vs SPY $7,444.20 (beat)
+  spx: regime_inv [L=200,R=qqq,I=psq] w2 buy-and-hold $7,444.20 (-16.91%/yr) | delta +11.29 pp/yr
+  regime_inv [L=150,R=spy,I=sh] w3: $11,708.31 vs SPY $12,853.20 (did not beat)
+  spx: regime_inv [L=150,R=spy,I=sh] w3 buy-and-hold $12,853.20 (+16.97%/yr) | delta -6.62 pp/yr
+  regime_inv [L=150,R=spy,I=sh] w4: $6,790.48 vs SPY $10,560.14 (did not beat)
+  spx: regime_inv [L=150,R=spy,I=sh] w4 buy-and-hold $10,560.14 (+3.46%/yr) | delta -24.89 pp/yr
+  regime_inv [L=200,R=spy,I=sh] w5: $14,030.15 vs SPY $14,030.15 (did not beat)
+  spx: regime_inv [L=200,R=spy,I=sh] w5 buy-and-hold $14,030.15 (+23.45%/yr) | delta +0.00 pp/yr
+  regime_inv [L=150,R=spy,I=sh] w6: $7,470.77 vs SPY $9,518.26 (did not beat)
+  spx: regime_inv [L=150,R=spy,I=sh] w6 buy-and-hold $9,518.26 (-3.04%/yr) | delta -13.63 pp/yr
+  regime_inv [L=200,R=qqq,I=psq] w7: $10,251.85 vs SPY $13,462.26 (did not beat)
+  spx: regime_inv [L=200,R=qqq,I=psq] w7 buy-and-hold $13,462.26 (+20.47%/yr) | delta -18.90 pp/yr
+  regime_inv [L=200,R=spy,I=sh] w8: $10,320.24 vs SPY $11,659.24 (did not beat)
+  spx: regime_inv [L=200,R=spy,I=sh] w8 buy-and-hold $11,659.24 (+10.02%/yr) | delta -8.04 pp/yr
+  regime_inv [L=200,R=qqq,I=psq] w9: $11,572.69 vs SPY $12,424.73 (did not beat)
+  spx: regime_inv [L=200,R=qqq,I=psq] w9 buy-and-hold $12,424.73 (+14.60%/yr) | delta -5.00 pp/yr
+  regime_inv [L=200,R=qqq,I=psq] w10: $11,593.16 vs SPY $10,711.12 (beat)
+  spx: regime_inv [L=200,R=qqq,I=psq] w10 buy-and-hold $10,711.12 (+4.38%/yr) | delta +5.29 pp/yr
+  regime_inv: NO-EDGE (2/9 windows beat SPY) | mean OOS delta -6.72 pp/yr
+
+family regime_flat:
+  regime_flat [L=200,R=qqq] w2: $10,412.85 vs SPY $7,444.20 (beat)
+  spx: regime_flat [L=200,R=qqq] w2 buy-and-hold $7,444.20 (-16.91%/yr) | delta +19.48 pp/yr
+  regime_flat [L=150,R=spy] w3: $12,398.98 vs SPY $12,853.20 (did not beat)
+  spx: regime_flat [L=150,R=spy] w3 buy-and-hold $12,853.20 (+16.97%/yr) | delta -2.60 pp/yr
+  regime_flat [L=150,R=spy] w4: $8,810.77 vs SPY $10,560.14 (did not beat)
+  spx: regime_flat [L=150,R=spy] w4 buy-and-hold $10,560.14 (+3.46%/yr) | delta -11.04 pp/yr
+  regime_flat [L=200,R=spy] w5: $14,030.15 vs SPY $14,030.15 (did not beat)
+  spx: regime_flat [L=200,R=spy] w5 buy-and-hold $14,030.15 (+23.45%/yr) | delta +0.00 pp/yr
+  regime_flat [L=150,R=spy] w6: $8,556.90 vs SPY $9,518.26 (did not beat)
+  spx: regime_flat [L=150,R=spy] w6 buy-and-hold $9,518.26 (-3.04%/yr) | delta -6.25 pp/yr
+  regime_flat [L=200,R=qqq] w7: $12,535.94 vs SPY $13,462.26 (did not beat)
+  spx: regime_flat [L=200,R=qqq] w7 buy-and-hold $13,462.26 (+20.47%/yr) | delta -5.26 pp/yr
+  regime_flat [L=150,R=qqq] w8: $11,854.58 vs SPY $11,659.24 (beat)
+  spx: regime_flat [L=150,R=qqq] w8 buy-and-hold $11,659.24 (+10.02%/yr) | delta +1.14 pp/yr
+  regime_flat [L=200,R=qqq] w9: $13,865.26 vs SPY $12,424.73 (beat)
+  spx: regime_flat [L=200,R=qqq] w9 buy-and-hold $12,424.73 (+14.60%/yr) | delta +8.17 pp/yr
+  regime_flat [L=200,R=qqq] w10: $10,997.48 vs SPY $10,711.12 (beat)
+  spx: regime_flat [L=200,R=qqq] w10 buy-and-hold $10,711.12 (+4.38%/yr) | delta +1.73 pp/yr
+  regime_flat: NO-EDGE (4/9 windows beat SPY) | mean OOS delta +0.60 pp/yr
+
+family regime_safe:
+  regime_safe [L=200,R=qqq,S=gld] w2: $10,114.72 vs SPY $7,444.20 (beat)
+  spx: regime_safe [L=200,R=qqq,S=gld] w2 buy-and-hold $7,444.20 (-16.91%/yr) | delta +17.63 pp/yr
+  regime_safe [L=150,R=spy,S=tlt] w3: $13,018.29 vs SPY $12,853.20 (beat)
+  spx: regime_safe [L=150,R=spy,S=tlt] w3 buy-and-hold $12,853.20 (+16.97%/yr) | delta +0.94 pp/yr
+  regime_safe [L=150,R=spy,S=gld] w4: $9,230.92 vs SPY $10,560.14 (did not beat)
+  spx: regime_safe [L=150,R=spy,S=gld] w4 buy-and-hold $10,560.14 (+3.46%/yr) | delta -8.32 pp/yr
+  regime_safe [L=200,R=spy,S=tlt] w5: $14,030.15 vs SPY $14,030.15 (did not beat)
+  spx: regime_safe [L=200,R=spy,S=tlt] w5 buy-and-hold $14,030.15 (+23.45%/yr) | delta +0.00 pp/yr
+  regime_safe [L=150,R=spy,S=gld] w6: $9,180.78 vs SPY $9,518.26 (did not beat)
+  spx: regime_safe [L=150,R=spy,S=gld] w6 buy-and-hold $9,518.26 (-3.04%/yr) | delta -2.16 pp/yr
+  regime_safe [L=200,R=qqq,S=gld] w7: $12,811.42 vs SPY $13,462.26 (did not beat)
+  spx: regime_safe [L=200,R=qqq,S=gld] w7 buy-and-hold $13,462.26 (+20.47%/yr) | delta -3.68 pp/yr
+  regime_safe [L=150,R=qqq,S=gld] w8: $12,999.28 vs SPY $11,659.24 (beat)
+  spx: regime_safe [L=150,R=qqq,S=gld] w8 buy-and-hold $11,659.24 (+10.02%/yr) | delta +7.71 pp/yr
+  regime_safe [L=200,R=qqq,S=gld] w9: $14,779.72 vs SPY $12,424.73 (beat)
+  spx: regime_safe [L=200,R=qqq,S=gld] w9 buy-and-hold $12,424.73 (+14.60%/yr) | delta +13.19 pp/yr
+  regime_safe [L=200,R=qqq,S=gld] w10: $10,082.38 vs SPY $10,711.12 (did not beat)
+  spx: regime_safe [L=200,R=qqq,S=gld] w10 buy-and-hold $10,711.12 (+4.38%/yr) | delta -3.87 pp/yr
+  regime_safe: NO-EDGE (4/9 windows beat SPY) | mean OOS delta +2.38 pp/yr
+
+family mom_inv:
+  mom_inv [L=252] w2: $8,073.96 vs SPY $7,444.20 (beat)
+  spx: mom_inv [L=252] w2 buy-and-hold $7,444.20 (-16.91%/yr) | delta +4.34 pp/yr
+  mom_inv [L=63] w3: $13,349.91 vs SPY $12,853.20 (beat)
+  spx: mom_inv [L=63] w3 buy-and-hold $12,853.20 (+16.97%/yr) | delta +2.80 pp/yr
+  mom_inv [L=63] w4: $11,578.56 vs SPY $10,560.14 (beat)
+  spx: mom_inv [L=63] w4 buy-and-hold $10,560.14 (+3.46%/yr) | delta +6.11 pp/yr
+  mom_inv [L=63] w5: $11,739.46 vs SPY $14,030.15 (did not beat)
+  spx: mom_inv [L=63] w5 buy-and-hold $14,030.15 (+23.45%/yr) | delta -12.96 pp/yr
+  mom_inv [L=252] w6: $8,686.52 vs SPY $9,518.26 (did not beat)
+  spx: mom_inv [L=252] w6 buy-and-hold $9,518.26 (-3.04%/yr) | delta -5.39 pp/yr
+  mom_inv [L=252] w7: $8,979.22 vs SPY $13,462.26 (did not beat)
+  spx: mom_inv [L=252] w7 buy-and-hold $13,462.26 (+20.47%/yr) | delta -27.00 pp/yr
+  mom_inv [L=126] w8: $9,786.74 vs SPY $11,659.24 (did not beat)
+  spx: mom_inv [L=126] w8 buy-and-hold $11,659.24 (+10.02%/yr) | delta -11.36 pp/yr
+  mom_inv [L=252] w9: $11,512.81 vs SPY $12,424.73 (did not beat)
+  spx: mom_inv [L=252] w9 buy-and-hold $12,424.73 (+14.60%/yr) | delta -5.35 pp/yr
+  mom_inv [L=252] w10: $11,206.02 vs SPY $10,711.12 (beat)
+  spx: mom_inv [L=252] w10 buy-and-hold $10,711.12 (+4.38%/yr) | delta +2.99 pp/yr
+  mom_inv: NO-EDGE (4/9 windows beat SPY) | mean OOS delta -5.09 pp/yr
+
+family best_bh:
+  best_bh [asset=gld] w2: $10,563.26 vs SPY $7,444.20 (beat)
+  spx: best_bh [asset=gld] w2 buy-and-hold $7,444.20 (-16.91%/yr) | delta +20.41 pp/yr
+  best_bh [asset=gld] w3: $14,487.29 vs SPY $12,853.20 (beat)
+  spx: best_bh [asset=gld] w3 buy-and-hold $12,853.20 (+16.97%/yr) | delta +9.07 pp/yr
+  best_bh [asset=gld] w4: $11,804.04 vs SPY $10,560.14 (beat)
+  spx: best_bh [asset=gld] w4 buy-and-hold $10,560.14 (+3.46%/yr) | delta +7.44 pp/yr
+  best_bh [asset=tlt] w5: $9,105.42 vs SPY $14,030.15 (did not beat)
+  spx: best_bh [asset=tlt] w5 buy-and-hold $14,030.15 (+23.45%/yr) | delta -29.12 pp/yr
+  best_bh [asset=qqq] w6: $10,312.21 vs SPY $9,518.26 (beat)
+  spx: best_bh [asset=qqq] w6 buy-and-hold $9,518.26 (-3.04%/yr) | delta +4.98 pp/yr
+  best_bh [asset=tlt] w7: $9,583.46 vs SPY $13,462.26 (did not beat)
+  spx: best_bh [asset=tlt] w7 buy-and-hold $13,462.26 (+20.47%/yr) | delta -23.10 pp/yr
+  best_bh [asset=qqq] w8: $13,004.26 vs SPY $11,659.24 (beat)
+  spx: best_bh [asset=qqq] w8 buy-and-hold $11,659.24 (+10.02%/yr) | delta +7.73 pp/yr
+  best_bh [asset=qqq] w9: $15,663.07 vs SPY $12,424.73 (beat)
+  spx: best_bh [asset=qqq] w9 buy-and-hold $12,424.73 (+14.60%/yr) | delta +17.93 pp/yr
+  best_bh [asset=qqq] w10: $9,835.86 vs SPY $10,711.12 (did not beat)
+  spx: best_bh [asset=qqq] w10 buy-and-hold $10,711.12 (+4.38%/yr) | delta -5.41 pp/yr
+  best_bh: BEATS-SPX (6/9 windows beat SPY) | mean OOS delta +1.10 pp/yr
+
+ALLOC8 DIR regime_inv: NO-EDGE (2/9, -6.72 pp/yr); regime_flat: NO-EDGE (4/9, +0.60 pp/yr); regime_safe: NO-EDGE (4/9, +2.38 pp/yr); mom_inv: NO-EDGE (4/9, -5.09 pp/yr); best_bh: BEATS-SPX (6/9, +1.10 pp/yr) | FRONTIER regime_safe (holdout target by v8 4)
+
+span: 2006-06-21T00:00:00+00:00 -> 2022-07-08T00:00:00+00:00 (16.05 years)
+wall: 0.2 s
+annualized: regime_inv [L=200,R=qqq,I=psq] w2 audited $9,119.79 vs initial $10,000.00 -> -5.62%/yr
+benchmark: regime_inv [L=200,R=qqq,I=psq] w2 buy-and-hold $7,444.20 (-16.91%/yr) | delta +11.29 pp/yr
+annualized: regime_inv [L=150,R=spy,I=sh] w3 audited $11,708.31 vs initial $10,000.00 -> +10.35%/yr
+benchmark: regime_inv [L=150,R=spy,I=sh] w3 buy-and-hold $12,853.20 (+16.97%/yr) | delta -6.62 pp/yr
+annualized: regime_inv [L=150,R=spy,I=sh] w4 audited $6,790.48 vs initial $10,000.00 -> -21.44%/yr
+benchmark: regime_inv [L=150,R=spy,I=sh] w4 buy-and-hold $10,560.14 (+3.46%/yr) | delta -24.89 pp/yr
+annualized: regime_inv [L=200,R=spy,I=sh] w5 audited $14,030.15 vs initial $10,000.00 -> +23.45%/yr
+benchmark: regime_inv [L=200,R=spy,I=sh] w5 buy-and-hold $14,030.15 (+23.45%/yr) | delta +0.00 pp/yr
+annualized: regime_inv [L=150,R=spy,I=sh] w6 audited $7,470.77 vs initial $10,000.00 -> -16.67%/yr
+benchmark: regime_inv [L=150,R=spy,I=sh] w6 buy-and-hold $9,518.26 (-3.04%/yr) | delta -13.63 pp/yr
+annualized: regime_inv [L=200,R=qqq,I=psq] w7 audited $10,251.85 vs initial $10,000.00 -> +1.57%/yr
+benchmark: regime_inv [L=200,R=qqq,I=psq] w7 buy-and-hold $13,462.26 (+20.47%/yr) | delta -18.90 pp/yr
+annualized: regime_inv [L=200,R=spy,I=sh] w8 audited $10,320.24 vs initial $10,000.00 -> +1.98%/yr
+benchmark: regime_inv [L=200,R=spy,I=sh] w8 buy-and-hold $11,659.24 (+10.02%/yr) | delta -8.04 pp/yr
+annualized: regime_inv [L=200,R=qqq,I=psq] w9 audited $11,572.69 vs initial $10,000.00 -> +9.60%/yr
+benchmark: regime_inv [L=200,R=qqq,I=psq] w9 buy-and-hold $12,424.73 (+14.60%/yr) | delta -5.00 pp/yr
+annualized: regime_inv [L=200,R=qqq,I=psq] w10 audited $11,593.16 vs initial $10,000.00 -> +9.67%/yr
+benchmark: regime_inv [L=200,R=qqq,I=psq] w10 buy-and-hold $10,711.12 (+4.38%/yr) | delta +5.29 pp/yr
+annualized: regime_flat [L=200,R=qqq] w2 audited $10,412.85 vs initial $10,000.00 -> +2.57%/yr
+benchmark: regime_flat [L=200,R=qqq] w2 buy-and-hold $7,444.20 (-16.91%/yr) | delta +19.48 pp/yr
+annualized: regime_flat [L=150,R=spy] w3 audited $12,398.98 vs initial $10,000.00 -> +14.37%/yr
+benchmark: regime_flat [L=150,R=spy] w3 buy-and-hold $12,853.20 (+16.97%/yr) | delta -2.60 pp/yr
+annualized: regime_flat [L=150,R=spy] w4 audited $8,810.77 vs initial $10,000.00 -> -7.59%/yr
+benchmark: regime_flat [L=150,R=spy] w4 buy-and-hold $10,560.14 (+3.46%/yr) | delta -11.04 pp/yr
+annualized: regime_flat [L=200,R=spy] w5 audited $14,030.15 vs initial $10,000.00 -> +23.45%/yr
+benchmark: regime_flat [L=200,R=spy] w5 buy-and-hold $14,030.15 (+23.45%/yr) | delta +0.00 pp/yr
+annualized: regime_flat [L=150,R=spy] w6 audited $8,556.90 vs initial $10,000.00 -> -9.29%/yr
+benchmark: regime_flat [L=150,R=spy] w6 buy-and-hold $9,518.26 (-3.04%/yr) | delta -6.25 pp/yr
+annualized: regime_flat [L=200,R=qqq] w7 audited $12,535.94 vs initial $10,000.00 -> +15.21%/yr
+benchmark: regime_flat [L=200,R=qqq] w7 buy-and-hold $13,462.26 (+20.47%/yr) | delta -5.26 pp/yr
+annualized: regime_flat [L=150,R=qqq] w8 audited $11,854.58 vs initial $10,000.00 -> +11.17%/yr
+benchmark: regime_flat [L=150,R=qqq] w8 buy-and-hold $11,659.24 (+10.02%/yr) | delta +1.14 pp/yr
+annualized: regime_flat [L=200,R=qqq] w9 audited $13,865.26 vs initial $10,000.00 -> +22.76%/yr
+benchmark: regime_flat [L=200,R=qqq] w9 buy-and-hold $12,424.73 (+14.60%/yr) | delta +8.17 pp/yr
+annualized: regime_flat [L=200,R=qqq] w10 audited $10,997.48 vs initial $10,000.00 -> +6.12%/yr
+benchmark: regime_flat [L=200,R=qqq] w10 buy-and-hold $10,711.12 (+4.38%/yr) | delta +1.73 pp/yr
+annualized: regime_safe [L=200,R=qqq,S=gld] w2 audited $10,114.72 vs initial $10,000.00 -> +0.72%/yr
+benchmark: regime_safe [L=200,R=qqq,S=gld] w2 buy-and-hold $7,444.20 (-16.91%/yr) | delta +17.63 pp/yr
+annualized: regime_safe [L=150,R=spy,S=tlt] w3 audited $13,018.29 vs initial $10,000.00 -> +17.90%/yr
+benchmark: regime_safe [L=150,R=spy,S=tlt] w3 buy-and-hold $12,853.20 (+16.97%/yr) | delta +0.94 pp/yr
+annualized: regime_safe [L=150,R=spy,S=gld] w4 audited $9,230.92 vs initial $10,000.00 -> -4.87%/yr
+benchmark: regime_safe [L=150,R=spy,S=gld] w4 buy-and-hold $10,560.14 (+3.46%/yr) | delta -8.32 pp/yr
+annualized: regime_safe [L=200,R=spy,S=tlt] w5 audited $14,030.15 vs initial $10,000.00 -> +23.45%/yr
+benchmark: regime_safe [L=200,R=spy,S=tlt] w5 buy-and-hold $14,030.15 (+23.45%/yr) | delta +0.00 pp/yr
+annualized: regime_safe [L=150,R=spy,S=gld] w6 audited $9,180.78 vs initial $10,000.00 -> -5.21%/yr
+benchmark: regime_safe [L=150,R=spy,S=gld] w6 buy-and-hold $9,518.26 (-3.04%/yr) | delta -2.16 pp/yr
+annualized: regime_safe [L=200,R=qqq,S=gld] w7 audited $12,811.42 vs initial $10,000.00 -> +16.79%/yr
+benchmark: regime_safe [L=200,R=qqq,S=gld] w7 buy-and-hold $13,462.26 (+20.47%/yr) | delta -3.68 pp/yr
+annualized: regime_safe [L=150,R=qqq,S=gld] w8 audited $12,999.28 vs initial $10,000.00 -> +17.73%/yr
+benchmark: regime_safe [L=150,R=qqq,S=gld] w8 buy-and-hold $11,659.24 (+10.02%/yr) | delta +7.71 pp/yr
+annualized: regime_safe [L=200,R=qqq,S=gld] w9 audited $14,779.72 vs initial $10,000.00 -> +27.78%/yr
+benchmark: regime_safe [L=200,R=qqq,S=gld] w9 buy-and-hold $12,424.73 (+14.60%/yr) | delta +13.19 pp/yr
+annualized: regime_safe [L=200,R=qqq,S=gld] w10 audited $10,082.38 vs initial $10,000.00 -> +0.51%/yr
+benchmark: regime_safe [L=200,R=qqq,S=gld] w10 buy-and-hold $10,711.12 (+4.38%/yr) | delta -3.87 pp/yr
+annualized: mom_inv [L=252] w2 audited $8,073.96 vs initial $10,000.00 -> -12.56%/yr
+benchmark: mom_inv [L=252] w2 buy-and-hold $7,444.20 (-16.91%/yr) | delta +4.34 pp/yr
+annualized: mom_inv [L=63] w3 audited $13,349.91 vs initial $10,000.00 -> +19.77%/yr
+benchmark: mom_inv [L=63] w3 buy-and-hold $12,853.20 (+16.97%/yr) | delta +2.80 pp/yr
+annualized: mom_inv [L=63] w4 audited $11,578.56 vs initial $10,000.00 -> +9.57%/yr
+benchmark: mom_inv [L=63] w4 buy-and-hold $10,560.14 (+3.46%/yr) | delta +6.11 pp/yr
+annualized: mom_inv [L=63] w5 audited $11,739.46 vs initial $10,000.00 -> +10.49%/yr
+benchmark: mom_inv [L=63] w5 buy-and-hold $14,030.15 (+23.45%/yr) | delta -12.96 pp/yr
+annualized: mom_inv [L=252] w6 audited $8,686.52 vs initial $10,000.00 -> -8.43%/yr
+benchmark: mom_inv [L=252] w6 buy-and-hold $9,518.26 (-3.04%/yr) | delta -5.39 pp/yr
+annualized: mom_inv [L=252] w7 audited $8,979.22 vs initial $10,000.00 -> -6.52%/yr
+benchmark: mom_inv [L=252] w7 buy-and-hold $13,462.26 (+20.47%/yr) | delta -27.00 pp/yr
+annualized: mom_inv [L=126] w8 audited $9,786.74 vs initial $10,000.00 -> -1.33%/yr
+benchmark: mom_inv [L=126] w8 buy-and-hold $11,659.24 (+10.02%/yr) | delta -11.36 pp/yr
+annualized: mom_inv [L=252] w9 audited $11,512.81 vs initial $10,000.00 -> +9.24%/yr
+benchmark: mom_inv [L=252] w9 buy-and-hold $12,424.73 (+14.60%/yr) | delta -5.35 pp/yr
+annualized: mom_inv [L=252] w10 audited $11,206.02 vs initial $10,000.00 -> +7.37%/yr
+benchmark: mom_inv [L=252] w10 buy-and-hold $10,711.12 (+4.38%/yr) | delta +2.99 pp/yr
+annualized: best_bh [asset=gld] w2 audited $10,563.26 vs initial $10,000.00 -> +3.50%/yr
+benchmark: best_bh [asset=gld] w2 buy-and-hold $7,444.20 (-16.91%/yr) | delta +20.41 pp/yr
+annualized: best_bh [asset=gld] w3 audited $14,487.29 vs initial $10,000.00 -> +26.04%/yr
+benchmark: best_bh [asset=gld] w3 buy-and-hold $12,853.20 (+16.97%/yr) | delta +9.07 pp/yr
+annualized: best_bh [asset=gld] w4 audited $11,804.04 vs initial $10,000.00 -> +10.89%/yr
+benchmark: best_bh [asset=gld] w4 buy-and-hold $10,560.14 (+3.46%/yr) | delta +7.44 pp/yr
+annualized: best_bh [asset=tlt] w5 audited $9,105.42 vs initial $10,000.00 -> -5.66%/yr
+benchmark: best_bh [asset=tlt] w5 buy-and-hold $14,030.15 (+23.45%/yr) | delta -29.12 pp/yr
+annualized: best_bh [asset=qqq] w6 audited $10,312.21 vs initial $10,000.00 -> +1.94%/yr
+benchmark: best_bh [asset=qqq] w6 buy-and-hold $9,518.26 (-3.04%/yr) | delta +4.98 pp/yr
+annualized: best_bh [asset=tlt] w7 audited $9,583.46 vs initial $10,000.00 -> -2.63%/yr
+benchmark: best_bh [asset=tlt] w7 buy-and-hold $13,462.26 (+20.47%/yr) | delta -23.10 pp/yr
+annualized: best_bh [asset=qqq] w8 audited $13,004.26 vs initial $10,000.00 -> +17.76%/yr
+benchmark: best_bh [asset=qqq] w8 buy-and-hold $11,659.24 (+10.02%/yr) | delta +7.73 pp/yr
+annualized: best_bh [asset=qqq] w9 audited $15,663.07 vs initial $10,000.00 -> +32.53%/yr
+benchmark: best_bh [asset=qqq] w9 buy-and-hold $12,424.73 (+14.60%/yr) | delta +17.93 pp/yr
+annualized: best_bh [asset=qqq] w10 audited $9,835.86 vs initial $10,000.00 -> -1.03%/yr
+benchmark: best_bh [asset=qqq] w10 buy-and-hold $10,711.12 (+4.38%/yr) | delta -5.41 pp/yr
+
+=== RESULT: ALLOC8 DIR regime_inv: NO-EDGE (2/9, -6.72 pp/yr); regime_flat: NO-EDGE (4/9, +0.60 pp/yr); regime_safe: NO-EDGE (4/9, +2.38 pp/yr); mom_inv: NO-EDGE (4/9, -5.09 pp/yr); best_bh: BEATS-SPX (6/9, +1.10 pp/yr) | FRONTIER regime_safe (holdout target by v8 4)

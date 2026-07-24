@@ -899,3 +899,61 @@ parentheses.
     green. experiments/allocation7.py reuses the v6 machinery
     (load_joint, rebalance, judge, momentum_ranked) with v5/v6 code
     untouched. Red lines untouched.
+
+103. **v8 spec ratified on operator directive ("I learned bull vs
+    bear markets and using inverse ETFs when they go down ... create
+    v8 ... look into new strategies").** New universe U_DIR = gld,
+    psq, qqq, sh, spy, tlt on *real* inverse-ETF tapes (SH -1x S&P500,
+    PSQ -1x Nasdaq-100, both from 2006-06-21 via Yahoo), so the test
+    pays the true daily-reset drag of holding an inverse product — no
+    synthetic -1x returns. Five families, grids frozen pre-run: three
+    share one regime clock (risk-on asset R vs its own SMA(L),
+    L in {150,200}) and differ only in the bear leg — regime_inv holds
+    the listed inverse I, regime_flat goes to cash, regime_safe flees
+    to S in {gld,tlt}; mom_inv is monthly top-1 momentum over all of
+    U_DIR (the v6/v7 dispersion idea made literal: a selloff makes an
+    inverse ETF the momentum leader); best_bh is the control. The three
+    regime_* families are contamination-symmetric, so their ranking
+    isolates whether being short adds value. allocation8.py reuses the
+    v6 machinery (momentum_ranked, rebalance, judge, COST_LADDER) and
+    its own load_joint; v4-v7 code untouched.
+
+104. **v8 bench verdict: the operator's literal idea — hold inverse
+    ETFs in a bear — is the WORST family; passive beta still wins.**
+    Dir bench, 9 OOS windows over 2006->2022 grid span: regime_inv
+    NO-EDGE 2/9 mean -6.72 pp/yr (worst); mom_inv NO-EDGE 4/9 -5.09
+    (the inverse ETFs poison the rotation); regime_flat 4/9 +0.60;
+    regime_safe 4/9 +2.38 (best timed family but still NO-EDGE);
+    best_bh BEATS-SPX 6/9 +1.10 — the only certified family, again the
+    control. The contamination-symmetric ranking is unambiguous:
+    flee-to-safety > cash > short-via-inverse. Inverse ETFs bleed from
+    daily-reset drag and 200-day-SMA timing cannot overcome it.
+
+105. **v8 historical shot fired regime_safe [L=200,R=qqq,S=gld] and
+    said BEATS-SPX (+10.62 pp/yr) — but the win is beta + luck, not
+    shorting skill, and is disclosed-contaminated.** Reserved final 20%
+    (2022-07-11 -> 2026-07-17, 4.02y): $27,296.83 (+28.41%/yr) vs SPY
+    $19,299.73 (+17.79%/yr), robust at 2x/5x costs. Read honestly: the
+    winning combo holds QQQ in bull (the v6 growth-beta finding) and
+    flees to GLD in bear, and gold ripped over this span (bh gld
+    $22,770 > spy $19,300) — the edge is that tailwind, not timing. The
+    inverse ETFs it AVOIDS were destroyed on the same span (bh psq
+    $3,794, sh $5,129 — roughly halved), the drag made vivid. In-grid
+    the family was NO-EDGE (4/9); the author knew this span held the
+    2022 bear when designing it (disclosed). Evidence, not proof;
+    data/holdout/alloc8.SHOT forbids reruns.
+
+106. **The v8 clean shot is FORWARD: alloc8.FORWARD pre-declares
+    regime_safe on U_DIR, cutoff 2026-07-23, min 126 rows postdating
+    it** (the pre-registered highest-mean-OOS-delta rule; regime_inv,
+    the literal inverse idea, did not merit a forward shot at -6.72).
+    Fires once via `--holdout regime_safe --forward` on data that does
+    not yet exist; refuses a spent shot, unripe tape, and any other
+    family (three tests). Ripe ~2027 after refetching tapes. v8
+    acceptance: tests (10) cover leakage across all families, the
+    mom_inv->dm_topk K=1 bridge, regime switching on synthetic
+    trends, no-daily-churn, weight and flat-tape invariants, the
+    three forward refusals, and FORWARD integrity; full suite 249
+    green. Red lines untouched (inverse ETFs are ordinary long
+    positions in real listed products; no synthetic shorting, no
+    leverage, exposure <= 1.0).

@@ -1,0 +1,24 @@
+record: experiments/holdout_alloc8_regime_safe_20260724T001901718Z_p20860.txt
+utc: 2026-07-24T00:19:01+00:00
+git: 2158a9e-dirty
+rng_seed: n/a
+config: {"tapes": {"gld": "4029ec5933a6219d", "psq": "e1eae55bae5eb9a8", "qqq": "4e645c698e4d95ce", "sh": "954c560019ea2dbf", "spy": "7f758062b681ee8e", "tlt": "36f6789c28dee591"}, "universe": ["gld", "psq", "qqq", "sh", "spy", "tlt"], "joint_rows": 5049, "grid_rows": 4040, "windows": 10, "capital_u": 10000000000, "venue": {"taker_bps": 10, "maker_bps": 0, "spread_bps": 2, "min_fee_u": 0, "fill_delay_ticks": 1}}
+========================================================================
+
+--- results -----------------------------------------------------
+historical holdout shot (v8 4): family regime_safe, params [L=200,R=qqq,S=gld] re-selected on the grid span (4040 rows), frozen
+contamination disclosure (v8 4): the author knew this span held the 2022 bear when designing the regime families — weaker evidence than the forward shot (alloc8.FORWARD)
+
+  holdout regime_safe [L=200,R=qqq,S=gld]: $27,296.83 vs SPY $19,299.73 (beat)
+  spx: holdout regime_safe [L=200,R=qqq,S=gld] buy-and-hold $19,299.73 (+17.79%/yr) | delta +10.62 pp/yr
+  cost ladder 2x: $26,702.18 (beat SPY)
+  cost ladder 5x: $24,996.06 (beat SPY)
+  context: holdout buy-and-hold gld $22,769.79, psq $3,794.32, qqq $23,999.90, sh $5,129.35, spy $19,299.73, tlt $7,369.47
+HOLDOUT alloc8 regime_safe [L=200,R=qqq,S=gld]: BEATS-SPX (beat SPY on the holdout, delta +10.62 pp/yr)
+
+span: 2022-07-11T00:00:00+00:00 -> 2026-07-17T00:00:00+00:00 (4.02 years)
+wall: 0.0 s
+annualized: holdout regime_safe [L=200,R=qqq,S=gld] audited $27,296.83 vs initial $10,000.00 -> +28.41%/yr
+benchmark: holdout regime_safe [L=200,R=qqq,S=gld] buy-and-hold $19,299.73 (+17.79%/yr) | delta +10.62 pp/yr
+
+=== RESULT: HOLDOUT alloc8 regime_safe [L=200,R=qqq,S=gld]: BEATS-SPX (beat SPY on the holdout, delta +10.62 pp/yr)

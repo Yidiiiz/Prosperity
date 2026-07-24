@@ -352,6 +352,52 @@ on pre-cutoff data, frozen, run once on rows nobody has seen — because they
 haven't happened. The runner refuses a spent shot, an unripe tape, and any
 undeclared family; all three refusals are tests.
 
+## The regime bench (v8)
+
+```
+python -m experiments.allocation8                              # bull/bear + inverse ETFs
+python -m experiments.allocation8 --holdout regime_safe        # historical shot (fires once)
+python -m experiments.allocation8 --holdout regime_safe --forward   # refuses until ~2027
+```
+
+v8 tests a market idea directly: markets have **bull** and **bear** regimes,
+and you can hold an **inverse ETF** to profit while the market falls instead
+of only fleeing to cash. Universe `U_DIR` adds *real* inverse-ETF tapes (SH
+−1× S&P 500, PSQ −1× Nasdaq-100, from 2006) so the test pays their true
+daily-reset drag. Three families share one regime clock (risk-on asset vs its
+own SMA) and differ only in the bear leg — `regime_inv` holds the inverse,
+`regime_flat` goes to cash, `regime_safe` flees to gold/bonds — so their
+ranking isolates whether *being short adds value*. `mom_inv` lets momentum
+rotate into an inverse ETF when a selloff makes it the leader; `best_bh` is
+the control (grids frozen in BUILD_SPEC_V8.md).
+
+Measured (dir bench, 9 OOS windows, 2006→2022 grid span):
+
+| family | verdict | bear leg |
+|---|---|---|
+| regime_safe | 4/9, **+2.38 pp/yr** | flee to gold/bonds |
+| best_bh (control) | **6/9, +1.10** | — (only BEATS-SPX family) |
+| regime_flat | 4/9, +0.60 | cash |
+| mom_inv | 4/9, −5.09 | rotate (inverses poison it) |
+| regime_inv | 2/9, **−6.72** | hold the inverse ETF |
+
+**The operator's literal idea — hold inverse ETFs in a bear — is the worst
+family.** The ranking is unambiguous: *flee-to-safety > cash > short-via-
+inverse.* Inverse ETFs bleed from daily-reset drag and 200-day-SMA timing
+can't overcome it; over the holdout span buy-and-hold of the inverses roughly
+halved capital (psq $3,794, sh $5,129 from $10,000). Passive beta still wins
+in-grid.
+
+The historical shot (`regime_safe [R=qqq, S=gld]`, reserved 2022→2026 span)
+did beat SPY — $27,297 vs $19,300, +10.62 pp/yr — but read honestly that win
+is **beta + luck, not shorting skill**: it holds QQQ in bull markets (the v6
+growth-beta finding) and flees to gold, and gold ripped over this span. It was
+NO-EDGE in-grid, and the author knew the span held the 2022 bear when
+designing it (disclosed). So the clean test is **forward**: `alloc8.FORWARD`
+pre-declares `regime_safe` on `U_DIR`, firing once ≥126 rows postdate
+2026-07-23 (~2027). Refuses a spent shot, unripe tape, and any undeclared
+family; all three refusals are tests.
+
 ## Money conservation, stated plainly
 
 Every movement of money is one ledger row with a debit and a credit account.

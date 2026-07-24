@@ -1,0 +1,4 @@
+fired: 2026-07-24T00:19:01+00:00
+family: regime_safe [L=200,R=qqq,S=gld]
+HOLDOUT alloc8 regime_safe [L=200,R=qqq,S=gld]: BEATS-SPX (beat SPY on the holdout, delta +10.62 pp/yr)
+reruns refuse: a second look requires data that postdates the shot (v8 4)
