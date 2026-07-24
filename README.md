@@ -488,6 +488,61 @@ clean test is **forward** (`alloc10.FORWARD`, `gmi_switch` on `U_WISH2`, ripe
 ~2027), refusing spent shot / unripe tape / undeclared family — all three
 refusals are tests.
 
+## The regime-gated rotation bench (v11)
+
+```
+python -m experiments.allocation11                              # gate the rotation on the GMI regime
+python -m experiments.allocation11 --holdout pure_mom --forward     # clean forward shot, refuses until ~2027
+```
+
+v11 answers *"work on former promising ideas, and this current one too."* The two
+idea-lines each have the flaw the other fixes, so v11 **fuses** them:
+
+- **Former promising idea — cross-asset momentum rotation.** The only edge ever
+  validated out of sample (v5, +18 pp/yr on its holdout). It earns from
+  *dispersion* — rotate into the strongest asset — but it is **slow**: it rides a
+  crash for weeks before the trailing return turns the pick defensive. Upside, no
+  brake.
+- **This current idea — GMI regime timing (v10).** A 6-count regime read with a
+  hysteresis band. On a single index in a correlated bull it only ever
+  *sacrificed* upside (v8/v9/v10, three times). Brake, no upside.
+
+`gated_mom` gates the rotation on the regime: **green → rotate into the strongest
+RISK asset** (btc/eth/spy/qqq/iwm/efa — momentum's upside, crypto included);
+**red → step to a cash/gld/tlt safe sleeve** (timing's brake). Universe = the
+8-asset crypto-era set (2017→2026, bound by the Binance tapes) — the widest
+genuine dispersion available, holding the 2018/2020/2022 drawdowns for the brake
+to matter. No inverse or leveraged ETFs (they decay — v8/v9/v10); the safe sleeve
+is long-only. `pure_mom` (ungated) and `gmi_bh` (timing alone) are the two
+references; `best_bh` the passive control.
+
+Measured (regime-gated bench, 9 OOS windows, 2017→2026 crypto-era span):
+
+| family | verdict | note |
+|---|---|---|
+| pure_mom (ungated) | 6/9, **+105.46 pp/yr** | frontier — the validated dispersion edge, re-appearing |
+| gated_mom (the synthesis) | 7/9, **+61.03 pp/yr** | most consistent, but the brake halves the return |
+| gmi_bh (timing alone) | 4/9, −3.35 | NO-EDGE — a single-index timer, no upside |
+| best_bh (control) | 3/9, −11.34 | NO-EDGE |
+
+**The bench isolates two questions.** *Does momentum help the brake?* Emphatically
+yes — adding the rotation turns the losing `gmi_bh` timer (−3.35) into the strong
+`gated_mom` winner (+61); the upside capture is the whole story. *Does the brake
+help momentum?* On raw return, no — the GMI equity-breadth gate pulls out of
+crypto during crypto's biggest runs, roughly *halving* the edge (105 → 61 pp/yr);
+it buys marginal consistency (7/9 vs 6/9 windows) at a steep cost. So on a
+high-dispersion universe **momentum is the engine and the GMI brake is a drag** —
+the exact mirror of the equity-only benches, where the brake's *absence* of
+upside was the whole problem.
+
+Every historical span is spent (the v5 shot consumed this same crypto calendar's
+tail), so v11 fires **no historical shot** — the historical `--holdout` refuses,
+pointing to `--forward`. The one clean test is **forward** (`alloc11.FORWARD`,
+`pure_mom` on the 8-asset universe, cutoff 2026-07-23, ripe ~2027). The frontier
+*rule* ("highest mean OOS delta") was fixed in the spec before results, so the
+forward names `pure_mom`, not the flashier `gated_mom` — picking the novel idea
+post-hoc would be the cherry-pick the discipline exists to prevent.
+
 ## Money conservation, stated plainly
 
 Every movement of money is one ledger row with a debit and a credit account.

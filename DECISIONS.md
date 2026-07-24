@@ -1063,3 +1063,51 @@ parentheses.
     5% drop), GMI hysteresis reaching -1x/-3x, the gmi_glb GMI-red exit,
     no-daily-churn, warmup, weight/flat-tape invariants, three forward
     refusals, FORWARD integrity; full suite 273 green. Red lines untouched.
+
+116. **v11 fuses the two idea-lines (spec BUILD_SPEC_V11.md): gate the
+    validated momentum rotation on the GMI regime.** The operator asked to
+    "work on former promising ideas, and this current one too." Each line has
+    the flaw the other fixes: cross-asset momentum (v5/v7, the only validated
+    edge) has upside capture but no brake — it rides a crash for weeks before
+    the trailing return turns defensive; GMI timing (v10) has a brake but on a
+    single index only ever sacrificed upside (v8/v9/v10). v11's `gated_mom`
+    rotates into the strongest RISK asset while the regime is green and steps
+    to a cash/gld/tlt safe sleeve while red. Universe = v6's 8-asset crypto-era
+    `U_FULL` (2017->2026, bound by the Binance tapes) — the widest genuine
+    dispersion set, and it holds real drawdowns (2018/2020/2022) for the brake
+    to matter. No inverse/leveraged ETFs (they decay — v8/v9/v10); safe sleeve
+    is long-only, exposure <= 1.0. (v11 0-2)
+
+117. **The bench answers v11's two isolating questions cleanly.** *Does
+    momentum help the brake?* Emphatically yes: `gated_mom` +61.03 pp/yr
+    (BEATS-SPX 7/9) vs `gmi_bh` (timing a single index alone) NO-EDGE -3.35 —
+    adding the rotation turns a losing timer into a strong winner; the upside
+    capture is the whole story. *Does the brake help momentum?* On raw return,
+    no: `pure_mom` (ungated) +105.46 pp/yr (6/9) roughly DOUBLES `gated_mom` —
+    the GMI equity-breadth gate pulls out of crypto during crypto's biggest
+    runs (when breadth momentarily dips), clipping the dispersion edge. The
+    brake buys marginal consistency (7/9 vs 6/9 windows) at a steep return
+    cost. best_bh NO-EDGE -11.34. Lesson: **on a high-dispersion universe
+    momentum is the engine and the GMI brake is a drag** — the mirror image of
+    the equity-only benches, where the brake's absence of upside was the whole
+    problem. (v11 3)
+
+118. **v11 fires NO historical shot; forward-only, on the frontier by the
+    pre-declared rule.** Every historical span is spent — the v5 shot consumed
+    this same 2017->2026 crypto calendar's tail, so no fresh carve exists.
+    `data/holdout/alloc11.FORWARD` pre-declares `pure_mom` on U_GATE (cutoff
+    2026-07-23, min 126 rows, ripe ~2027). The frontier RULE was fixed in the
+    spec before results ("highest mean OOS delta"); that is `pure_mom`
+    (+105.46), a re-appearance of the only mechanism ever validated out of
+    sample. Registering `gated_mom` instead — because it is v11's novel idea
+    and marginally more consistent — would be exactly the post-hoc cherry-pick
+    the discipline forbids, so the forward names `pure_mom`. The gate's own
+    question (does the brake survive out of sample?) is answered in-grid here
+    (it is a drag) and left un-armed on purpose. v11 acceptance: tests (17)
+    cover leakage, the gate mechanics (green->top-momentum, red->safe sleeve,
+    warmup->cash), the brake-on-flip (gated_mom leaves a still-rising pick when
+    GMI turns red) vs pure_mom holding through the crash, no-daily-churn,
+    hysteresis, weight/flat-tape invariants, warmup, the historical-shot
+    refusal, three forward refusals, FORWARD integrity; full suite 290 green.
+    Red lines untouched (virtual money; no orders; no shorting/leverage;
+    long-only safe sleeve). (v11 4)
