@@ -1,0 +1,11 @@
+forward-holdout declaration (v13 4) — a commitment registered before the data exists
+family: xs_topk
+params: K=5,L=63
+universe: stocks (66 fixed large-cap US names, masked by listing date)
+cutoff: 2026-07-17
+min_new_rows: 126
+rule: frontier = highest mean OOS delta vs SPY over the walk-forward windows; xs_topk won 9/9 windows at +23.82 pp/yr
+resolved_from: exploratory bench 1993-01-29..2026-07-17, 8423 joint days, 9 walk-forward windows. xs_topk (+23.82 pp/yr) > xs_invvol (+19.14) > best_bh (+16.82) > ew_all (+6.65), all BEATS-SPX.
+survivorship_disclosure: the +23.82 vs SPY is INFLATED — ew_all (own every survivor, zero skill) already beat SPY 8/9 at +6.65 pp/yr, so ~7 pp/yr of the gap is pure survivorship beta. The unbiased in-sample signal is xs_topk over ew_all: 9/9 windows, ~+17 pp/yr, because both share the identical biased universe. This forward shot on virgin post-cutoff rows is the ONLY read free of that inflation.
+fire_when_ripe: python -m experiments.allocation13 --holdout xs_topk --forward
+reruns_refuse: a second look requires data that postdates the shot (v13 4)

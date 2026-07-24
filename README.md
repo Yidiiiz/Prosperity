@@ -597,6 +597,60 @@ file as **confirmatory, not a new mechanism test.** Arming a risk-limited family
 that lost would be the reverse cherry-pick; the discipline arms whatever the rule
 names.
 
+## The cross-section bench (v13)
+
+```
+python -m experiments.allocation13                              # momentum ACROSS 66 large-cap stocks
+python -m experiments.allocation13 --holdout xs_topk --forward       # clean forward shot, refuses until ripe
+```
+
+Every prior bench rotated a handful of asset-class ETFs (+ crypto). v13 answers
+*"what if you run momentum across all stocks — big companies list hundreds that
+are doing well?"* — the classic cross-sectional momentum factor. Out of a
+**fixed 66-name large-cap US universe**, each month own the strongest few by
+trailing return, long-only, exposure ≤ 1.0.
+
+Two honest departures from the ETF machinery:
+
+- **Masked universe.** Stocks list at different times (AMZN 1997, GOOGL 2004,
+  META 2012). A name is `None` — invisible to the ranker — until it has real
+  history, so the universe *grows* over time (56 names listed in 1993, 66 by
+  2026) instead of truncating to the youngest tape.
+- **Survivorship is measured, not hidden.** A modern large-cap list is a basket
+  of *survivors*: the companies that went to zero (Lehman, Enron, the dot-coms)
+  are gone, and even WBA 404'd on fetch because Walgreens was taken private in
+  2025. That flatters any long-biased backtest. So the bench includes **`ew_all`**
+  — own *every* listed name equal-weight, zero selection skill — as the control.
+
+Families: **`xs_topk`** (top-K by momentum, equal weight, short-fall → cash),
+**`xs_invvol`** (top-K inverse-vol weighted), **`ew_all`** (survivorship control),
+**`best_bh`** (chase last window's single hottest name).
+
+Measured (9 OOS walk-forward windows, 1993→2026, base-venue tolls):
+
+| family | verdict vs SPY | mean OOS delta |
+|---|---|---|
+| xs_topk (top-K momentum) | **9/9** | **+23.82 pp/yr** (frontier) |
+| xs_invvol (risk parity) | 9/9 | +19.14 |
+| best_bh (chase the winner) | 9/9 | +16.82 |
+| **ew_all (survivorship control)** | 8/9 | **+6.65** |
+
+**Read this carefully — the honest signal is not the +23.82 vs SPY.** `ew_all`,
+with *zero* skill, already beats SPY 8/9 at +6.65 pp/yr: that is pure
+survivorship beta, and you cannot buy "1993's survivors-of-2026" in 1993. The
+real, bias-controlled test is **`xs_topk` vs `ew_all`** — both share the
+*identical* biased universe, so the survivor inflation cancels. There, momentum
+wins **9/9 windows** by ~+17 pp/yr. Cross-sectional momentum genuinely adds
+skill *on top of* its universe; roughly ~7 of the 23.8 pp/yr is survivor
+inflation and ~17 is real edge.
+
+That 9/9-over-the-neutral-control is the strongest cross-sectional evidence in
+the repo — so `xs_topk` [K=5, L=63] earns a **forward holdout**
+(`data/holdout/alloc13.FORWARD`), fired only on virgin post-2026-07-17 rows.
+The bench carves no historical shot: on a survivorship-shaped universe the
+absolute in-sample number is inflated by construction, and only forward data is
+clean.
+
 ## Money conservation, stated plainly
 
 Every movement of money is one ledger row with a debit and a credit account.

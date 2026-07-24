@@ -1159,3 +1159,45 @@ parentheses.
     historical-shot refusal, three forward refusals, FORWARD integrity; full
     suite 306 green. Red lines untouched (virtual money; no orders; no
     shorting/leverage; exposure ≤ 1.0, only ever scaled down). (v12 4)
+
+122. **v13 runs momentum ACROSS stocks (cross-sectional), on a MASKED
+    universe.** The operator asked to try the strategy "across all stocks."
+    Answer: the classic cross-sectional momentum factor on a fixed 66-name
+    large-cap US universe (`tools/fetch_market_data.py` fetched each tape;
+    `data/stocks/*` is gitignored like the other operator-fetched big tapes,
+    digests pinned in the record). The ETF benches' strict joint calendar would
+    truncate everything to the youngest tape (META 2012), so v13 introduces a
+    **masked loader**: each name is `None` before its first trade and only
+    becomes eligible to be ranked/held once it has real history (56 names listed
+    at the 1993 open, 66 by 2026). `momentum_ranked`, `realized_daily_vol`, and
+    `rebalance` all skip `None` legs. Families `xs_topk` (top-K equal weight,
+    short-fall→cash), `xs_invvol` (top-K inverse-vol), long-only, exposure ≤ 1.0.
+
+123. **The v13 control is `ew_all` (own every survivor equal-weight), NOT just
+    SPY.** A modern large-cap list is a survivor basket — the zeros (Lehman,
+    Enron) are absent, and WBA itself 404'd on fetch (Walgreens taken private
+    2025). So "beats SPY 9/9 at +23.82 pp/yr" is inflated: `ew_all` with zero
+    skill already beats SPY 8/9 at +6.65 pp/yr (pure survivorship beta). The
+    honest, bias-controlled test is `xs_topk` vs `ew_all` — both share the
+    identical biased universe, so the inflation cancels — and there momentum
+    wins **9/9 windows by ~+17 pp/yr**. Roughly ~7 of the 23.8 is survivor
+    inflation, ~17 is real skill. Baking `ew_all` into the bench (not leaving it
+    a scratch diagnostic) makes the survivorship decomposition reproducible.
+
+124. **v13 carves NO historical shot; it arms one clean forward holdout for
+    `xs_topk`.** On a survivorship-shaped universe the absolute in-sample number
+    is inflated by construction and the calendar overlaps spans that shaped my
+    priors, so a historical one-shot would be worthless. But `xs_topk` beating
+    the survivor-neutral control 9/9 is the strongest cross-sectional evidence
+    in the repo, so it earns a commitment: `data/holdout/alloc13.FORWARD`
+    (xs_topk [K=5,L=63], cutoff 2026-07-17, min 126 new rows), fired only on
+    virgin post-cutoff rows — the only read free of survivorship. `--holdout`
+    without `--forward` refuses (rc 2, before touching disk). v13 acceptance:
+    17 tests cover masking (unlisted invisible; loader marks `None` before
+    listing), the 1-day lag boundary (spike at i-1 selects, same spike at i
+    ignored), the families (top-K equal weight, short-fall→cash, all-negative→
+    cash, invvol full+calmer-leg-heavier, ew_all listed-only), no-leverage and
+    money-conservation-with-a-None-leg invariants, `read_forward` integrity, and
+    the no-forward refusal; full suite 328 green. Red lines untouched (virtual
+    money; only the fetch tool hits the network; no orders; no shorting/leverage;
+    exposure ≤ 1.0). (v13)

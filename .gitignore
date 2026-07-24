@@ -30,4 +30,7 @@ data/holdout/*
 !data/holdout/*.FORWARD
 # paper-trade runtime state/ledger — a personal track record, not repo data
 data/papertrade/*
+# large-cap stock universe for the cross-section bench (operator-fetched, many
+# tapes; digests pinned in records, synthetic fixtures keep the suite offline)
+data/stocks/*
 fetch_err.log
