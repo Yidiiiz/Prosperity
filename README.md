@@ -437,6 +437,57 @@ $12,858 vs SPY's $18,113, −11.82 pp/yr. The clean test is **forward**
 (`alloc9.FORWARD`, `sector_mom` on `U_WISH`, ripe ~2027), refusing spent shot /
 unripe tape / undeclared family — all three refusals are tests.
 
+## The careful Wish bench (v10)
+
+```
+python -m experiments.allocation10                              # careful GMI switch, 5%-stop GLB
+python -m experiments.allocation10 --holdout gmi_switch         # historical shot (fires once)
+python -m experiments.allocation10 --holdout gmi_switch --forward   # refuses until ~2027
+```
+
+v10 answers the operator's refinement of the Wish brief: *"when the GMI signal
+is red, switch from buy-and-hold to an inverse or something else, and when it's
+green switch back … green line breakouts sell if the stock falls ~5% off its
+all-time high."* Two corrections over v9's crude versions:
+
+- **GMI is a count, not one moving average.** The real GMI (Wish, 2005) is a
+  0–6 tally of six mostly-QQQ trend/breadth indicators (green ≥3, defensive
+  below 4, cash below 3). `gmi_switch` builds a 6-component **GMI-lite** and
+  switches on a *hysteresis* band — leave green only below 3, re-enter only at
+  4 — which kills the whipsaw that made v9's single-MA `gmi_inv` the worst
+  family. The red destination — inverse **or** cash/bonds/gold — is a bench
+  parameter, so "an inverse or something else" is decided head-to-head.
+- **GLB exits on a 5% stop from the high, not a moving average.** `glb_pct`
+  rides an all-time-high breakout and sells only when the close falls p% below
+  the running high (p ∈ {3,5,8}%). `gmi_glb` gates GLB entries on GMI-green, as
+  Wish actually trades. `best_bh` is the control.
+
+*GMI-lite is a disclosed approximation:* the true GMI needs new-high breadth
+over ~4,000 stocks the repo has no tape for; GMI-lite is a QQQ/SPY vs
+50/150/200-day trend count plus a narrow {spy,qqq,ita,itb} breadth proxy.
+
+Measured (careful-wish bench, 9 OOS windows, 2010→2022 grid span):
+
+| family | verdict | note |
+|---|---|---|
+| gmi_switch | 4/9, **−2.84 pp/yr** | frontier — roughly *half* v9's crude gmi_inv drag |
+| best_bh (control) | 4/9, −6.29 | the bull-decade hold still led the timers |
+| glb_pct (5% stop) | 1/9, −6.81 | percent stop no better than v9's MA stop |
+| gmi_glb | 1/9, −7.02 | gating GLB on GMI did not save it |
+
+**Care helped, but nothing beat SPY.** The careful hysteresis switch halved the
+crude version's drag — real progress — yet the 2010s bull still rewarded simply
+holding the index. The historical shot is the honest punchline: `gmi_switch`
+re-selected **[R=qqq, D=gld]** and *nominally* beat SPY on the reserved
+2023→2026 span ($18,264 vs $18,113, +0.30 pp/yr) — but the margin is razor-thin,
+it **loses at 2× and 5× costs**, its **drawdown was worse than SPY's** (19.8% vs
+19.0% — the timing didn't even buy downside protection), and the selection
+**rejected every inverse ETF in favor of gold**. So "an inverse or something
+else?" — *something else* (flee-to-safety) won, exactly as v8 and v9 found. The
+clean test is **forward** (`alloc10.FORWARD`, `gmi_switch` on `U_WISH2`, ripe
+~2027), refusing spent shot / unripe tape / undeclared family — all three
+refusals are tests.
+
 ## Money conservation, stated plainly
 
 Every movement of money is one ledger row with a debit and a credit account.

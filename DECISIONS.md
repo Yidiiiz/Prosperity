@@ -1008,3 +1008,58 @@ parentheses.
     integrity; full suite 260 green. Red lines untouched (leveraged and
     inverse ETFs are ordinary long positions in real listed products;
     no synthetic shorting, no margin, exposure <= 1.0).
+
+111. **v10 spec ratified on the operator's refinement of the Wish brief.**
+    The operator corrected two things: (a) "when the gmi signal is red,
+    switch from buy and hold to an inverse or smth else, and when it is
+    back to green switch back" — GMI is a *count*, switch on it carefully;
+    (b) GLB "focus on when stocks hit all time highs, and if they go back
+    down [~5%] of that all time high you sell." Research grounded both:
+    Dr. Wish's real GMI is a 0-6 tally of six mostly-QQQ trend/breadth
+    indicators (green >=3, defensive <4, cash <3); his literal GLB exit is
+    "sell if it falls back below the green line." v10 implements the
+    operator's percent-stop variant and a *count* GMI. (spec v10 0)
+
+112. **GMI-lite is a disclosed approximation, not the real GMI.** The true
+    GMI needs breadth over a ~4,000-stock universe (daily new highs, the
+    10-day Successful New High Index) the repo has no tape for. v10's
+    gmi_count is a 6-boolean trend tally from the index tapes it *does*
+    hold: QQQ/SPY vs 50/150/200d MAs, QQQ 10-day momentum, and a narrow
+    {spy,qqq,ita,itb} breadth proxy. Faithful in spirit (QQQ-centric trend
+    count), not the article. Disclosed in the record and README. (v10 0,2)
+
+113. **Two careful corrections over v9's crude versions.** (a) `gmi_switch`
+    replaces v9's single-MA `gmi_inv` with a *hysteresis* band — leave
+    green only below 3, re-enter only at 4 — which suppresses the whipsaw
+    that made gmi_inv the worst v9 family; and it makes the red destination
+    {cash, gld, tlt, -1x, -3x} a bench parameter, so "an inverse or smth
+    else" is decided head-to-head. (b) `glb_pct` replaces v9's 150/210-day
+    MA stop with the operator's percent trailing stop from the running
+    all-time high (p in {3,5,8}%). Added `gmi_glb` (GLB gated by GMI green,
+    as Wish actually trades) and kept `best_bh` as control. (v10 2)
+
+114. **v10 bench: still NO-EDGE, but the careful GMI switch roughly halved
+    the drag.** 2010->2022 grid, 9 OOS windows: gmi_switch **-2.84 pp/yr**
+    (4/9, frontier) vs v9 gmi_inv's -6 to -7.56; best_bh -6.29; glb_pct
+    (5% stop) -6.81; gmi_glb -7.02. Care helped the switch (hysteresis +
+    a free choice of safe-haven destination), but nothing beat SPY in the
+    2010s bull. The percent-stop GLB was no better than v9's MA-stop GLB:
+    timing out of a relentless bull costs either way. (v10 3)
+
+115. **v10 historical shot: nominal BEATS-SPX +0.30 pp/yr, but substantively
+    NO-EDGE.** gmi_switch re-selected [R=qqq, **D=gld**] on the first 80%
+    and made $18,263.77 vs SPY $18,112.89 on the reserved 2023-03-31 ->
+    2026-07-17 span (826 rows). Four reasons it is not a real edge: the
+    margin is razor-thin (+0.30 pp/yr); it is disclosed-contaminated; it
+    **loses at 2x and 5x costs** ($17,135 / $14,150); and its **drawdown
+    was worse** than just holding SPY (19.8% vs 19.0%) — the timing did not
+    even buy the downside protection that is its whole point. The one real
+    finding: the careful selection **rejected every inverse ETF and chose
+    gold** as the red destination, settling "an inverse or smth else" —
+    *something else* (flee-to-safety) won, confirming v8/v9. Clean test is
+    forward: alloc10.FORWARD pre-declares gmi_switch on U_WISH2, cutoff
+    2026-07-23, min 126 rows, ripe ~2027. v10 acceptance: tests (13) cover
+    leakage, the GLB percent-stop (holds shallow dips, exits exactly on the
+    5% drop), GMI hysteresis reaching -1x/-3x, the gmi_glb GMI-red exit,
+    no-daily-churn, warmup, weight/flat-tape invariants, three forward
+    refusals, FORWARD integrity; full suite 273 green. Red lines untouched.

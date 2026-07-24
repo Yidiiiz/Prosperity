@@ -1,0 +1,4 @@
+fired: 2026-07-24T00:49:30+00:00
+family: gmi_switch [R=qqq,D=gld] (holdout)
+HOLDOUT alloc10 gmi_switch [R=qqq,D=gld]: BEATS-SPX (beat SPY on 826 rows, delta +0.30 pp/yr)
+reruns refuse: a second look requires data that postdates the shot (v10 4)
