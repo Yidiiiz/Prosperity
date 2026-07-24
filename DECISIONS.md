@@ -1201,3 +1201,48 @@ parentheses.
     the no-forward refusal; full suite 328 green. Red lines untouched (virtual
     money; only the fetch tool hits the network; no orders; no shorting/leverage;
     exposure ≤ 1.0). (v13)
+
+125. **The literal v14 (fetch the graveyard, re-rank) is impossible with honest
+    data — and that is itself a finding.** Yahoo's chart API, the only network
+    tool this repo allows, does not serve delisted price history: real casualties
+    404 (LEH, ENE, WCOM, BSC, CFC, NT, EK, PALM, SUNW), the post-bankruptcy "Q"
+    tickers resolve to empty shells with zero rows (LEHMQ, ENRNQ, WAMUQ, WCOEQ,
+    CPQ), and the reusable symbols point at NEW companies (WB→Weibo 2014, CC→
+    Chemours 2015, SHLD 2023, GM 2010), not the dead originals. Fabricating a
+    tape and passing it off as history would violate the repo's integrity, so v14
+    does NOT do that. It answers the survivorship question three honest ways
+    instead (spec v14). (v14)
+
+126. **v14 resolves the DIRECTION of survivorship bias with real data, and it
+    refutes the v13 hedge.** Attributing `xs_topk`'s daily log-edge over `ew_all`
+    by SPY 200-day regime gives +3.54 (bull) and −1.06 (bear): momentum's entire
+    edge over the survivor control is bull-market winner-chasing, and it LOSES to
+    equal-weight in down-markets. So survivorship INFLATES the vs-SPY number — it
+    is not, as v13 speculated it might be, a defensive cash-exit that a real
+    graveyard would flatter. The concentrated momentum book offers no downside
+    protection over owning the whole universe. (v14)
+
+127. **The graveyard stress is a labeled synthetic model, never history, and its
+    lever is collapse SPEED, not just intensity.** Phantom landmines rise (get
+    chased) then collapse −95% and delist; all prices synthetic and seeded, never
+    written to a tape/record as real. The honest subtlety I nearly missed: a slow
+    bleed lets momentum's cash-exit + 21-day rebalance escape (so momentum looks
+    robust and `ew_all` eats the loss), but a 1-day gap (bankruptcy filing / fraud
+    reveal) cannot be dodged and hits the concentrated top-K harder. Testing BOTH:
+    the `xs_topk − ew_all` edge survives even single-day gaps to ~2.4 delistings/
+    yr, but the gap roughly halves its intensity-scaling (+8.4 vs +16.2 at ~1.2/
+    yr) and widens variance — concentration is more fragile to sudden landmines,
+    not fatally. (v14)
+
+128. **v14's new signal `xs_skip` LOSES, so v14 arms NO new forward.** The
+    canonical 12–1 momentum (skip the recent month) scored +18.63 pp/yr (9/9) vs
+    raw `xs_topk`'s +23.82 — recent-month momentum is additive here, not reversal.
+    Since `xs_skip` is worse than the already-armed `xs_topk` (alloc13.FORWARD),
+    arming a weaker near-duplicate forward would be a cherry-pick; discipline is
+    satisfied by arming nothing. `--holdout` still refuses without `--forward`
+    (rc 2) and `read_forward` refuses when unarmed. v14 acceptance: 13 offline
+    tests (xs_skip skips the recent window / sees older momentum / short-fall→
+    cash, grids keep L>skip, no-leverage, run_equity length, SPY-regime sampler,
+    graveyard generator determinism + rise-collapse-delist shape + a held phantom
+    realizes the loss, calibration sanity, the no-forward refusal); full suite
+    341 green. Red lines untouched. (v14)

@@ -651,6 +651,51 @@ The bench carves no historical shot: on a survivorship-shaped universe the
 absolute in-sample number is inflated by construction, and only forward data is
 clean.
 
+## The survivorship stress bench (v14)
+
+```
+python -m experiments.allocation14 --mode all      # bench + regime-direction + graveyard stress
+```
+
+v13 disclosed that its vs-SPY number is survivor-inflated and controlled the
+*level* of that inflation with `ew_all`. v14 asks the sharper questions: does the
+canonical academic signal help, which *direction* does survivorship bias run, and
+**would putting the dead companies back into the ranking pool blow up the
+concentrated top-K book?**
+
+The literal test — fetch the graveyard, re-rank — turns out to be **impossible
+with honest data.** Yahoo's chart API (the only network tool this repo allows)
+does not serve delisted price history: real casualties 404 (LEH, ENE, WCOM,
+BSC…), the post-bankruptcy "Q" tickers resolve to empty shells (LEHMQ, ENRNQ,
+WAMUQ…), and reusable symbols (WB, CC, SHLD, GM) point at *new* companies, not
+the dead originals. Fabricating a tape and calling it history would violate the
+repo's integrity, so v14 answers three honest ways instead:
+
+- **`xs_skip` — the 12–1 signal (skip the recent month).** A clean negative:
+  **+18.63 pp/yr (9/9)** vs raw `xs_topk`'s +23.82. Skipping short-term reversal
+  *hurts* by ~5 pp/yr here — recent-month momentum is additive in this universe,
+  not reversal. The textbook tweak loses; raw momentum wins.
+- **Survivorship *direction* (real data).** Attribute `xs_topk`'s daily
+  log-edge over `ew_all` by SPY regime (≥ / < its 200-day MA): **+3.54 in bull
+  regimes, −1.06 in bear.** Momentum's *entire* edge is bull-market winner-
+  chasing, and it actually **loses to the equal-weight survivor basket in
+  down-markets.** So survivorship **inflates** the edge — it is *not* a defensive
+  cash-exit that a real graveyard would flatter.
+- **Synthetic graveyard stress (labeled, seeded — not history).** Inject phantom
+  "landmines" that rise (get chased) then collapse −95% and delist. The lever is
+  collapse *speed*: under a slow bleed momentum's cash-exit escapes and `ew_all`
+  eats the loss; under a **1-day gap** (bankruptcy filing / fraud reveal) the
+  concentrated book is hit harder. Result: the `xs_topk − ew_all` edge **survives
+  even single-day gaps up to ~2.4 delistings/yr**, but the gap roughly halves its
+  intensity-scaling (edge +8.4 vs +16.2 at ~1.2/yr) and widens its variance —
+  concentration *is* more fragile to sudden landmines, just not fatally so.
+
+Net: cross-sectional momentum's skill over its universe is real and graveyard-
+robust, but its *absolute* return is a bull-market, survivor-flattered upper
+bound with no downside protection over simply owning the whole universe.
+`xs_skip` is worse than the already-armed `xs_topk`, so v14 arms **no new
+forward** — re-arming a weaker near-duplicate would be a cherry-pick.
+
 ## Money conservation, stated plainly
 
 Every movement of money is one ledger row with a debit and a credit account.
