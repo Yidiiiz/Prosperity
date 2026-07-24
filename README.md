@@ -398,6 +398,45 @@ pre-declares `regime_safe` on `U_DIR`, firing once ≥126 rows postdate
 2026-07-23 (~2027). Refuses a spent shot, unripe tape, and any undeclared
 family; all three refusals are tests.
 
+## The Wish bench (v9)
+
+```
+python -m experiments.allocation9                            # Green Line Breakout, GMI inverse, sectors
+python -m experiments.allocation9 --holdout sector_mom       # historical shot (fires once)
+python -m experiments.allocation9 --holdout sector_mom --forward   # refuses until ~2027
+```
+
+v9 implements Dr. Eric Wish's strategies and tests the leveraged-inverse idea
+*correctly*, on real tapes: SQQQ/SPXU (−3×), SDS (−2×), plus defense (ITA) and
+home construction (ITB) sectors. Families: `glb` (Green Line Breakout — buy an
+all-time-high breakout that has held ≥3 months, ride it under a 30-/42-week MA
+stop), `gmi_inv` (Wish's market timing → hold the index above its 30-week MA,
+else rotate into an inverse ETF — each index paired with −1× *and* −3×/−2× to
+test the leverage head-to-head), `sector_mom` (momentum over the long-only
+sleeve), and `best_bh` (control).
+
+**The 3× fact, measured.** SQQQ's *daily* beta vs QQQ is **−2.96** — so yes,
+−3× products move ~3× the inverse each day. But daily reset compounds into
+decay: **buy-and-hold SQQQ 2010→2026 went to ≈$0 while QQQ rose 15.9×.** The
+3× relationship is a one-day statement; held for any length these bleed out.
+
+Measured (wish bench, 9 OOS windows, 2010→2022 grid span):
+
+| family | verdict | note |
+|---|---|---|
+| sector_mom | 2/9, **−1.57 pp/yr** | least-bad (frontier), still loses |
+| glb (Green Line Breakout) | 2/9, −4.74 | timing out of a bull decade costs |
+| best_bh (control) | 4/9, −6.29 | even the best hold lagged SPY |
+| gmi_inv | 2/9, **−7.56** | worst — the −3×/−2× legs made it worse, not better |
+
+**Nothing beat buy-and-hold SPY.** The 2010s were a relentless SPY bull; every
+strategy that stepped out of the index, shorted it, or diluted into sectors
+paid for it, and the leveraged-inverse legs were the single worst family. The
+historical shot confirmed it: `sector_mom` on the reserved 2023→2026 span made
+$12,858 vs SPY's $18,113, −11.82 pp/yr. The clean test is **forward**
+(`alloc9.FORWARD`, `sector_mom` on `U_WISH`, ripe ~2027), refusing spent shot /
+unripe tape / undeclared family — all three refusals are tests.
+
 ## Money conservation, stated plainly
 
 Every movement of money is one ledger row with a debit and a credit account.

@@ -957,3 +957,54 @@ parentheses.
     green. Red lines untouched (inverse ETFs are ordinary long
     positions in real listed products; no synthetic shorting, no
     leverage, exposure <= 1.0).
+
+107. **v9 spec ratified on operator directive (professor Dr. Eric Wish:
+    implement Green Line Breakout "and others", do leveraged inverse
+    ETFs "correctly" per his ~3x point, add defensive sectors like
+    construction/war companies).** New universe U_WISH on real tapes:
+    SQQQ/SPXU (-3x), SDS (-2x), ITA (defense), ITB (home construction),
+    plus v6/v8 carryovers; bound by SQQQ inception 2010-02-11. Four
+    families, grids frozen pre-run: glb (Green Line Breakout — enter R
+    when its close exceeds the highest close >=63 trading days old, ride
+    under a 150/210-day MA stop, exit to cash below it), gmi_inv
+    (Wish's market timing as QQQ-vs-30-week-MA, risk-off into an inverse
+    leg, pairing each index with -1x AND -3x/-2x to test the leverage
+    head-to-head), sector_mom (monthly top-K momentum over the long-only
+    sleeve spy,qqq,gld,tlt,ita,itb), best_bh control. allocation9.py
+    reuses v6 machinery; v4-v8 untouched.
+
+108. **The 3x claim, measured not argued: correct for one DAY, false
+    for any holding period.** SQQQ's daily return beta vs QQQ is -2.96
+    (~-3x, as the professor said). But daily reset compounds into decay:
+    buy-and-hold SQQQ 2010->2026 -> ~$0 while QQQ rose 15.9x. A -3x ETF
+    is a short-holding tactical instrument gated by a signal, never a
+    hold. Implemented with REAL leveraged tapes so the true drag is in
+    the closes, not a synthetic -3x model that would flatter it.
+
+109. **v9 bench verdict: nothing worked. Not Green Line Breakout, not
+    the GMI-gated inverse (any leverage), not the sectors — none beat
+    buy-and-hold SPY out of sample on the 2010->2022 grid.** 9 OOS
+    windows: sector_mom NO-EDGE 2/9 mean -1.57 pp/yr (least-bad,
+    frontier); glb NO-EDGE 2/9 -4.74; best_bh NO-EDGE 4/9 -6.29;
+    gmi_inv NO-EDGE 2/9 -7.56 (WORST — the -3x/-2x legs did not rescue
+    it; drag + whipsaw dominated). The 2010s were a relentless SPY bull;
+    any strategy that stepped out of SPY, or shorted it, or diluted into
+    sectors, paid for it. The professor's leveraged-inverse idea is
+    falsified as a portfolio strategy here: gmi_inv with -3x was the
+    single worst family across the whole bench.
+
+110. **v9 historical shot fired sector_mom [L=63,K=1] and said NO-EDGE
+    (-11.82 pp/yr).** Reserved final 20% (2023-03-31 -> 2026-07-17,
+    3.30y): $12,857.93 (+7.92%/yr) vs SPY $18,112.89 (+19.75%/yr),
+    losing at 2x/5x costs too. The least-bad in-grid family still lost
+    badly out of sample — the negative result replicates. Clean test is
+    forward: alloc9.FORWARD pre-declares sector_mom on U_WISH, cutoff
+    2026-07-23, min 126 rows, ripe ~2027 (`--holdout sector_mom
+    --forward`); refuses spent shot / unripe tape / undeclared family
+    (three tests). v9 acceptance: tests (11) cover leakage, GLB
+    breakout-then-MA-stop mechanics, GMI switching that reaches the -3x
+    products, no-daily-churn, the sector_mom->dm_topk K=1 bridge, weight
+    and flat-tape invariants, the three forward refusals, FORWARD
+    integrity; full suite 260 green. Red lines untouched (leveraged and
+    inverse ETFs are ordinary long positions in real listed products;
+    no synthetic shorting, no margin, exposure <= 1.0).

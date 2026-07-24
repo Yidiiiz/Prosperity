@@ -1,0 +1,172 @@
+record: experiments/alloc9_wish_20260724T003305090Z_p35980.txt
+utc: 2026-07-24T00:33:05+00:00
+git: e5b4b06
+rng_seed: n/a
+config: {"tapes": {"gld": "4029ec5933a6219d", "ita": "c808872bc5d6cd67", "itb": "02303b439352ad57", "psq": "e1eae55bae5eb9a8", "qqq": "4e645c698e4d95ce", "sds": "02bf5ebcf61f1926", "sh": "954c560019ea2dbf", "spxu": "b9b98efac51a39e1", "spy": "7f758062b681ee8e", "sqqq": "98aee315dff576cf", "tlt": "36f6789c28dee591"}, "universe": ["gld", "ita", "itb", "psq", "qqq", "sds", "sh", "spxu", "spy", "sqqq", "tlt"], "joint_rows": 4132, "grid_rows": 3306, "windows": 10, "capital_u": 10000000000, "venue": {"taker_bps": 10, "maker_bps": 0, "spread_bps": 2, "min_fee_u": 0, "fill_delay_ticks": 1}}
+========================================================================
+
+--- results -----------------------------------------------------
+wish bench: 4132 joint days, grid 3306 rows / 10 windows, holdout 826 rows (universe gld,ita,itb,psq,qqq,sds,sh,spxu,spy,sqqq,tlt)
+
+family glb:
+  glb [R=qqq,S=150] w2: $10,251.67 vs SPY $11,160.03 (did not beat)
+  spx: glb [R=qqq,S=150] w2 buy-and-hold $11,160.03 (+8.79%/yr) | delta -6.86 pp/yr
+  glb [R=qqq,S=210] w3: $11,321.04 vs SPY $12,633.94 (did not beat)
+  spx: glb [R=qqq,S=210] w3 buy-and-hold $12,633.94 (+19.52%/yr) | delta -9.59 pp/yr
+  glb [R=qqq,S=150] w4: $10,781.16 vs SPY $11,443.31 (did not beat)
+  spx: glb [R=qqq,S=150] w4 buy-and-hold $11,443.31 (+10.83%/yr) | delta -4.92 pp/yr
+  glb [R=qqq,S=210] w5: $8,412.16 vs SPY $10,359.12 (did not beat)
+  spx: glb [R=qqq,S=210] w5 buy-and-hold $10,359.12 (+2.74%/yr) | delta -15.17 pp/yr
+  glb [R=spy,S=150] w6: $11,628.72 vs SPY $12,256.93 (did not beat)
+  spx: glb [R=spy,S=150] w6 buy-and-hold $12,256.93 (+16.90%/yr) | delta -4.63 pp/yr
+  glb [R=qqq,S=150] w7: $9,920.53 vs SPY $10,820.00 (did not beat)
+  spx: glb [R=qqq,S=150] w7 buy-and-hold $10,820.00 (+6.17%/yr) | delta -6.77 pp/yr
+  glb [R=qqq,S=210] w8: $11,082.50 vs SPY $11,525.13 (did not beat)
+  spx: glb [R=qqq,S=210] w8 buy-and-hold $11,525.13 (+11.48%/yr) | delta -3.29 pp/yr
+  glb [R=qqq,S=210] w9: $14,378.04 vs SPY $13,687.28 (beat)
+  spx: glb [R=qqq,S=210] w9 buy-and-hold $13,687.28 (+27.23%/yr) | delta +4.90 pp/yr
+  glb [R=qqq,S=150] w10: $9,149.02 vs SPY $8,670.11 (beat)
+  spx: glb [R=qqq,S=150] w10 buy-and-hold $8,670.11 (-10.17%/yr) | delta +3.70 pp/yr
+  glb: NO-EDGE (2/9 windows beat SPY) | mean OOS delta -4.74 pp/yr
+
+family gmi_inv:
+  gmi_inv [R=qqq,I=psq,S=150] w2: $8,366.74 vs SPY $11,160.03 (did not beat)
+  spx: gmi_inv [R=qqq,I=psq,S=150] w2 buy-and-hold $11,160.03 (+8.79%/yr) | delta -21.57 pp/yr
+  gmi_inv [R=qqq,I=sqqq,S=150] w3: $11,559.90 vs SPY $12,633.94 (did not beat)
+  spx: gmi_inv [R=qqq,I=sqqq,S=150] w3 buy-and-hold $12,633.94 (+19.52%/yr) | delta -7.83 pp/yr
+  gmi_inv [R=spy,I=sh,S=150] w4: $10,450.37 vs SPY $11,443.31 (did not beat)
+  spx: gmi_inv [R=spy,I=sh,S=150] w4 buy-and-hold $11,443.31 (+10.83%/yr) | delta -7.41 pp/yr
+  gmi_inv [R=qqq,I=psq,S=210] w5: $6,794.43 vs SPY $10,359.12 (did not beat)
+  spx: gmi_inv [R=qqq,I=psq,S=210] w5 buy-and-hold $10,359.12 (+2.74%/yr) | delta -28.41 pp/yr
+  gmi_inv [R=spy,I=sh,S=210] w6: $12,256.93 vs SPY $12,256.93 (did not beat)
+  spx: gmi_inv [R=spy,I=sh,S=210] w6 buy-and-hold $12,256.93 (+16.90%/yr) | delta +0.00 pp/yr
+  gmi_inv [R=qqq,I=psq,S=150] w7: $9,594.04 vs SPY $10,820.00 (did not beat)
+  spx: gmi_inv [R=qqq,I=psq,S=150] w7 buy-and-hold $10,820.00 (+6.17%/yr) | delta -9.27 pp/yr
+  gmi_inv [R=qqq,I=psq,S=210] w8: $10,818.50 vs SPY $11,525.13 (did not beat)
+  spx: gmi_inv [R=qqq,I=psq,S=210] w8 buy-and-hold $11,525.13 (+11.48%/yr) | delta -5.27 pp/yr
+  gmi_inv [R=qqq,I=psq,S=210] w9: $14,378.04 vs SPY $13,687.28 (beat)
+  spx: gmi_inv [R=qqq,I=psq,S=210] w9 buy-and-hold $13,687.28 (+27.23%/yr) | delta +4.90 pp/yr
+  gmi_inv [R=qqq,I=psq,S=150] w10: $9,559.22 vs SPY $8,670.11 (beat)
+  spx: gmi_inv [R=qqq,I=psq,S=150] w10 buy-and-hold $8,670.11 (-10.17%/yr) | delta +6.84 pp/yr
+  gmi_inv: NO-EDGE (2/9 windows beat SPY) | mean OOS delta -7.56 pp/yr
+
+family sector_mom:
+  sector_mom [L=63,K=2] w2: $14,046.41 vs SPY $11,160.03 (beat)
+  spx: sector_mom [L=63,K=2] w2 buy-and-hold $11,160.03 (+8.79%/yr) | delta +21.00 pp/yr
+  sector_mom [L=63,K=2] w3: $14,526.31 vs SPY $12,633.94 (beat)
+  spx: sector_mom [L=63,K=2] w3 buy-and-hold $12,633.94 (+19.52%/yr) | delta +13.42 pp/yr
+  sector_mom [L=63,K=1] w4: $10,138.00 vs SPY $11,443.31 (did not beat)
+  spx: sector_mom [L=63,K=1] w4 buy-and-hold $11,443.31 (+10.83%/yr) | delta -9.78 pp/yr
+  sector_mom [L=252,K=2] w5: $9,271.56 vs SPY $10,359.12 (did not beat)
+  spx: sector_mom [L=252,K=2] w5 buy-and-hold $10,359.12 (+2.74%/yr) | delta -8.38 pp/yr
+  sector_mom [L=126,K=1] w6: $11,716.72 vs SPY $12,256.93 (did not beat)
+  spx: sector_mom [L=126,K=1] w6 buy-and-hold $12,256.93 (+16.90%/yr) | delta -3.97 pp/yr
+  sector_mom [L=63,K=2] w7: $10,715.09 vs SPY $10,820.00 (did not beat)
+  spx: sector_mom [L=63,K=2] w7 buy-and-hold $10,820.00 (+6.17%/yr) | delta -0.78 pp/yr
+  sector_mom [L=63,K=1] w8: $11,411.48 vs SPY $11,525.13 (did not beat)
+  spx: sector_mom [L=63,K=1] w8 buy-and-hold $11,525.13 (+11.48%/yr) | delta -0.84 pp/yr
+  sector_mom [L=63,K=1] w9: $11,374.04 vs SPY $13,687.28 (did not beat)
+  spx: sector_mom [L=63,K=1] w9 buy-and-hold $13,687.28 (+27.23%/yr) | delta -16.85 pp/yr
+  sector_mom [L=252,K=2] w10: $7,663.36 vs SPY $8,670.11 (did not beat)
+  spx: sector_mom [L=252,K=2] w10 buy-and-hold $8,670.11 (-10.17%/yr) | delta -7.96 pp/yr
+  sector_mom: NO-EDGE (2/9 windows beat SPY) | mean OOS delta -1.57 pp/yr
+
+family best_bh:
+  best_bh [asset=gld] w2: $11,421.92 vs SPY $11,160.03 (beat)
+  spx: best_bh [asset=gld] w2 buy-and-hold $11,160.03 (+8.79%/yr) | delta +1.95 pp/yr
+  best_bh [asset=itb] w3: $12,003.02 vs SPY $12,633.94 (did not beat)
+  spx: best_bh [asset=itb] w3 buy-and-hold $12,633.94 (+19.52%/yr) | delta -4.58 pp/yr
+  best_bh [asset=ita] w4: $11,232.68 vs SPY $11,443.31 (did not beat)
+  spx: best_bh [asset=ita] w4 buy-and-hold $11,443.31 (+10.83%/yr) | delta -1.56 pp/yr
+  best_bh [asset=qqq] w5: $10,790.77 vs SPY $10,359.12 (beat)
+  spx: best_bh [asset=qqq] w5 buy-and-hold $10,359.12 (+2.74%/yr) | delta +3.27 pp/yr
+  best_bh [asset=tlt] w6: $8,855.98 vs SPY $12,256.93 (did not beat)
+  spx: best_bh [asset=tlt] w6 buy-and-hold $12,256.93 (+16.90%/yr) | delta -25.80 pp/yr
+  best_bh [asset=itb] w7: $8,658.35 vs SPY $10,820.00 (did not beat)
+  spx: best_bh [asset=itb] w7 buy-and-hold $10,820.00 (+6.17%/yr) | delta -16.53 pp/yr
+  best_bh [asset=qqq] w8: $14,642.23 vs SPY $11,525.13 (beat)
+  spx: best_bh [asset=qqq] w8 buy-and-hold $11,525.13 (+11.48%/yr) | delta +22.43 pp/yr
+  best_bh [asset=gld] w9: $8,725.10 vs SPY $13,687.28 (did not beat)
+  spx: best_bh [asset=gld] w9 buy-and-hold $13,687.28 (+27.23%/yr) | delta -37.17 pp/yr
+  best_bh [asset=itb] w10: $8,850.69 vs SPY $8,670.11 (beat)
+  spx: best_bh [asset=itb] w10 buy-and-hold $8,670.11 (-10.17%/yr) | delta +1.40 pp/yr
+  best_bh: NO-EDGE (4/9 windows beat SPY) | mean OOS delta -6.29 pp/yr
+
+ALLOC9 WISH glb: NO-EDGE (2/9, -4.74 pp/yr); gmi_inv: NO-EDGE (2/9, -7.56 pp/yr); sector_mom: NO-EDGE (2/9, -1.57 pp/yr); best_bh: NO-EDGE (4/9, -6.29 pp/yr) | FRONTIER sector_mom (holdout target by v9 4)
+
+span: 2010-02-11T00:00:00+00:00 -> 2023-03-30T00:00:00+00:00 (13.13 years)
+wall: 0.3 s
+annualized: glb [R=qqq,S=150] w2 audited $10,251.67 vs initial $10,000.00 -> +1.93%/yr
+benchmark: glb [R=qqq,S=150] w2 buy-and-hold $11,160.03 (+8.79%/yr) | delta -6.86 pp/yr
+annualized: glb [R=qqq,S=210] w3 audited $11,321.04 vs initial $10,000.00 -> +9.92%/yr
+benchmark: glb [R=qqq,S=210] w3 buy-and-hold $12,633.94 (+19.52%/yr) | delta -9.59 pp/yr
+annualized: glb [R=qqq,S=150] w4 audited $10,781.16 vs initial $10,000.00 -> +5.90%/yr
+benchmark: glb [R=qqq,S=150] w4 buy-and-hold $11,443.31 (+10.83%/yr) | delta -4.92 pp/yr
+annualized: glb [R=qqq,S=210] w5 audited $8,412.16 vs initial $10,000.00 -> -12.43%/yr
+benchmark: glb [R=qqq,S=210] w5 buy-and-hold $10,359.12 (+2.74%/yr) | delta -15.17 pp/yr
+annualized: glb [R=spy,S=150] w6 audited $11,628.72 vs initial $10,000.00 -> +12.28%/yr
+benchmark: glb [R=spy,S=150] w6 buy-and-hold $12,256.93 (+16.90%/yr) | delta -4.63 pp/yr
+annualized: glb [R=qqq,S=150] w7 audited $9,920.53 vs initial $10,000.00 -> -0.60%/yr
+benchmark: glb [R=qqq,S=150] w7 buy-and-hold $10,820.00 (+6.17%/yr) | delta -6.77 pp/yr
+annualized: glb [R=qqq,S=210] w8 audited $11,082.50 vs initial $10,000.00 -> +8.19%/yr
+benchmark: glb [R=qqq,S=210] w8 buy-and-hold $11,525.13 (+11.48%/yr) | delta -3.29 pp/yr
+annualized: glb [R=qqq,S=210] w9 audited $14,378.04 vs initial $10,000.00 -> +32.13%/yr
+benchmark: glb [R=qqq,S=210] w9 buy-and-hold $13,687.28 (+27.23%/yr) | delta +4.90 pp/yr
+annualized: glb [R=qqq,S=150] w10 audited $9,149.02 vs initial $10,000.00 -> -6.47%/yr
+benchmark: glb [R=qqq,S=150] w10 buy-and-hold $8,670.11 (-10.17%/yr) | delta +3.70 pp/yr
+annualized: gmi_inv [R=qqq,I=psq,S=150] w2 audited $8,366.74 vs initial $10,000.00 -> -12.79%/yr
+benchmark: gmi_inv [R=qqq,I=psq,S=150] w2 buy-and-hold $11,160.03 (+8.79%/yr) | delta -21.57 pp/yr
+annualized: gmi_inv [R=qqq,I=sqqq,S=150] w3 audited $11,559.90 vs initial $10,000.00 -> +11.69%/yr
+benchmark: gmi_inv [R=qqq,I=sqqq,S=150] w3 buy-and-hold $12,633.94 (+19.52%/yr) | delta -7.83 pp/yr
+annualized: gmi_inv [R=spy,I=sh,S=150] w4 audited $10,450.37 vs initial $10,000.00 -> +3.42%/yr
+benchmark: gmi_inv [R=spy,I=sh,S=150] w4 buy-and-hold $11,443.31 (+10.83%/yr) | delta -7.41 pp/yr
+annualized: gmi_inv [R=qqq,I=psq,S=210] w5 audited $6,794.43 vs initial $10,000.00 -> -25.66%/yr
+benchmark: gmi_inv [R=qqq,I=psq,S=210] w5 buy-and-hold $10,359.12 (+2.74%/yr) | delta -28.41 pp/yr
+annualized: gmi_inv [R=spy,I=sh,S=210] w6 audited $12,256.93 vs initial $10,000.00 -> +16.90%/yr
+benchmark: gmi_inv [R=spy,I=sh,S=210] w6 buy-and-hold $12,256.93 (+16.90%/yr) | delta +0.00 pp/yr
+annualized: gmi_inv [R=qqq,I=psq,S=150] w7 audited $9,594.04 vs initial $10,000.00 -> -3.10%/yr
+benchmark: gmi_inv [R=qqq,I=psq,S=150] w7 buy-and-hold $10,820.00 (+6.17%/yr) | delta -9.27 pp/yr
+annualized: gmi_inv [R=qqq,I=psq,S=210] w8 audited $10,818.50 vs initial $10,000.00 -> +6.21%/yr
+benchmark: gmi_inv [R=qqq,I=psq,S=210] w8 buy-and-hold $11,525.13 (+11.48%/yr) | delta -5.27 pp/yr
+annualized: gmi_inv [R=qqq,I=psq,S=210] w9 audited $14,378.04 vs initial $10,000.00 -> +32.13%/yr
+benchmark: gmi_inv [R=qqq,I=psq,S=210] w9 buy-and-hold $13,687.28 (+27.23%/yr) | delta +4.90 pp/yr
+annualized: gmi_inv [R=qqq,I=psq,S=150] w10 audited $9,559.22 vs initial $10,000.00 -> -3.33%/yr
+benchmark: gmi_inv [R=qqq,I=psq,S=150] w10 buy-and-hold $8,670.11 (-10.17%/yr) | delta +6.84 pp/yr
+annualized: sector_mom [L=63,K=2] w2 audited $14,046.41 vs initial $10,000.00 -> +29.79%/yr
+benchmark: sector_mom [L=63,K=2] w2 buy-and-hold $11,160.03 (+8.79%/yr) | delta +21.00 pp/yr
+annualized: sector_mom [L=63,K=2] w3 audited $14,526.31 vs initial $10,000.00 -> +32.94%/yr
+benchmark: sector_mom [L=63,K=2] w3 buy-and-hold $12,633.94 (+19.52%/yr) | delta +13.42 pp/yr
+annualized: sector_mom [L=63,K=1] w4 audited $10,138.00 vs initial $10,000.00 -> +1.05%/yr
+benchmark: sector_mom [L=63,K=1] w4 buy-and-hold $11,443.31 (+10.83%/yr) | delta -9.78 pp/yr
+annualized: sector_mom [L=252,K=2] w5 audited $9,271.56 vs initial $10,000.00 -> -5.64%/yr
+benchmark: sector_mom [L=252,K=2] w5 buy-and-hold $10,359.12 (+2.74%/yr) | delta -8.38 pp/yr
+annualized: sector_mom [L=126,K=1] w6 audited $11,716.72 vs initial $10,000.00 -> +12.93%/yr
+benchmark: sector_mom [L=126,K=1] w6 buy-and-hold $12,256.93 (+16.90%/yr) | delta -3.97 pp/yr
+annualized: sector_mom [L=63,K=2] w7 audited $10,715.09 vs initial $10,000.00 -> +5.38%/yr
+benchmark: sector_mom [L=63,K=2] w7 buy-and-hold $10,820.00 (+6.17%/yr) | delta -0.78 pp/yr
+annualized: sector_mom [L=63,K=1] w8 audited $11,411.48 vs initial $10,000.00 -> +10.64%/yr
+benchmark: sector_mom [L=63,K=1] w8 buy-and-hold $11,525.13 (+11.48%/yr) | delta -0.84 pp/yr
+annualized: sector_mom [L=63,K=1] w9 audited $11,374.04 vs initial $10,000.00 -> +10.38%/yr
+benchmark: sector_mom [L=63,K=1] w9 buy-and-hold $13,687.28 (+27.23%/yr) | delta -16.85 pp/yr
+annualized: sector_mom [L=252,K=2] w10 audited $7,663.36 vs initial $10,000.00 -> -18.13%/yr
+benchmark: sector_mom [L=252,K=2] w10 buy-and-hold $8,670.11 (-10.17%/yr) | delta -7.96 pp/yr
+annualized: best_bh [asset=gld] w2 audited $11,421.92 vs initial $10,000.00 -> +10.74%/yr
+benchmark: best_bh [asset=gld] w2 buy-and-hold $11,160.03 (+8.79%/yr) | delta +1.95 pp/yr
+annualized: best_bh [asset=itb] w3 audited $12,003.02 vs initial $10,000.00 -> +14.94%/yr
+benchmark: best_bh [asset=itb] w3 buy-and-hold $12,633.94 (+19.52%/yr) | delta -4.58 pp/yr
+annualized: best_bh [asset=ita] w4 audited $11,232.68 vs initial $10,000.00 -> +9.27%/yr
+benchmark: best_bh [asset=ita] w4 buy-and-hold $11,443.31 (+10.83%/yr) | delta -1.56 pp/yr
+annualized: best_bh [asset=qqq] w5 audited $10,790.77 vs initial $10,000.00 -> +6.01%/yr
+benchmark: best_bh [asset=qqq] w5 buy-and-hold $10,359.12 (+2.74%/yr) | delta +3.27 pp/yr
+annualized: best_bh [asset=tlt] w6 audited $8,855.98 vs initial $10,000.00 -> -8.90%/yr
+benchmark: best_bh [asset=tlt] w6 buy-and-hold $12,256.93 (+16.90%/yr) | delta -25.80 pp/yr
+annualized: best_bh [asset=itb] w7 audited $8,658.35 vs initial $10,000.00 -> -10.36%/yr
+benchmark: best_bh [asset=itb] w7 buy-and-hold $10,820.00 (+6.17%/yr) | delta -16.53 pp/yr
+annualized: best_bh [asset=qqq] w8 audited $14,642.23 vs initial $10,000.00 -> +33.91%/yr
+benchmark: best_bh [asset=qqq] w8 buy-and-hold $11,525.13 (+11.48%/yr) | delta +22.43 pp/yr
+annualized: best_bh [asset=gld] w9 audited $8,725.10 vs initial $10,000.00 -> -9.94%/yr
+benchmark: best_bh [asset=gld] w9 buy-and-hold $13,687.28 (+27.23%/yr) | delta -37.17 pp/yr
+annualized: best_bh [asset=itb] w10 audited $8,850.69 vs initial $10,000.00 -> -8.77%/yr
+benchmark: best_bh [asset=itb] w10 buy-and-hold $8,670.11 (-10.17%/yr) | delta +1.40 pp/yr
+
+=== RESULT: ALLOC9 WISH glb: NO-EDGE (2/9, -4.74 pp/yr); gmi_inv: NO-EDGE (2/9, -7.56 pp/yr); sector_mom: NO-EDGE (2/9, -1.57 pp/yr); best_bh: NO-EDGE (4/9, -6.29 pp/yr) | FRONTIER sector_mom (holdout target by v9 4)

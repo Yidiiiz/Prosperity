@@ -1,0 +1,4 @@
+fired: 2026-07-24T00:34:25+00:00
+family: sector_mom [L=63,K=1] (holdout)
+HOLDOUT alloc9 sector_mom [L=63,K=1]: NO-EDGE (did not beat SPY on 826 rows, delta -11.82 pp/yr)
+reruns refuse: a second look requires data that postdates the shot (v9 4)
