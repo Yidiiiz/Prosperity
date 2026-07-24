@@ -28,4 +28,6 @@ data/holdout/*
 !data/holdout/*.SHOT
 # the forward-holdout declaration is a commitment, not data (v7 4)
 !data/holdout/*.FORWARD
+# paper-trade runtime state/ledger — a personal track record, not repo data
+data/papertrade/*
 fetch_err.log
