@@ -1111,3 +1111,51 @@ parentheses.
     refusal, three forward refusals, FORWARD integrity; full suite 290 green.
     Red lines untouched (virtual money; no orders; no shorting/leverage;
     long-only safe sleeve). (v11 4)
+
+119. **v12 answers "limit risk" by SIZING, not timing — the one lever v4-v11
+    left untouched.** Every prior bench was all-or-nothing (weight 1.0 on a
+    single asset). Eleven versions settled that downside *timing* is a drag
+    (inverse ETFs, GLB stops, the GMI gate, even the gate fused onto momentum —
+    each lost or clipped the edge), so v12 does not add another brake. It keeps
+    the validated momentum engine but makes the WEIGHT the object of study:
+    `vt_mom` sizes the top-1 pick to a volatility target (w = min(1.0,
+    target/realized vol) — the min-clamp is the no-leverage red line, v12 only
+    scales DOWN); `rp_topk` spreads across the top-K picks inverse-vol weighted
+    (risk parity). `pure_mom` (full-size top-1, the v11 frontier) and `best_bh`
+    are the controls. Universe = the 8-asset crypto-era U_FULL. (v12 0-2)
+
+120. **The frontier metric was changed to risk-adjusted, pre-declared, for the
+    operator's mandate — and it made no difference to who wins.** v4-v11 ranked
+    families by raw mean OOS delta; because the brief was explicitly "risk is
+    fine as long as you limit it," v12's spec (before the run) fixes the
+    frontier as `score = mean OOS delta / max(mean OOS maxDD_pp, 5.0)` — return
+    per unit of downside. Result: `pure_mom` is STILL the frontier (score
+    +2.895, +105.46 pp/yr, 36.4% DD, 6/9) — and crucially it wins the
+    risk-adjusted score too, not just raw return. The two NEW risk-limited
+    families LOST the very metric they were built for: `rp_topk` +0.801 (+25.06
+    pp/yr, 31.3% DD, 4/9 NO-EDGE), `vt_mom` +0.760 (+23.45 pp/yr, 30.8% DD,
+    5/9). Sizing to a budget removed ~78% of the return to shave ~15% of the
+    drawdown, because the momentum edge lives precisely in the high-vol crypto
+    winners that vol targeting caps. best_bh NO-EDGE -0.240. The metric change
+    strengthens rather than softens the finding: even an objective chosen to
+    reward risk-limiting prefers the full-size control. (v12 3)
+
+121. **v12 fires NO historical shot; the forward re-arms the frontier
+    `pure_mom`, disclosed as confirmatory of alloc11.** Every historical span is
+    spent (the v5 shot consumed this same crypto calendar's tail). The spec's
+    §4 pre-declared both branches: if a risk-limited family won the
+    risk-adjusted score the forward would test the new mechanism; since
+    `pure_mom` won, the forward names it. `data/holdout/alloc12.FORWARD`
+    (pure_mom on U_RISK, cutoff 2026-07-23, min 126 rows, ripe ~2027) is
+    therefore the SAME family/calendar as `alloc11.FORWARD` — disclosed in the
+    file as confirmatory, not a new test. Arming a risk-limited family instead
+    would be the reverse cherry-pick (naming a loser); the discipline arms the
+    frontier the rule names. v12's genuine, publishable result is the NEGATIVE
+    one: risk-budgeting by position sizing does not improve risk-adjusted return
+    on the dispersion universe — limiting risk by sizing costs the edge. v12
+    acceptance: tests (16) cover leakage, the sizing mechanics (vt caps a hot
+    pick, holds a calm one full, never levers, cash on no-momentum; rp weights
+    the calmer leg heavier and sums to one), weight/flat-tape invariants, the
+    historical-shot refusal, three forward refusals, FORWARD integrity; full
+    suite 306 green. Red lines untouched (virtual money; no orders; no
+    shorting/leverage; exposure ≤ 1.0, only ever scaled down). (v12 4)

@@ -543,6 +543,60 @@ pointing to `--forward`. The one clean test is **forward** (`alloc11.FORWARD`,
 forward names `pure_mom`, not the flashier `gated_mom` — picking the novel idea
 post-hoc would be the cherry-pick the discipline exists to prevent.
 
+## The risk-budget rotation bench (v12)
+
+```
+python -m experiments.allocation12                              # limit risk by SIZING, not timing
+python -m experiments.allocation12 --holdout pure_mom --forward     # clean forward shot, refuses until ~2027
+```
+
+v12 answers *"risk is fine as long as you limit it"* — and answers it with the
+one lever every prior bench left untouched. v4–v11 were all-or-nothing (weight
+1.0 on a single asset), and eleven versions proved downside *timing* is a drag
+(inverse ETFs, GLB stops, the GMI gate, even that gate fused onto momentum — each
+lost or clipped the edge). So v12 does not add another brake. It keeps the
+validated momentum engine and makes the **weight** the object of study:
+
+- **`vt_mom`** — volatility-targeted top-1 momentum: `w = min(1.0, target /
+  realized vol)` of the pick. A calm asset is held full; a hot one (crypto in a
+  vol spike) is sized down toward cash. The `min(1.0, …)` clamp is the
+  no-leverage red line — **v12 only ever scales a position down, never up.**
+- **`rp_topk`** — risk parity across the top-K momentum names, inverse-vol
+  weighted, normalized to 1.0. Diversifies `pure_mom`'s single-asset
+  concentration without a timing gate.
+- **`pure_mom`** (full-size top-1, the v11 frontier) and **`best_bh`** are the
+  controls. Universe = the 8-asset crypto-era set (2017→2026).
+
+**The frontier metric was changed to risk-adjusted — pre-declared, for the "limit
+risk" mandate.** Prior benches ranked by raw mean OOS delta; v12's spec (before
+the run) fixes the frontier as `score = mean OOS delta / max(mean OOS maxDD_pp,
+5.0)` — return per point of downside.
+
+Measured (risk-budget bench, 9 OOS windows, 2017→2026 crypto-era span):
+
+| family | verdict | mean delta | mean maxDD | risk-adj score |
+|---|---|---|---|---|
+| pure_mom (full-size) | 6/9 | **+105.46 pp/yr** | 36.4% | **+2.895** (frontier) |
+| rp_topk (risk parity) | 4/9 | +25.06 | 31.3% | +0.801 |
+| vt_mom (vol target) | 5/9 | +23.45 | 30.8% | +0.760 |
+| best_bh (control) | 3/9 | −11.34 | 47.3% | −0.240 |
+
+**The result is a clean negative.** The metric was chosen *specifically* to reward
+risk-limiting, and the full-size control still wins it — the two risk-limited
+families lose on return-per-unit-drawdown, not just on raw return. Sizing to a
+budget removed ~78% of the return to shave ~15% of the drawdown, because the
+momentum edge lives precisely in the **high-vol crypto winners that vol targeting
+caps.** Limiting risk by sizing costs the edge; on this universe you are paid for
+holding the volatility, not for damping it.
+
+Every historical span is spent (the v5 shot consumed this same crypto calendar's
+tail), so v12 fires **no historical shot**. The spec pre-declared both forward
+branches; since `pure_mom` won the risk-adjusted score, `alloc12.FORWARD` names it
+(ripe ~2027) — the same family/calendar as `alloc11.FORWARD`, disclosed in the
+file as **confirmatory, not a new mechanism test.** Arming a risk-limited family
+that lost would be the reverse cherry-pick; the discipline arms whatever the rule
+names.
+
 ## Money conservation, stated plainly
 
 Every movement of money is one ledger row with a debit and a credit account.
