@@ -29,6 +29,7 @@ order-placement code. See [Scope and safety](#scope-and-safety).
 - [The Observatory](#the-observatory)
 - [Market data](#market-data)
 - [Research benches](#research-benches)
+- [Results](#results)
 - [Methodology](#methodology)
 - [Money conservation](#money-conservation)
 - [Testing and CI](#testing-and-ci)
@@ -200,6 +201,118 @@ advance. Findings are recorded in [DECISIONS.md](DECISIONS.md).
 Results are summarized above; each bench's full record, including the outcomes
 that contradicted the original hypothesis, is in `DECISIONS.md` and the
 per-version specifications.
+
+## Results
+
+Every figure below is measured rather than projected, and is net of the venue's
+fees and spread. Read the evidence column before the returns column: only one
+result in this repository has ever survived a true out-of-sample holdout, and
+everything else should be discounted accordingly.
+
+| Evidence tier | What it means |
+|---|---|
+| **Holdout** | Fired once, on data never used for selection, guarded by a committed `.SHOT` file that makes reruns refuse. The strongest claim available here. |
+| **Walk-forward** | Parameters chosen on window *k* and judged on window *k+1*. Out-of-sample per window, but the family and the grid were still chosen by someone who had already seen the data. |
+| **In-sample** | A full-span sweep. Useful for locating a mechanism, worthless as a performance claim. |
+
+### Ranked: the stock cross-section, 1999–2026
+
+One universe, one span (6,732 trading days), one benchmark, so these rank
+against each other honestly. **SPY buy-and-hold returned +6.61 %/yr with a
+56.5 % maximum drawdown** over the same window.
+
+| # | Approach | Walk-forward vs SPY | CAGR | maxDD |
+|---|---|---|---|---|
+| 1 | **Cross-sectional momentum** — own the strongest few names, rebalanced monthly | **+24.96 pp/yr**, 9/9 windows | +20.58 % | 58.0 % |
+| 2 | **Green-line breakouts, widened stops** — breakouts ranked by strength, stop ~30 % or ~2.5× volatility | **+10.12 pp/yr**, 8/9 | +21.58 % | 58.7 % |
+| 3 | **Own the entire universe, equal weight** — zero selection skill | +4.60 pp/yr, 9/9 | +12.46 % | 52.0 % |
+| 4 | **Breadth-gated momentum** — the same momentum book, gated on a market-health indicator | +1.29 pp/yr, 5/9 | +9.61 % | **30.9 %** |
+| 5 | **Quality-selected breakouts** — breakouts filtered by strength, 10 % stop | +0.28 pp/yr, 5/9 | +8.86 % | 52.6 % |
+| 6 | **Green-line breakouts, 5 % stop** — the textbook rule as published | −1.66 pp/yr, 5/9 | +3.67 % | 59.9 % |
+| 7 | **Moving-average fan ranking** — the "good-looking chart" screen | −2.71 pp/yr, 3/9 | −0.60 % | 89.8 % |
+
+The walk-forward column re-selects parameters every window; the CAGR and
+drawdown columns are a single fixed parameterization held across the whole
+span, so the two describe related but different things.
+
+**Three corrections belong on top of that table**, and they matter more than the
+ordering:
+
+1. **Roughly a quarter of the leader's margin is survivorship, not skill.** Row 3
+   owns every surviving name with no selection skill at all and still beats the
+   index by 4.60 pp/yr, purely because the universe is a list of companies that
+   are still alive. Measured against that control rather than against SPY, the
+   leader's honest margin is about **+20 pp/yr**, not +25.
+2. **The leader earns all of it in rising markets.** Split by regime, its edge
+   over the zero-skill control is +3.54 in bull markets and −1.06 in bear ones.
+   It offers no downside protection; the 58 % drawdown is worse than the index's.
+3. **None of it is out-of-sample at the family level.** The forward holdout for
+   row 1 is registered but not yet ripe.
+
+Row 4 is the one honest case for a market-timing gate: it costs about 11 pp/yr
+against holding the momentum book, but it nearly halves the worst drawdown
+(30.9 % against 58.0 %). Whether that trade is worth making is a preference
+about risk, not a claim about return.
+
+### Other universes
+
+Not comparable with the table above — different assets, different spans — but
+they are where the strongest and weakest results in the project both live.
+
+**High-dispersion universe** (8 assets including crypto, 2017–2026), mean
+walk-forward delta vs SPY:
+
+| Approach | Result |
+|---|---|
+| Momentum rotation, full size | +105.46 pp/yr, 6/9 windows |
+| Momentum rotation, regime-gated | +61.03 pp/yr, 7/9 |
+| Momentum rotation, risk-parity sized | +25.06 pp/yr, 4/9 |
+| Momentum rotation, volatility-targeted | +23.45 pp/yr, 5/9 |
+| Market timing alone, no rotation | −3.35 pp/yr |
+| Buy-and-hold the best single asset | −11.34 pp/yr |
+
+These are the project's largest numbers and its least transferable: the edge is
+**dispersion**, and it is powered by crypto's volatility over a span that
+contains one of the largest bull runs on record.
+
+**Index-timing universe** (ETFs, 2010–2022): nothing beat buy-and-hold. The
+least-bad family lost 1.57 pp/yr; timing into inverse ETFs lost 7.56 pp/yr.
+
+### Holdouts fired
+
+| Strategy | Result | Verdict |
+|---|---|---|
+| Dual momentum (v5) | **+18.00 pp/yr** | The one clean out-of-sample win |
+| Buy-and-hold QQQ (v6) | +5.22 pp/yr | Beat SPY, but it is passive beta |
+| Regime-switch to safety (v8) | +10.62 pp/yr | Disclosed as contaminated — the span was chosen knowing it held a bear market |
+| Market-timing switch (v10) | +0.30 pp/yr | Nominally positive, substantively no edge: it loses at 2× costs and its drawdown is worse than SPY's |
+| Sector momentum (v9) | −11.82 pp/yr | No edge |
+| Bitcoin daily (v4) | No edge | 0 of 3 seeds |
+
+### What did not work
+
+Ordered by how thoroughly each was tested before being abandoned:
+
+1. **Downside timing**, in five separate forms across v8–v11 — inverse ETFs,
+   percentage stops, a market-health gate, and that gate fused onto momentum.
+   Every one either lost to buy-and-hold or clipped the edge it was protecting.
+2. **Risk budgeting by position size** (v12) — removed about 78 % of the return
+   to shave about 15 % of the drawdown, and lost on the risk-adjusted metric it
+   was specifically built to win.
+3. **Trading faster** (v4) — no edge at any frequency; the higher frequencies
+   certified fewer champions, not more.
+4. **Leveraged inverse ETFs** (v9) — a −3× fund tracked its daily target
+   faithfully at −2.96 beta, and still decayed to near zero over twelve years
+   through daily reset. A short-horizon instrument, never a holding.
+5. **The 5 % trailing stop** (v15) — the worst rule in a 156-cell sweep; not one
+   of its twelve cells beat buy-and-hold. The optimum sits roughly six times
+   wider.
+6. **Chart-pattern screening** (v15) — ranking breakout candidates by moving-average
+   fan alignment scored below ranking them by plain momentum, and below
+   taking every breakout indiscriminately.
+7. **Relative strength** (v15) — not merely weak but mathematically empty as a
+   same-day cross-sectional ranker: dividing every candidate by the same index
+   return cannot reorder them, and it reproduced plain momentum to the decimal.
 
 ## Methodology
 
