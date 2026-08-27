@@ -20,3 +20,9 @@ packages = ["colony", "colony.arenas", "colony.web"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# The suite imports `experiments` and `tests`, which are research and test
+# code rather than shipped packages, so they are deliberately absent from
+# [tool.setuptools].packages. Put the project root on sys.path for the test
+# session so a bare `pytest` (which, unlike `python -m pytest`, does not add
+# the CWD) can import them.
+pythonpath = ["."]
