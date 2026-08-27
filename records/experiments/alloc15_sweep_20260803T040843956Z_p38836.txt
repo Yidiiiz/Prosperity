@@ -1,0 +1,44 @@
+record: experiments/alloc15_sweep_20260803T040843956Z_p38836.txt
+utc: 2026-08-03T04:08:43+00:00
+git: a291308-dirty
+rng_seed: n/a
+config: {"universe": ["aapl", "msft", "intc", "csco", "orcl", "ibm", "txn", "qcom", "adbe", "amd", "nvda", "mu", "amat", "ko", "pep", "pg", "wmt", "mcd", "nke", "sbux", "hd", "low", "cost", "dis", "cmcsa", "tgt", "jnj", "pfe", "mrk", "abt", "unh", "bmy", "lly", "amgn", "gild", "mdt", "jpm", "bac", "wfc", "c", "gs", "axp", "usb", "ms", "ge", "cat", "ba", "mmm", "hon", "ups", "lmt", "de", "xom", "cvx", "cop", "slb", "t", "vz", "duk", "so", "amzn", "googl", "nflx", "crm", "meta", "tsla"], "windows": 10, "capital_u": 10000000000, "venue": {"taker_bps": 10, "maker_bps": 0, "spread_bps": 2, "min_fee_u": 0, "fill_delay_ticks": 1}, "gmi": {"green": 4, "red": 2, "confirm": 2, "t2108_ma": 40, "nh_lookback": 252}, "disclosure": "closing highs (no intraday tape); breadth over 66 survivors, not ~4000 \u2014 thresholds scaled by fraction B; volume rules out of scope", "tapes": {"aapl": "88bba464cb85ffe5", "msft": "0e2feb4be58794a4", "intc": "b78357b3e388f89c", "csco": "fead28ab892fa739", "orcl": "fec2c7dba84354b9", "ibm": "936fe3c903abb319", "txn": "95fd3702a72ea61b", "qcom": "802154bacdce4261", "adbe": "76cf2e07c3b67503", "amd": "8a5c1c42b744eda1", "nvda": "c3929c2903e7d15e", "mu": "49d9d7d5ce0e431b", "amat": "7ec5784497dff867", "ko": "8148f93d512261ad", "pep": "bfaddec4c62cb063", "pg": "1557363d154bdf86", "wmt": "93f64951be5d0a1a", "mcd": "c1316563a14341dc", "nke": "6a6425e7356a2580", "sbux": "b61cf986a6549d03", "hd": "c47053c69739d159", "low": "cfd47385b5f61f84", "cost": "0304df707f23093f", "dis": "846f7fe376747981", "cmcsa": "d9eeba48e6114297", "tgt": "a881adfe9fd283cd", "jnj": "250b252c6e179bb6", "pfe": "e187a3e7e21dd8a8", "mrk": "f2623e97e4e83edc", "abt": "161cb86732df5793", "unh": "7032534e77b095ec", "bmy": "a2ea378ce5d258ee", "lly": "3eae2440c048e1a9", "amgn": "ba2ebd2ca8a990c4", "gild": "24a46da45af4d3fc", "mdt": "780d5740eb25c831", "jpm": "84ee2549ec159dda", "bac": "54c8b4e740364859", "wfc": "fe8af20efa919a8a", "c": "cd14e433732946f8", "gs": "fe0c4403d7e0cd3f", "axp": "ca0cf8e5419c0d3f", "usb": "f82a4341b3e2f252", "ms": "3241c02705dbe5d4", "ge": "b7902462c7e786d0", "cat": "b3613e8f6e142877", "ba": "0387bf04426a70ce", "mmm": "592c82d27320ce5e", "hon": "c81fa89d96f2167b", "ups": "c36c35ab0bdbf3ae", "lmt": "54e9f17b6d4794f4", "de": "f7e37e7b956423f6", "xom": "51ec1f5056599a09", "cvx": "92d66b33c48ffedd", "cop": "c0f07bd7da189a80", "slb": "458d2459cc895e07", "t": "162caaf3314b5a86", "vz": "e4af17f344bc308b", "duk": "32a0510e1c5150fe", "so": "12e3e005f3404b86", "amzn": "d59d074ba3615c87", "googl": "af93d47bc00def1a", "nflx": "44807ac6058bac14", "crm": "ed567aa9ecb15cb1", "meta": "6e504024cbbd140f", "tsla": "b7b2554ae7247137"}, "joint_rows": 8423, "gmi_start_row": 1691}
+========================================================================
+
+--- results -----------------------------------------------------
+wide GLB search: 156 cells over 6732 days (6 selection statistics x 13 stop rules x K in (5, 10)), vs SPY buy-and-hold $55,485.84 (+6.61 %/yr)
+  in-sample and unadjusted: read the ROWS, not the maximum
+
+by selection statistic:
+  mom          median  +4.82 pp/yr | best +14.97 | worst  -4.42 | 20/26 beat SPY
+  rs           median  +4.82 pp/yr | best +14.97 | worst  -4.42 | 20/26 beat SPY
+  vol          median  +0.05 pp/yr | best  +7.84 | worst  -4.19 | 14/26 beat SPY
+  base         median  +2.57 pp/yr | best +14.89 | worst  -3.75 | 18/26 beat SPY
+  prox         median  +0.93 pp/yr | best +10.10 | worst  -3.85 | 15/26 beat SPY
+  rwb          median  +1.01 pp/yr | best  +6.86 | worst  -5.37 | 16/26 beat SPY
+
+by stop rule:
+  pct:0.05     median  -3.67 pp/yr | best  -1.83 | worst  -5.37 | 0/12 beat SPY
+  pct:0.08     median  -0.99 pp/yr | best  +0.68 | worst  -2.72 | 3/12 beat SPY
+  pct:0.1      median  -0.29 pp/yr | best  +2.25 | worst  -1.37 | 5/12 beat SPY
+  pct:0.15     median  +1.45 pp/yr | best  +4.12 | worst  -0.67 | 11/12 beat SPY
+  pct:0.2      median  +2.76 pp/yr | best  +9.40 | worst  +0.46 | 12/12 beat SPY
+  pct:0.3      median  +6.54 pp/yr | best +13.36 | worst  +2.02 | 12/12 beat SPY
+  pct:0.5      median  +4.29 pp/yr | best  +6.46 | worst  +0.04 | 12/12 beat SPY
+  atr:0.5      median  -2.92 pp/yr | best  +0.14 | worst  -5.18 | 1/12 beat SPY
+  atr:1.0      median  +0.41 pp/yr | best  +4.82 | worst  -1.44 | 6/12 beat SPY
+  atr:1.5      median  +5.13 pp/yr | best  +9.13 | worst  +1.11 | 12/12 beat SPY
+  atr:2.5      median  +8.36 pp/yr | best +14.97 | worst  +3.34 | 12/12 beat SPY
+  ma:50        median  -0.15 pp/yr | best  +5.29 | worst  -1.43 | 5/12 beat SPY
+  ma:150       median  +4.98 pp/yr | best  +9.92 | worst  +1.14 | 12/12 beat SPY
+
+by K:
+  5            median  +2.78 pp/yr | best +14.97 | worst  -3.85 | 58/78 beat SPY
+  10           median  +1.01 pp/yr | best  +8.36 | worst  -5.37 | 45/78 beat SPY
+
+whole grid: median +1.45 pp/yr vs SPY, 103/156 cells beat it
+best cell [K=5,QUAL=mom,SMODE=atr,SP=2.5]: +14.97 pp/yr, maxDD 58.7%
+  the best of 156 cells is NOT a finding -- searching 156 rules on one 26-year tape produces a best cell even when nothing works. The median and the per-row shifts are the readable signal, and the walk-forward bench (glb_wide vs glb_sel) is where the search pays its own tax.
+ALLOC15 SWEEP 156 cells: median +1.45 pp/yr vs SPY, 103/156 beat it; best [K=5,QUAL=mom,SMODE=atr,SP=2.5] +14.97 (in-sample, unadjusted)
+
+=== RESULT: ALLOC15 SWEEP 156 cells: median +1.45 pp/yr vs SPY, 103/156 beat it; best [K=5,QUAL=mom,SMODE=atr,SP=2.5] +14.97 (in-sample, unadjusted)

@@ -1,0 +1,173 @@
+record: experiments/alloc15_wish_20260803T035647345Z_p28952.txt
+utc: 2026-08-03T03:56:47+00:00
+git: a291308-dirty
+rng_seed: n/a
+config: {"universe": ["aapl", "msft", "intc", "csco", "orcl", "ibm", "txn", "qcom", "adbe", "amd", "nvda", "mu", "amat", "ko", "pep", "pg", "wmt", "mcd", "nke", "sbux", "hd", "low", "cost", "dis", "cmcsa", "tgt", "jnj", "pfe", "mrk", "abt", "unh", "bmy", "lly", "amgn", "gild", "mdt", "jpm", "bac", "wfc", "c", "gs", "axp", "usb", "ms", "ge", "cat", "ba", "mmm", "hon", "ups", "lmt", "de", "xom", "cvx", "cop", "slb", "t", "vz", "duk", "so", "amzn", "googl", "nflx", "crm", "meta", "tsla"], "windows": 10, "capital_u": 10000000000, "venue": {"taker_bps": 10, "maker_bps": 0, "spread_bps": 2, "min_fee_u": 0, "fill_delay_ticks": 1}, "gmi": {"green": 4, "red": 2, "confirm": 2, "t2108_ma": 40, "nh_lookback": 252}, "disclosure": "closing highs (no intraday tape); breadth over 66 survivors, not ~4000 \u2014 thresholds scaled by fraction B; volume rules out of scope", "tapes": {"aapl": "88bba464cb85ffe5", "msft": "0e2feb4be58794a4", "intc": "b78357b3e388f89c", "csco": "fead28ab892fa739", "orcl": "fec2c7dba84354b9", "ibm": "936fe3c903abb319", "txn": "95fd3702a72ea61b", "qcom": "802154bacdce4261", "adbe": "76cf2e07c3b67503", "amd": "8a5c1c42b744eda1", "nvda": "c3929c2903e7d15e", "mu": "49d9d7d5ce0e431b", "amat": "7ec5784497dff867", "ko": "8148f93d512261ad", "pep": "bfaddec4c62cb063", "pg": "1557363d154bdf86", "wmt": "93f64951be5d0a1a", "mcd": "c1316563a14341dc", "nke": "6a6425e7356a2580", "sbux": "b61cf986a6549d03", "hd": "c47053c69739d159", "low": "cfd47385b5f61f84", "cost": "0304df707f23093f", "dis": "846f7fe376747981", "cmcsa": "d9eeba48e6114297", "tgt": "a881adfe9fd283cd", "jnj": "250b252c6e179bb6", "pfe": "e187a3e7e21dd8a8", "mrk": "f2623e97e4e83edc", "abt": "161cb86732df5793", "unh": "7032534e77b095ec", "bmy": "a2ea378ce5d258ee", "lly": "3eae2440c048e1a9", "amgn": "ba2ebd2ca8a990c4", "gild": "24a46da45af4d3fc", "mdt": "780d5740eb25c831", "jpm": "84ee2549ec159dda", "bac": "54c8b4e740364859", "wfc": "fe8af20efa919a8a", "c": "cd14e433732946f8", "gs": "fe0c4403d7e0cd3f", "axp": "ca0cf8e5419c0d3f", "usb": "f82a4341b3e2f252", "ms": "3241c02705dbe5d4", "ge": "b7902462c7e786d0", "cat": "b3613e8f6e142877", "ba": "0387bf04426a70ce", "mmm": "592c82d27320ce5e", "hon": "c81fa89d96f2167b", "ups": "c36c35ab0bdbf3ae", "lmt": "54e9f17b6d4794f4", "de": "f7e37e7b956423f6", "xom": "51ec1f5056599a09", "cvx": "92d66b33c48ffedd", "cop": "c0f07bd7da189a80", "slb": "458d2459cc895e07", "t": "162caaf3314b5a86", "vz": "e4af17f344bc308b", "duk": "32a0510e1c5150fe", "so": "12e3e005f3404b86", "amzn": "d59d074ba3615c87", "googl": "af93d47bc00def1a", "nflx": "44807ac6058bac14", "crm": "ed567aa9ecb15cb1", "meta": "6e504024cbbd140f", "tsla": "b7b2554ae7247137"}, "joint_rows": 8423, "gmi_start_row": 1691}
+========================================================================
+
+--- results -----------------------------------------------------
+wish bench: 6732 judged days / 10 windows over 66 large-cap names, window opens at master row 1691 (the first day GMI-real is computable — the QQQ tape starts 1999; lookbacks still reach the earlier rows), exploratory (survivorship-shaped universe; only a forward shot is unbiased)
+
+family glb_sel:
+  glb_sel [K=5,STOP=0.1,QUAL=mom] w2: $13,386.43 vs SPY $11,521.72 (beat)
+  spx: glb_sel [K=5,STOP=0.1,QUAL=mom] w2 buy-and-hold $11,521.72 (+5.46%/yr) | delta +6.10 pp/yr
+  glb_sel [K=5,STOP=0.1,QUAL=mom] w3: $17,744.25 vs SPY $12,421.20 (beat)
+  spx: glb_sel [K=5,STOP=0.1,QUAL=mom] w3 buy-and-hold $12,421.20 (+8.47%/yr) | delta +15.52 pp/yr
+  glb_sel [K=5,STOP=0.1,QUAL=mom] w4: $7,028.88 vs SPY $7,240.11 (did not beat)
+  spx: glb_sel [K=5,STOP=0.1,QUAL=mom] w4 buy-and-hold $7,240.11 (-11.39%/yr) | delta -0.98 pp/yr
+  glb_sel [K=10,STOP=0.05,QUAL=rwb] w5: $11,236.16 vs SPY $13,935.03 (did not beat)
+  spx: glb_sel [K=10,STOP=0.05,QUAL=rwb] w5 buy-and-hold $13,935.03 (+13.19%/yr) | delta -8.74 pp/yr
+  glb_sel [K=5,STOP=0.1,QUAL=both] w6: $16,486.75 vs SPY $13,569.94 (beat)
+  spx: glb_sel [K=5,STOP=0.1,QUAL=both] w6 buy-and-hold $13,569.94 (+12.16%/yr) | delta +8.51 pp/yr
+  glb_sel [K=5,STOP=0.1,QUAL=mom] w7: $15,220.14 vs SPY $12,954.12 (beat)
+  spx: glb_sel [K=5,STOP=0.1,QUAL=mom] w7 buy-and-hold $12,954.12 (+10.18%/yr) | delta +6.86 pp/yr
+  glb_sel [K=5,STOP=0.1,QUAL=both] w8: $14,436.19 vs SPY $13,825.61 (beat)
+  spx: glb_sel [K=5,STOP=0.1,QUAL=both] w8 buy-and-hold $13,825.61 (+12.89%/yr) | delta +1.84 pp/yr
+  glb_sel [K=5,STOP=0.1,QUAL=mom] w9: $7,824.22 vs SPY $11,305.66 (did not beat)
+  spx: glb_sel [K=5,STOP=0.1,QUAL=mom] w9 buy-and-hold $11,305.66 (+4.71%/yr) | delta -13.51 pp/yr
+  glb_sel [K=10,STOP=0.05,QUAL=both] w10: $12,539.84 vs SPY $17,020.47 (did not beat)
+  spx: glb_sel [K=10,STOP=0.05,QUAL=both] w10 buy-and-hold $17,020.47 (+21.82%/yr) | delta -13.06 pp/yr
+  glb_sel: BEATS-SPX (5/9 windows beat SPY) | mean OOS delta +0.28 pp/yr
+
+family glb_xs:
+  glb_xs [K=10,STOP=0.1,ANCHOR=entry] w2: $11,729.87 vs SPY $11,521.72 (beat)
+  spx: glb_xs [K=10,STOP=0.1,ANCHOR=entry] w2 buy-and-hold $11,521.72 (+5.46%/yr) | delta +0.71 pp/yr
+  glb_xs [K=5,STOP=0.1,ANCHOR=green] w3: $14,564.34 vs SPY $12,421.20 (beat)
+  spx: glb_xs [K=5,STOP=0.1,ANCHOR=green] w3 buy-and-hold $12,421.20 (+8.47%/yr) | delta +6.67 pp/yr
+  glb_xs [K=5,STOP=0.1,ANCHOR=entry] w4: $7,463.63 vs SPY $7,240.11 (beat)
+  spx: glb_xs [K=5,STOP=0.1,ANCHOR=entry] w4 buy-and-hold $7,240.11 (-11.39%/yr) | delta +1.01 pp/yr
+  glb_xs [K=10,STOP=0.05,ANCHOR=green] w5: $10,868.38 vs SPY $13,935.03 (did not beat)
+  spx: glb_xs [K=10,STOP=0.05,ANCHOR=green] w5 buy-and-hold $13,935.03 (+13.19%/yr) | delta -10.03 pp/yr
+  glb_xs [K=5,STOP=0.1,ANCHOR=entry] w6: $16,468.06 vs SPY $13,569.94 (beat)
+  spx: glb_xs [K=5,STOP=0.1,ANCHOR=entry] w6 buy-and-hold $13,569.94 (+12.16%/yr) | delta +8.46 pp/yr
+  glb_xs [K=5,STOP=0.1,ANCHOR=green] w7: $15,236.61 vs SPY $12,954.12 (beat)
+  spx: glb_xs [K=5,STOP=0.1,ANCHOR=green] w7 buy-and-hold $12,954.12 (+10.18%/yr) | delta +6.91 pp/yr
+  glb_xs [K=5,STOP=0.1,ANCHOR=green] w8: $12,639.31 vs SPY $13,825.61 (did not beat)
+  spx: glb_xs [K=5,STOP=0.1,ANCHOR=green] w8 buy-and-hold $13,825.61 (+12.89%/yr) | delta -3.73 pp/yr
+  glb_xs [K=5,STOP=0.05,ANCHOR=green] w9: $8,475.38 vs SPY $11,305.66 (did not beat)
+  spx: glb_xs [K=5,STOP=0.05,ANCHOR=green] w9 buy-and-hold $11,305.66 (+4.71%/yr) | delta -10.74 pp/yr
+  glb_xs [K=5,STOP=0.1,ANCHOR=green] w10: $12,197.85 vs SPY $17,020.47 (did not beat)
+  spx: glb_xs [K=5,STOP=0.1,ANCHOR=green] w10 buy-and-hold $17,020.47 (+21.82%/yr) | delta -14.17 pp/yr
+  glb_xs: BEATS-SPX (5/9 windows beat SPY) | mean OOS delta -1.66 pp/yr
+
+family xs_topk:
+  xs_topk [K=10,L=126] w2: $17,048.39 vs SPY $11,521.72 (beat)
+  spx: xs_topk [K=10,L=126] w2 buy-and-hold $11,521.72 (+5.46%/yr) | delta +16.69 pp/yr
+  xs_topk [K=5,L=126] w3: $20,548.46 vs SPY $12,421.20 (beat)
+  spx: xs_topk [K=5,L=126] w3 buy-and-hold $12,421.20 (+8.47%/yr) | delta +22.54 pp/yr
+  xs_topk [K=5,L=126] w4: $8,710.69 vs SPY $7,240.11 (beat)
+  spx: xs_topk [K=5,L=126] w4 buy-and-hold $7,240.11 (-11.39%/yr) | delta +6.36 pp/yr
+  xs_topk [K=10,L=63] w5: $14,006.63 vs SPY $13,935.03 (beat)
+  spx: xs_topk [K=10,L=63] w5 buy-and-hold $13,935.03 (+13.19%/yr) | delta +0.22 pp/yr
+  xs_topk [K=5,L=252] w6: $27,133.74 vs SPY $13,569.94 (beat)
+  spx: xs_topk [K=5,L=252] w6 buy-and-hold $13,569.94 (+12.16%/yr) | delta +33.36 pp/yr
+  xs_topk [K=5,L=252] w7: $31,476.69 vs SPY $12,954.12 (beat)
+  spx: xs_topk [K=5,L=252] w7 buy-and-hold $12,954.12 (+10.18%/yr) | delta +43.48 pp/yr
+  xs_topk [K=5,L=126] w8: $27,011.28 vs SPY $13,825.61 (beat)
+  spx: xs_topk [K=5,L=126] w8 buy-and-hold $13,825.61 (+12.89%/yr) | delta +32.16 pp/yr
+  xs_topk [K=5,L=126] w9: $14,339.03 vs SPY $11,305.66 (beat)
+  spx: xs_topk [K=5,L=126] w9 buy-and-hold $11,305.66 (+4.71%/yr) | delta +9.77 pp/yr
+  xs_topk [K=5,L=252] w10: $50,110.66 vs SPY $17,020.47 (beat)
+  spx: xs_topk [K=5,L=252] w10 buy-and-hold $17,020.47 (+21.82%/yr) | delta +60.06 pp/yr
+  xs_topk: BEATS-SPX (9/9 windows beat SPY) | mean OOS delta +24.96 pp/yr
+
+family ew_all:
+  ew_all [] w2: $13,734.88 vs SPY $11,521.72 (beat)
+  spx: ew_all [] w2 buy-and-hold $11,521.72 (+5.46%/yr) | delta +7.18 pp/yr
+  ew_all [] w3: $14,542.80 vs SPY $12,421.20 (beat)
+  spx: ew_all [] w3 buy-and-hold $12,421.20 (+8.47%/yr) | delta +6.61 pp/yr
+  ew_all [] w4: $9,098.18 vs SPY $7,240.11 (beat)
+  spx: ew_all [] w4 buy-and-hold $7,240.11 (-11.39%/yr) | delta +7.92 pp/yr
+  ew_all [] w5: $14,848.98 vs SPY $13,935.03 (beat)
+  spx: ew_all [] w5 buy-and-hold $13,935.03 (+13.19%/yr) | delta +2.72 pp/yr
+  ew_all [] w6: $15,381.95 vs SPY $13,569.94 (beat)
+  spx: ew_all [] w6 buy-and-hold $13,569.94 (+12.16%/yr) | delta +5.41 pp/yr
+  ew_all [] w7: $14,600.87 vs SPY $12,954.12 (beat)
+  spx: ew_all [] w7 buy-and-hold $12,954.12 (+10.18%/yr) | delta +5.05 pp/yr
+  ew_all [] w8: $15,339.80 vs SPY $13,825.61 (beat)
+  spx: ew_all [] w8 buy-and-hold $13,825.61 (+12.89%/yr) | delta +4.48 pp/yr
+  ew_all [] w9: $11,783.60 vs SPY $11,305.66 (beat)
+  spx: ew_all [] w9 buy-and-hold $11,305.66 (+4.71%/yr) | delta +1.64 pp/yr
+  ew_all [] w10: $17,166.90 vs SPY $17,020.47 (beat)
+  spx: ew_all [] w10 buy-and-hold $17,020.47 (+21.82%/yr) | delta +0.39 pp/yr
+  ew_all: BEATS-SPX (9/9 windows beat SPY) | mean OOS delta +4.60 pp/yr
+
+survivorship-neutral read: xs_topk vs ew_all = +20.36 pp/yr (both share the biased universe)
+ALLOC15 WISH glb_sel: BEATS-SPX (5/9, +0.28 pp/yr); glb_xs: BEATS-SPX (5/9, -1.66 pp/yr); xs_topk: BEATS-SPX (9/9, +24.96 pp/yr); ew_all: BEATS-SPX (9/9, +4.60 pp/yr) | FRONTIER xs_topk
+
+span: 1999-10-11T00:00:00+00:00 -> 2026-07-17T00:00:00+00:00 (26.77 years)
+wall: 4.2 s
+annualized: glb_sel [K=5,STOP=0.1,QUAL=mom] w2 audited $13,386.43 vs initial $10,000.00 -> +11.56%/yr
+benchmark: glb_sel [K=5,STOP=0.1,QUAL=mom] w2 buy-and-hold $11,521.72 (+5.46%/yr) | delta +6.10 pp/yr
+annualized: glb_sel [K=5,STOP=0.1,QUAL=mom] w3 audited $17,744.25 vs initial $10,000.00 -> +23.99%/yr
+benchmark: glb_sel [K=5,STOP=0.1,QUAL=mom] w3 buy-and-hold $12,421.20 (+8.47%/yr) | delta +15.52 pp/yr
+annualized: glb_sel [K=5,STOP=0.1,QUAL=mom] w4 audited $7,028.88 vs initial $10,000.00 -> -12.37%/yr
+benchmark: glb_sel [K=5,STOP=0.1,QUAL=mom] w4 buy-and-hold $7,240.11 (-11.39%/yr) | delta -0.98 pp/yr
+annualized: glb_sel [K=10,STOP=0.05,QUAL=rwb] w5 audited $11,236.16 vs initial $10,000.00 -> +4.45%/yr
+benchmark: glb_sel [K=10,STOP=0.05,QUAL=rwb] w5 buy-and-hold $13,935.03 (+13.19%/yr) | delta -8.74 pp/yr
+annualized: glb_sel [K=5,STOP=0.1,QUAL=both] w6 audited $16,486.75 vs initial $10,000.00 -> +20.67%/yr
+benchmark: glb_sel [K=5,STOP=0.1,QUAL=both] w6 buy-and-hold $13,569.94 (+12.16%/yr) | delta +8.51 pp/yr
+annualized: glb_sel [K=5,STOP=0.1,QUAL=mom] w7 audited $15,220.14 vs initial $10,000.00 -> +17.04%/yr
+benchmark: glb_sel [K=5,STOP=0.1,QUAL=mom] w7 buy-and-hold $12,954.12 (+10.18%/yr) | delta +6.86 pp/yr
+annualized: glb_sel [K=5,STOP=0.1,QUAL=both] w8 audited $14,436.19 vs initial $10,000.00 -> +14.73%/yr
+benchmark: glb_sel [K=5,STOP=0.1,QUAL=both] w8 buy-and-hold $13,825.61 (+12.89%/yr) | delta +1.84 pp/yr
+annualized: glb_sel [K=5,STOP=0.1,QUAL=mom] w9 audited $7,824.22 vs initial $10,000.00 -> -8.80%/yr
+benchmark: glb_sel [K=5,STOP=0.1,QUAL=mom] w9 buy-and-hold $11,305.66 (+4.71%/yr) | delta -13.51 pp/yr
+annualized: glb_sel [K=10,STOP=0.05,QUAL=both] w10 audited $12,539.84 vs initial $10,000.00 -> +8.76%/yr
+benchmark: glb_sel [K=10,STOP=0.05,QUAL=both] w10 buy-and-hold $17,020.47 (+21.82%/yr) | delta -13.06 pp/yr
+annualized: glb_xs [K=10,STOP=0.1,ANCHOR=entry] w2 audited $11,729.87 vs initial $10,000.00 -> +6.17%/yr
+benchmark: glb_xs [K=10,STOP=0.1,ANCHOR=entry] w2 buy-and-hold $11,521.72 (+5.46%/yr) | delta +0.71 pp/yr
+annualized: glb_xs [K=5,STOP=0.1,ANCHOR=green] w3 audited $14,564.34 vs initial $10,000.00 -> +15.14%/yr
+benchmark: glb_xs [K=5,STOP=0.1,ANCHOR=green] w3 buy-and-hold $12,421.20 (+8.47%/yr) | delta +6.67 pp/yr
+annualized: glb_xs [K=5,STOP=0.1,ANCHOR=entry] w4 audited $7,463.63 vs initial $10,000.00 -> -10.38%/yr
+benchmark: glb_xs [K=5,STOP=0.1,ANCHOR=entry] w4 buy-and-hold $7,240.11 (-11.39%/yr) | delta +1.01 pp/yr
+annualized: glb_xs [K=10,STOP=0.05,ANCHOR=green] w5 audited $10,868.38 vs initial $10,000.00 -> +3.16%/yr
+benchmark: glb_xs [K=10,STOP=0.05,ANCHOR=green] w5 buy-and-hold $13,935.03 (+13.19%/yr) | delta -10.03 pp/yr
+annualized: glb_xs [K=5,STOP=0.1,ANCHOR=entry] w6 audited $16,468.06 vs initial $10,000.00 -> +20.62%/yr
+benchmark: glb_xs [K=5,STOP=0.1,ANCHOR=entry] w6 buy-and-hold $13,569.94 (+12.16%/yr) | delta +8.46 pp/yr
+annualized: glb_xs [K=5,STOP=0.1,ANCHOR=green] w7 audited $15,236.61 vs initial $10,000.00 -> +17.09%/yr
+benchmark: glb_xs [K=5,STOP=0.1,ANCHOR=green] w7 buy-and-hold $12,954.12 (+10.18%/yr) | delta +6.91 pp/yr
+annualized: glb_xs [K=5,STOP=0.1,ANCHOR=green] w8 audited $12,639.31 vs initial $10,000.00 -> +9.16%/yr
+benchmark: glb_xs [K=5,STOP=0.1,ANCHOR=green] w8 buy-and-hold $13,825.61 (+12.89%/yr) | delta -3.73 pp/yr
+annualized: glb_xs [K=5,STOP=0.05,ANCHOR=green] w9 audited $8,475.38 vs initial $10,000.00 -> -6.02%/yr
+benchmark: glb_xs [K=5,STOP=0.05,ANCHOR=green] w9 buy-and-hold $11,305.66 (+4.71%/yr) | delta -10.74 pp/yr
+annualized: glb_xs [K=5,STOP=0.1,ANCHOR=green] w10 audited $12,197.85 vs initial $10,000.00 -> +7.65%/yr
+benchmark: glb_xs [K=5,STOP=0.1,ANCHOR=green] w10 buy-and-hold $17,020.47 (+21.82%/yr) | delta -14.17 pp/yr
+annualized: xs_topk [K=10,L=126] w2 audited $17,048.39 vs initial $10,000.00 -> +22.15%/yr
+benchmark: xs_topk [K=10,L=126] w2 buy-and-hold $11,521.72 (+5.46%/yr) | delta +16.69 pp/yr
+annualized: xs_topk [K=5,L=126] w3 audited $20,548.46 vs initial $10,000.00 -> +31.01%/yr
+benchmark: xs_topk [K=5,L=126] w3 buy-and-hold $12,421.20 (+8.47%/yr) | delta +22.54 pp/yr
+annualized: xs_topk [K=5,L=126] w4 audited $8,710.69 vs initial $10,000.00 -> -5.04%/yr
+benchmark: xs_topk [K=5,L=126] w4 buy-and-hold $7,240.11 (-11.39%/yr) | delta +6.36 pp/yr
+annualized: xs_topk [K=10,L=63] w5 audited $14,006.63 vs initial $10,000.00 -> +13.41%/yr
+benchmark: xs_topk [K=10,L=63] w5 buy-and-hold $13,935.03 (+13.19%/yr) | delta +0.22 pp/yr
+annualized: xs_topk [K=5,L=252] w6 audited $27,133.74 vs initial $10,000.00 -> +45.51%/yr
+benchmark: xs_topk [K=5,L=252] w6 buy-and-hold $13,569.94 (+12.16%/yr) | delta +33.36 pp/yr
+annualized: xs_topk [K=5,L=252] w7 audited $31,476.69 vs initial $10,000.00 -> +53.66%/yr
+benchmark: xs_topk [K=5,L=252] w7 buy-and-hold $12,954.12 (+10.18%/yr) | delta +43.48 pp/yr
+annualized: xs_topk [K=5,L=126] w8 audited $27,011.28 vs initial $10,000.00 -> +45.04%/yr
+benchmark: xs_topk [K=5,L=126] w8 buy-and-hold $13,825.61 (+12.89%/yr) | delta +32.16 pp/yr
+annualized: xs_topk [K=5,L=126] w9 audited $14,339.03 vs initial $10,000.00 -> +14.49%/yr
+benchmark: xs_topk [K=5,L=126] w9 buy-and-hold $11,305.66 (+4.71%/yr) | delta +9.77 pp/yr
+annualized: xs_topk [K=5,L=252] w10 audited $50,110.66 vs initial $10,000.00 -> +81.89%/yr
+benchmark: xs_topk [K=5,L=252] w10 buy-and-hold $17,020.47 (+21.82%/yr) | delta +60.06 pp/yr
+annualized: ew_all [] w2 audited $13,734.88 vs initial $10,000.00 -> +12.64%/yr
+benchmark: ew_all [] w2 buy-and-hold $11,521.72 (+5.46%/yr) | delta +7.18 pp/yr
+annualized: ew_all [] w3 audited $14,542.80 vs initial $10,000.00 -> +15.08%/yr
+benchmark: ew_all [] w3 buy-and-hold $12,421.20 (+8.47%/yr) | delta +6.61 pp/yr
+annualized: ew_all [] w4 audited $9,098.18 vs initial $10,000.00 -> -3.48%/yr
+benchmark: ew_all [] w4 buy-and-hold $7,240.11 (-11.39%/yr) | delta +7.92 pp/yr
+annualized: ew_all [] w5 audited $14,848.98 vs initial $10,000.00 -> +15.91%/yr
+benchmark: ew_all [] w5 buy-and-hold $13,935.03 (+13.19%/yr) | delta +2.72 pp/yr
+annualized: ew_all [] w6 audited $15,381.95 vs initial $10,000.00 -> +17.56%/yr
+benchmark: ew_all [] w6 buy-and-hold $13,569.94 (+12.16%/yr) | delta +5.41 pp/yr
+annualized: ew_all [] w7 audited $14,600.87 vs initial $10,000.00 -> +15.23%/yr
+benchmark: ew_all [] w7 buy-and-hold $12,954.12 (+10.18%/yr) | delta +5.05 pp/yr
+annualized: ew_all [] w8 audited $15,339.80 vs initial $10,000.00 -> +17.37%/yr
+benchmark: ew_all [] w8 buy-and-hold $13,825.61 (+12.89%/yr) | delta +4.48 pp/yr
+annualized: ew_all [] w9 audited $11,783.60 vs initial $10,000.00 -> +6.35%/yr
+benchmark: ew_all [] w9 buy-and-hold $11,305.66 (+4.71%/yr) | delta +1.64 pp/yr
+annualized: ew_all [] w10 audited $17,166.90 vs initial $10,000.00 -> +22.21%/yr
+benchmark: ew_all [] w10 buy-and-hold $17,020.47 (+21.82%/yr) | delta +0.39 pp/yr
+
+=== RESULT: ALLOC15 WISH glb_sel: BEATS-SPX (5/9, +0.28 pp/yr); glb_xs: BEATS-SPX (5/9, -1.66 pp/yr); xs_topk: BEATS-SPX (9/9, +24.96 pp/yr); ew_all: BEATS-SPX (9/9, +4.60 pp/yr) | FRONTIER xs_topk

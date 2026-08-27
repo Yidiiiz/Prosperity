@@ -1246,3 +1246,234 @@ parentheses.
     graveyard generator determinism + rise-collapse-delist shape + a held phantom
     realizes the loss, calibration sanity, the no-forward refusal); full suite
     341 green. Red lines untouched. (v14)
+
+129. **v15 retires the excuse three benches leaned on: the GMI that lost was
+    never the GMI.** v9, v10 and v11 each disclosed the same limitation almost
+    verbatim ("the real GMI needs ~4,000-stock new-high breadth this repo
+    lacks"), substituted a tally of index moving averages, lost, and the loss
+    was booked as a verdict on *timing* (decision 119). But FOUR of the GMI's
+    six components count what individual stocks are doing, and not one had ever
+    been computed. v13 quietly removed the limitation by fetching 66 large-cap
+    tapes, so v15 builds **GMI-real** — the Successful 10-Day New High Index,
+    the new-high count, and a T2108 proxy, all over the actual cross-section,
+    plus Wish's QQQ/SPY daily and QQQ weekly trend rules — and re-runs the gate
+    A/B that v9–v12 only thought they ran. (v15 0, 3)
+
+130. **GMI-real is a genuine 6-count and it genuinely differs from the proxy —
+    and the verdict is unchanged anyway.** The fidelity mode was built to catch
+    the failure mode that would have made this whole exercise theatre: a
+    component pinned at 0% or 100% turns the 6-count into a secret 4-count.
+    None is pinned — positive rates land between 41.8% and 65.2% over 6,732
+    days, mean reading 3.23 of 6. And real breadth is NOT a relabelling of the
+    old proxy: GMI-real and v11's GMI-lite agree on only **84.1%** of days, with
+    real breadth markedly more conservative (green 60% of days vs 73%). Yet the
+    gate **costs −10.97 to −17.16 pp/yr across all six pre-declared settings**
+    (ungated xs_topk [K=5,L=63] +20.58 %/yr → best gated +9.61 %/yr). So the
+    missing-breadth excuse was **real but not load-bearing**: the instrument was
+    wrong and the conclusion was right. Decision 119 stands, now for a measured
+    reason rather than an untested one. (v15 5)
+
+131. **The brake works exactly as designed and still loses — that is a sharper
+    finding than "timing is a drag".** Decomposing the gate's daily log-effect
+    by SPY 200-day regime: it **earns +1.2950 in bear days and pays −4.3202 in
+    bull days**. The mechanism is not broken; it does precisely what a brake is
+    supposed to do. It is simply outbid, because v14 established that this
+    universe's momentum edge lives in the bull days the brake sits out. The gate
+    does buy real drawdown relief (maxDD 58.0% → 30.9% at GREEN=5, B=0.025), so
+    "worth it" is a preference about drawdown, not a claim about return. K/L
+    were FROZEN at v13's forward pick on both sides so the A/B isolates the gate
+    and nothing else. (v15 5)
+
+132. **Wish's stock rules, finally run on stocks, lose to plain momentum.** v9
+    and v10 ran the Green Line Breakout on QQQ and SPY — a stock-selection rule
+    pointed at the two instruments least likely to fire usefully on it. v15 puts
+    GLB and the RWB/RLC fan in the cross-section where the glossary puts them:
+    `glb_xs` (own up to K names above a green line that has stood ~3 months,
+    exit at the operator's 5%/10% stop below the running ATH) scores −0.50 pp/yr
+    on 5/9 windows; `rwb_xs` (66-pair EMA fan ranking, RLC=6 to enter, RLC=0 to
+    exit) is NO-EDGE at −2.71 pp/yr on 3/9. Both lose to plain `xs_topk`
+    (+24.96 pp/yr, 9/9; +20.36 over the `ew_all` survivorship control). The
+    misapplication was real and correcting it did not rescue the rules. (v15 4)
+
+133. **A pre-registered v15 prediction FAILED, and the diagnostic that "tested"
+    it was confounded — recorded as a retraction, not a reinterpretation.**
+    Spec v15 §2 predicted the survivor universe would print MORE new highs than
+    the market (survivors being flattered). Measured: the 66 print a new closing
+    high on **5.6%** of name-days, SPY on **11.0%** — the opposite direction.
+    But the comparison cannot settle it either way, because SPY is one
+    diversified index grinding along its own high while the 66 are individual
+    volatile names each off its own high most of the time: the gap measures
+    diversification, not survivorship. The tempting move was to reinterpret the
+    number as a finding; the honest one is to strike the claim, leave both rates
+    as descriptive statistics, and say plainly that no breadth-based read of
+    survivorship exists while the delisted tapes are unobtainable (v14 1).
+    `ew_all` remains the survivorship control and v14's return-based direction
+    (it INFLATES) stands unamended. (v15 2)
+
+134. **v15 arms NO forward holdout, by the rule declared before the run.**
+    Spec v15 §7 pre-committed to arming a forward only if a NEW family
+    (`wish_gmi`, `glb_xs`, `rwb_xs`) were the frontier AND beat `ew_all` AND
+    beat the incumbent `xs_topk`. The frontier is `xs_topk` and no new family
+    clears any of the three bars, so nothing is armed — the v14 precedent, where
+    `xs_skip` lost and arming a weaker near-duplicate would have been a
+    cherry-pick. `--holdout` without `--forward` still refuses (rc 2) before
+    touching disk, and `read_forward` refuses while unarmed. Honest limits
+    disclosed in the record: closing highs (no intraday tape), breadth over 66
+    survivors with Wish's absolute "> 100" thresholds re-expressed as a fraction
+    B that is walk-forward SELECTED rather than hand-tuned, and volume-confirmed
+    rules (the EasyScans) out of scope rather than approximated. v15 acceptance:
+    34 offline tests (all six components fire and go dark on their negation;
+    breadth/index components move independently; the two-day confirmation
+    ignores a one-day dip; B scales with the LISTED count and unlisted names are
+    invisible; the gate is a bit-exact no-op while green, holds cash without
+    churn while red, re-enters off-cadence on the flip, and reads the signal at
+    i−1; the green line must be 3 months old and a held name survives its green
+    line catching up; the ATH ratchet and percent stop; the RWB fan scores 66/66
+    perfect and 0 inverted, RLC=6 enters and RLC=0 drops; rolling primitives
+    reset across an unlisted gap; no-leverage and flat-tape conservation; the
+    forward refusals); full suite 375 green. Red lines untouched (virtual money;
+    no orders; no shorting/leverage; exposure ≤ 1.0). (v15 7)
+
+135. **The operator corrected the GLB stop, and the correction made it WORSE —
+    which located the actual problem.** His rule, stated precisely: "put a stop
+    loss 5% under every time you do the green line breakout and raise it as it
+    increases." v10 and v15's first draft both recomputed the stop each day as
+    5% below the RUNNING ALL-TIME HIGH. That is not the same rule, and the
+    difference is not cosmetic: a stock that has just broken out is trading at
+    its own ATH, so an ATH-anchored stop sits ABOVE the breakout level and
+    ejects on the first retest, whereas a stop anchored at entry leaves the
+    trade room to retest and hold. ("Raise it as it increases" is itself the
+    tell — if the anchor were the ever-rising ATH, the raising would be
+    automatic and would not need saying.) Implemented properly (stop set once at
+    entry, ratcheted up, never lowered) `glb_xs` scored **-1.66 pp/yr, worse
+    than the -0.50 the sloppy version got.** Correcting a rule toward its author
+    is not the same as improving its results, and the honest move is to report
+    the number that came out. (v15 4)
+
+136. **Fixing the stop exposed a second flaw: a stopped-out name was being
+    re-bought the next day.** Eligibility was a STATE test (close above the
+    green line) rather than an EVENT test, and a name that just stopped out is
+    still sitting above its old, lower green line — so it re-entered
+    immediately and the stop meant nothing. Re-entry now requires a FRESH
+    green-line cross that postdates the exit. The v15 test suite pins this
+    directly (`test_a_stopped_out_name_needs_a_FRESH_breakout_to_come_back`),
+    because it is the kind of bug that silently turns a stop-loss study into a
+    no-stop study. 37 v15 tests, full suite 378 green. (v15 4, 8)
+
+137. **The 5% figure is what breaks GLB — it is too tight for a 26-year daily
+    close test, and 10% flips the sign.** At Wish's stated 5%, glb_xs returns
+    +3.67 %/yr against SPY buy-and-hold's +6.61% over the same 6,732 days,
+    losing ~3 pp/yr AND drawing down slightly deeper (59.9% vs 56.5%) — it
+    whipsaws out of breakouts that go on to work. The identical rule at 10%
+    returns **+7.32 %/yr, ahead of buy-and-hold, with drawdown cut to 47.2%**.
+    The anchor ambiguity turned out NOT to be load-bearing (green-line vs
+    breakout-close differ by 0.3-1.0 pp/yr and which wins flips with the stop
+    width), so the pre-declared ANCHOR axis settled a real question with a null
+    answer. Caveat that cuts AGAINST 5%, not for it: this is a closing-price
+    test, so it never suffers the intraday whipsaw a real 5% stop would take —
+    the live version of the 5% rule would fare worse than measured here, not
+    better. Wish trades individual growth names with intraday data and a
+    discretionary overlay; a mechanical 5% close-to-close band on 66 large caps
+    is a different instrument, and that difference is the honest reading of the
+    gap rather than a verdict on his method. (v15 4)
+
+138. **"Only take the good-looking breakouts" WORKS — but the half that works
+    is strength, not chart appearance.** The operator's refinement: don't take
+    every green-line breakout, be selective. `glb_sel` is `glb_xs` with the
+    candidate pool filtered/ranked by quality instead of by breakout RECENCY
+    (which was arbitrary and is the control's real weakness), everything else
+    identical, so the pair is a clean A/B of selectivity alone. Walk-forward it
+    scores **+0.28 pp/yr against the unselective −1.66** — ~+1.9 pp/yr, and it
+    flips the sign. The split inside is the finding: ranking by **momentum beats
+    the unselective control at every single (K, STOP) pair** (K=5/10% gives
+    +8.86 %/yr vs SPY's +6.61 and the control's +7.32, maxDD 52.6%), while
+    filtering on the **RWB fan / RLC=6 — Wish's own "good-looking chart" —
+    HURTS** (+5.46 at the same settings), and `QUAL=both` tracks the RWB number,
+    proving the fan FILTER is what does the damage rather than the ranking.
+    Demanding the close sit above all six short EMAs on the breakout day rejects
+    precisely the breakouts that gap and then consolidate. So the visual pattern
+    that names the strategy is the part that subtracts. (v15 4)
+
+139. **A structural fact the glb_sel design had to not paper over: momentum can
+    only RANK green-line candidates, never veto one.** A GLB-eligible name
+    closes above EVERY close older than GLB_HOLD=63 days, and QUAL_L=126 > 63,
+    so its trailing 126-day return is positive BY CONSTRUCTION. The positivity
+    check in the `mom` branch is therefore structurally non-binding — it guards
+    only the warmup/None case. This is pinned by
+    `test_momentum_can_only_RANK_glb_candidates_never_reject_them` rather than
+    left as an implicit assumption, because a "filter" that can never reject
+    anything would otherwise read as doing work it is not doing. (v15 4, 8)
+
+140. **Selectivity's honest lesson is that the breakout condition is the part
+    costing money.** The component of "be selective" that helps is momentum —
+    the mechanism v13 already validated — and bolting the GLB condition on top
+    of it SUBTRACTS: glb_sel +0.28 pp/yr vs plain xs_topk +24.96. Three
+    refinements have now been applied to GLB in v15 (anchor the stop correctly,
+    require a fresh breakout to re-enter, select on quality) and the family has
+    moved -0.50 -> -1.66 -> +0.28 pp/yr, still 5/9 windows, still an order of
+    magnitude below simply owning the momentum book. The frontier is unchanged
+    and v15 still arms no forward. 42 v15 tests, full suite 383 green. (v15 4, 7)
+
+141. **Widening the search made GLB a real strategy — and, unusually, cost
+    nothing out of sample.** The operator asked for more selection statistics
+    and more stop types. `glb_wide` is 156 cells (6 statistics x 13 stop rules
+    x K in {5,10}) against `glb_sel`'s pre-declared 12, deliberately kept as
+    SEPARATE families so the narrow grid is a control on the widening itself.
+    Walk-forward: **+10.12 pp/yr on 8/9 windows vs the narrow grid's +0.28 on
+    5/9**, and it clears the `ew_all` survivorship control (+4.60) for the first
+    time any Wish family has. Widening a search normally buys in-sample
+    performance and pays for it out of sample; the reason it did not here is
+    visible in the sweep and is the actual evidence (142). (v15 4a)
+
+142. **The stop-width ladder is monotone with a clean interior optimum, and two
+    differently-parameterised stop families converge on the same distance.**
+    Percentage stops, median vs SPY across 12 cells each: 5% -3.67 (0/12 beat
+    SPY), 8% -0.99, 10% -0.29, 15% +1.45, 20% +2.76, **30% +6.54 (peak)**, 50%
+    +4.29 (turns back down). Volatility-scaled stops agree independently: atr
+    0.5 -2.92, 1.0 +0.41, 1.5 +5.13, 2.5 +8.36 -- and 2.5 x daily-vol x sqrt(21)
+    works out to ~23%, the same effective distance the percentage ladder peaks
+    at. Two rows moving together, monotonically, with an interior optimum, is
+    evidence of a mechanism; a single tall cell out of 156 is not, which is why
+    `--mode sweep` reports the DISTRIBUTION (median, share beating SPY, per-row
+    breakdown) and prints in its own output that the best of 156 cells is not a
+    finding. The 0.30/0.50/atr-2.5 cells were added explicitly to LOCATE the
+    boundary after the first sweep came back monotone -- a trend with no
+    interior optimum means the range was too narrow, not that wider is always
+    better. (v15 4a, 5)
+
+143. **Wish's 5% stop is the worst rule in the entire grid — zero of twelve
+    cells beat buy-and-hold.** Not merely suboptimal: it is the only stop
+    setting where nothing works at all, and the optimum sits ~6x wider (~30%,
+    or ~23% when scaled by each name's own volatility). Among moving-average
+    stops his 30-week line (+4.98 median) crushes the 10-week (-0.15). The
+    honest reading is not that his rule is wrong but that it is a different
+    instrument: he trades individual growth names with intraday data and a
+    discretionary overlay, while this is a mechanical close-to-close band on 66
+    large caps -- and a closing-price test never even takes the intraday
+    whipsaw a live 5% stop would, so the measurement FLATTERS 5% and it still
+    finishes last. (v15 4a)
+
+144. **A declared axis turned out to be mathematically empty, and is recorded
+    as refuted rather than quietly dropped.** `rs` (IBD/O'Neil-style relative
+    strength vs SPY) returned results IDENTICAL TO THE DECIMAL to raw `mom` in
+    both sweeps -- same median, best, worst and win count. It must: on a given
+    day every candidate is divided by the SAME index return, so it cannot
+    reorder them, and its sign rejection never binds because a GLB-eligible name
+    always has positive trailing return (139). Relative strength adds nothing
+    over momentum as a same-day cross-sectional ranker; it would only differ
+    against a per-name benchmark or as an absolute threshold. Kept in the code
+    with the derivation in a comment and pinned by
+    `test_relative_strength_is_a_REDUNDANT_axis_it_reorders_nothing`, so the
+    "6 statistics" is honestly 5. Statistic ranking: mom/rs +4.82 median >
+    base +2.57 > rwb +1.01 > prox +0.93 > vol +0.05 -- momentum first, `base`
+    (longest consolidation, a genuine Wish idea) a real runner-up, the RWB fan
+    near the bottom. K=5 > K=10 (+2.78 vs +1.01): concentration helps. (v15 4a)
+
+145. **The forward-holdout rule still refuses to arm, and that is the rule
+    working.** Spec v15 7 pre-committed to arming only if a new family is the
+    FRONTIER and beats `ew_all` and beats the incumbent `xs_topk`. `glb_wide`
+    now clears two of three bars (8/9 windows, +10.12 pp/yr, beats ew_all's
+    +4.60) but `xs_topk` is still the frontier at +24.96, so nothing is armed.
+    Arming the exciting new family after a 156-cell search, on the strength of
+    an in-grid number, is exactly the cherry-pick the discipline exists to
+    prevent. 50 v15 tests, full suite 391 green. (v15 7)

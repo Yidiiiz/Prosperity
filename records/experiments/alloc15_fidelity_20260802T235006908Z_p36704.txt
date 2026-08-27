@@ -1,0 +1,24 @@
+record: experiments/alloc15_fidelity_20260802T235006908Z_p36704.txt
+utc: 2026-08-02T23:50:06+00:00
+git: a291308-dirty
+rng_seed: n/a
+config: {"universe": ["aapl", "msft", "intc", "csco", "orcl", "ibm", "txn", "qcom", "adbe", "amd", "nvda", "mu", "amat", "ko", "pep", "pg", "wmt", "mcd", "nke", "sbux", "hd", "low", "cost", "dis", "cmcsa", "tgt", "jnj", "pfe", "mrk", "abt", "unh", "bmy", "lly", "amgn", "gild", "mdt", "jpm", "bac", "wfc", "c", "gs", "axp", "usb", "ms", "ge", "cat", "ba", "mmm", "hon", "ups", "lmt", "de", "xom", "cvx", "cop", "slb", "t", "vz", "duk", "so", "amzn", "googl", "nflx", "crm", "meta", "tsla"], "windows": 10, "capital_u": 10000000000, "venue": {"taker_bps": 10, "maker_bps": 0, "spread_bps": 2, "min_fee_u": 0, "fill_delay_ticks": 1}, "gmi": {"green": 4, "red": 2, "confirm": 2, "t2108_ma": 40, "nh_lookback": 252}, "disclosure": "closing highs (no intraday tape); breadth over 66 survivors, not ~4000 \u2014 thresholds scaled by fraction B; volume rules out of scope", "tapes": {"aapl": "88bba464cb85ffe5", "msft": "0e2feb4be58794a4", "intc": "b78357b3e388f89c", "csco": "fead28ab892fa739", "orcl": "fec2c7dba84354b9", "ibm": "936fe3c903abb319", "txn": "95fd3702a72ea61b", "qcom": "802154bacdce4261", "adbe": "76cf2e07c3b67503", "amd": "8a5c1c42b744eda1", "nvda": "c3929c2903e7d15e", "mu": "49d9d7d5ce0e431b", "amat": "7ec5784497dff867", "ko": "8148f93d512261ad", "pep": "bfaddec4c62cb063", "pg": "1557363d154bdf86", "wmt": "93f64951be5d0a1a", "mcd": "c1316563a14341dc", "nke": "6a6425e7356a2580", "sbux": "b61cf986a6549d03", "hd": "c47053c69739d159", "low": "cfd47385b5f61f84", "cost": "0304df707f23093f", "dis": "846f7fe376747981", "cmcsa": "d9eeba48e6114297", "tgt": "a881adfe9fd283cd", "jnj": "250b252c6e179bb6", "pfe": "e187a3e7e21dd8a8", "mrk": "f2623e97e4e83edc", "abt": "161cb86732df5793", "unh": "7032534e77b095ec", "bmy": "a2ea378ce5d258ee", "lly": "3eae2440c048e1a9", "amgn": "ba2ebd2ca8a990c4", "gild": "24a46da45af4d3fc", "mdt": "780d5740eb25c831", "jpm": "84ee2549ec159dda", "bac": "54c8b4e740364859", "wfc": "fe8af20efa919a8a", "c": "cd14e433732946f8", "gs": "fe0c4403d7e0cd3f", "axp": "ca0cf8e5419c0d3f", "usb": "f82a4341b3e2f252", "ms": "3241c02705dbe5d4", "ge": "b7902462c7e786d0", "cat": "b3613e8f6e142877", "ba": "0387bf04426a70ce", "mmm": "592c82d27320ce5e", "hon": "c81fa89d96f2167b", "ups": "c36c35ab0bdbf3ae", "lmt": "54e9f17b6d4794f4", "de": "f7e37e7b956423f6", "xom": "51ec1f5056599a09", "cvx": "92d66b33c48ffedd", "cop": "c0f07bd7da189a80", "slb": "458d2459cc895e07", "t": "162caaf3314b5a86", "vz": "e4af17f344bc308b", "duk": "32a0510e1c5150fe", "so": "12e3e005f3404b86", "amzn": "d59d074ba3615c87", "googl": "af93d47bc00def1a", "nflx": "44807ac6058bac14", "crm": "ed567aa9ecb15cb1", "meta": "6e504024cbbd140f", "tsla": "b7b2554ae7247137"}, "joint_rows": 8423, "gmi_start_row": 1691}
+========================================================================
+
+--- results -----------------------------------------------------
+GMI-real fidelity (spec v15 5) at B=0.025: 6732 computable days
+  per-component positive rate (a rate near 0% or 100% is a component carrying no information — the 6-count is secretly a smaller count):
+    succ-10d-new-high     41.8%
+    new-highs             60.0%
+    qqq-daily             52.2%
+    spy-daily             52.6%
+    qqq-weekly            51.4%
+    t2108-proxy           65.2%
+  mean GMI-real 3.23 of 6; green (>= 4) on 49% of days
+  GMI-real vs v11 GMI-lite over 6058 shared days: agree 84.1% of days (lite green 73%, real green 60%)
+  a high agreement rate means v9–v12's verdict stands and the missing-breadth excuse was never load-bearing
+  breadth rates (descriptive): the 66 names print a new closing high on 5.6% of name-days; SPY itself on 11.0% of days.
+  NOT a survivorship measurement, contra spec v15 2: SPY is one diversified index sitting near its own high, the 66 are individual volatile names — the gap is diversification, and it confounds the survivorship question rather than answering it. ew_all (v13) is the survivorship control; v14 settled the direction (INFLATES) on returns, and no breadth-based read of it exists while the delisted tapes are unobtainable (v14 1).
+ALLOC15 FIDELITY mean GMI-real 3.23/6, every component informative (42%..65% positive rate); agrees with GMI-lite 84.1% of days; universe new-high rate 5.6% vs SPY 11.0% (diversification, not survivorship)
+
+=== RESULT: ALLOC15 FIDELITY mean GMI-real 3.23/6, every component informative (42%..65% positive rate); agrees with GMI-lite 84.1% of days; universe new-high rate 5.6% vs SPY 11.0% (diversification, not survivorship)
